@@ -1,2 +1,0 @@
-{"count": 8, "seq": [1, 2, 3, 4, "hello world", false, { "a" :  1, "b" : 2}, [1, "hello", true]]}
-[8, [1, "hello", true], { "a" :  1, "b" : 2}, false, "hello world", 4, 3, 2, 1]
