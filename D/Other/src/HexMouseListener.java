@@ -15,16 +15,10 @@ public class HexMouseListener implements MouseListener {
     int xx = mouseEvent.getX();
     int yy = mouseEvent.getY() - inset;
 
-    if (xx + yy < size) {
-      System.exit(0);
+    if (xx + yy < size || yy - xx > size || xx - yy > size * 2 || xx + yy > size * 4) {
+      // skip
     }
-    if (yy - xx > size) {
-      System.exit(0);
-    }
-    if (xx - yy > size * 2) {
-      System.exit(0);
-    }
-    if (xx + yy > size * 4) {
+    else {
       System.exit(0);
     }
   }
