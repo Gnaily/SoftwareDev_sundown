@@ -7,13 +7,16 @@ public class HexPanel extends JPanel{
 
   private int size;
 
-
   public HexPanel(int size) {
     this.setBackground(Color.WHITE);
     this.size = size;
     this.setPreferredSize(new Dimension(3 * size, 2 * size));
   }
 
+
+  /**
+   * Renders the image of the hexagon using lines. Sets the color of the hexagon to red.
+   */
   @Override
   public void paintComponent(Graphics g) {
     super.paintComponent(g);

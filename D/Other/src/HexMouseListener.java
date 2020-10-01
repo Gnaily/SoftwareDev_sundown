@@ -1,16 +1,23 @@
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-public class HexMouseListener implements MouseListener {
+
+/**
+ *
+ */
+class HexMouseListener implements MouseListener {
   private int size;
   private int inset;
 
   public HexMouseListener(int size, int inset) {
     this.size = size;
-    this.inset = inset;
+    this.inset = inset; //inset subtracts border from coordinates
   }
 
-  // mouse event handlers
+  /**
+   * Handles exiting the program once the mouse has been clicked inside the hexagon
+   * @param mouseEvent the coordinates of the mouse click
+   */
   @Override public void mouseClicked(MouseEvent mouseEvent) {
     int xx = mouseEvent.getX();
     int yy = mouseEvent.getY() - inset;
