@@ -47,6 +47,9 @@ public class TCPConnection {
     if (args.length == 1) {
       try {
         port = Integer.parseInt(args[0]);
+        if (port <= 0) {
+          throw new IllegalArgumentException("number cannot be negative");
+        }
       }
       catch (Exception e) {
         // number passed in was not an integer
