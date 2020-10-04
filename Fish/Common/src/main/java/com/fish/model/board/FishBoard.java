@@ -1,7 +1,7 @@
-package com.fish.board;
+package com.fish.model.board;
 
 import com.fish.player.Player;
-import com.fish.tile.Tile;
+import com.fish.model.tile.Tile;
 
 import java.util.ArrayList;
 
@@ -15,6 +15,8 @@ public interface FishBoard {
   //  - tiles contain their own information of fish
   //  - hole vs tile
   //     - representation of hole
+
+  // board should have maxnumber of fish on a tile;
 
   int getWidth();
 

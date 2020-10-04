@@ -1,7 +1,6 @@
-package com.fish.tile;
+package com.fish.model.tile;
 
 public interface Tile {
 
   int getFishOnTile();
-
 }
