@@ -5,6 +5,7 @@ import com.fish.model.Penguin;
 import com.fish.model.PlayerColor;
 import com.fish.model.tile.Tile;
 import com.fish.player.Player;
+import java.util.Random
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -41,19 +42,72 @@ public class FishGameBoard {
     this.fillBoard(maxFish, holes, minOneFishTiles);
   }
 
-  // fill in later
+  /**
+   * FIll board...
+   * @param maxFish
+   * @param holes
+   * @param minOneFishTiles
+   */
   private void fillBoard(int maxFish, ArrayList<Coord> holes, int minOneFishTiles) {
+    Random rand = new Random(System.currentTimeMillis());
+
+    //Generate an Array of Integers containing the range of fish nums on tiles needed for
+    //a game
+    ArrayList<Integer> nums = new ArrayList<Integer>();
+    for (int ii = 0; ii < board.length*board[0].length - holes.size(); ii++) {
+      if (ii < minOneFishTiles) {
+        nums.add(1);
+      }
+      else {
+        nums.add(rand.nextInt(maxFish) + 1);
+      }
+    }
+
+    //fill in the board taking one number at a time from the nums array
+    for (int iRow = 0; iRow < board.length; iRow++) {
+      Tile[] row = board[iRow];
+      for (int iCol = 0; iCol < row.length; iCol++) {
+        if (holes.contains(new Coord(iRow, iCol))) {
+          board[iRow][iCol] = null
+        }
+        else {
+          board[iRow][iCol] = new BasicFishTile(nums.remove(rand.nextInt(nums.size())));
+        }
+      }
+    }
+  }
+
+  /**
+   *
+   */
+  private ArrayList<Coord> getValidMovesFromTile(Coord tileLoc) {
+    ArrayList<Coord> moves = new ArrayList<>();
+
+    int x = tileLoc.getX();
+    int y = tileLoc.getY();
+
+
 
 
   }
 
+  /**
+   * Get Valid Moves
+   * @param player
+   * @return
+   */
   private ArrayList<Coord> getValidMoves(PlayerColor player) {
     ArrayList<Coord> moves = new ArrayList<>();
     // figure it out
+
     
 
 
     return moves;
+  }
+
+  public Tile[][] getBoard{
+    return this.board;
   }
 
 
