@@ -1,7 +1,7 @@
 package com.fish.model.board;
 
 import com.fish.model.Coord;
-import com.fish.model.tile.BasicFishTile;
+import com.fish.model.tile.HexagonTile;
 import com.fish.model.tile.Tile;
 
 import java.util.ArrayList;
@@ -34,9 +34,9 @@ public class FishGameBoard implements FishBoard {
           + "one fish tiles");
     }
 
-    this.tiles = new Tile[rows][cols];
-    this.width = rows;
-    this.height = cols;
+    this.tiles = new Tile[cols][rows];
+    this.width = cols;
+    this.height = rows;
 
     this.fillBoardWithTiles(holes, minOneFishTiles, random);
 
@@ -55,10 +55,10 @@ public class FishGameBoard implements FishBoard {
         }
         else {
           if (random) {
-            tiles[iRow][iCol] = new BasicFishTile(nums.remove(rand.nextInt(nums.size())));
+            tiles[iRow][iCol] = new HexagonTile(nums.remove(rand.nextInt(nums.size())));
           }
           else {
-            tiles[iRow][iCol] = new BasicFishTile(nums.remove(0));
+            tiles[iRow][iCol] = new HexagonTile(nums.remove(0));
           }
         }
       }
@@ -86,7 +86,7 @@ public class FishGameBoard implements FishBoard {
           nums.add(rand.nextInt(MAX_FISH) + 1);
         }
         else {
-          nums.add(ii % MAX_FISH);
+          nums.add(ii % MAX_FISH + 1);
         }
       }
     }
@@ -134,81 +134,6 @@ public class FishGameBoard implements FishBoard {
   public List<Coord> getTilesReachableFrom(Coord start) throws IllegalArgumentException {
 
     List<Coord> moves = new ArrayList<>();
-
-    // there are six direction you can move: up, down, upleft, upright, downleft, downright
-
-    // this should get split off into new functions or something probably
-    int yStart = start.getY();
-    int xStart = start.getX();
-    // up:
-    for (int ii = yStart - 2; ii >= 0; ii -= 2) {
-      if (tiles[xStart][ii] != null) {
-        moves.add(new Coord(xStart, ii));
-      } else {
-        break;
-      }
-    }
-
-    //down:
-    for (int ii = yStart + 2; ii < this.width; ii += 2) {
-      if (tiles[xStart][ii] != null) {
-        moves.add(new Coord(xStart, ii));
-      } else {
-        break;
-      }
-    }
-
-      //upleft
-      int jj = xStart;
-      for (int ii = yStart - 1; ii >= 0; --ii) {
-        if (ii % 2 == 1) {
-          --jj;
-        }
-        if (tiles[jj][ii] != null) {
-          moves.add(new Coord(jj, ii));
-        } else {
-          break;
-        }
-      }
-
-    //upright
-    jj = xStart;
-    for (int ii = yStart - 1; ii >= 0; --ii) {
-      if (ii % 2 == 0) {
-        ++jj;
-      }
-      if (tiles[jj][ii] != null) {
-        moves.add(new Coord(jj, ii));
-      } else {
-        break;
-      }
-    }
-
-    //downleft
-    jj = xStart;
-    for (int ii = yStart + 1; ii >= 0; ++ii) {
-      if (ii % 2 == 1) {
-        --jj;
-      }
-      if (tiles[jj][ii] != null) {
-        moves.add(new Coord(jj, ii));
-      } else {
-        break;
-      }
-    }
-
-    //downright
-    jj = xStart;
-    for (int ii = yStart + 1; ii >= 0; ++ii) {
-      if (ii % 2 == 0) {
-        ++jj;
-      }
-      if (tiles[jj][ii] != null) {
-        moves.add(new Coord(jj, ii));
-      } else {
-        break;
-      }
-    }
 
 
     return moves;

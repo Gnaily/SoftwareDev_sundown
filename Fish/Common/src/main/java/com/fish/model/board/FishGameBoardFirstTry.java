@@ -3,12 +3,11 @@ package com.fish.model.board;
 import com.fish.model.Coord;
 import com.fish.model.Penguin;
 import com.fish.model.PlayerColor;
-import com.fish.model.tile.BasicFishTile;
+import com.fish.model.tile.HexagonTile;
 import com.fish.model.tile.Tile;
-import com.fish.player.Player;
+
 import java.util.Random;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class FishGameBoardFirstTry {
@@ -72,7 +71,7 @@ public class FishGameBoardFirstTry {
           board[iRow][iCol] = null;
         }
         else {
-          board[iRow][iCol] = new BasicFishTile(nums.remove(rand.nextInt(nums.size())));
+          board[iRow][iCol] = new HexagonTile(nums.remove(rand.nextInt(nums.size())));
 
         }
       }
