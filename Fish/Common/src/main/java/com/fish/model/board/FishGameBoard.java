@@ -1,114 +1,216 @@
 package com.fish.model.board;
 
 import com.fish.model.Coord;
-import com.fish.model.Penguin;
-import com.fish.model.PlayerColor;
+import com.fish.model.tile.BasicFishTile;
 import com.fish.model.tile.Tile;
-import com.fish.player.Player;
-import java.util.Random
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
-public class FishGameBoard {
+public class FishGameBoard implements FishBoard {
 
-  // what does a board need
-  // dimension (with tiles)
-  //  - tiles contain their own information of fish
-  //  - hole vs tile
-  //     - representation of hole
+  private Tile[][] tiles;
+  private int width;
+  private int height;
 
-  // board should have max number of fish on a tile;
+  public static final int MAX_FISH = 5;
 
-  private Tile[][] board;
-  private ArrayList<Penguin> penguins;
-
-  // ListOfPlayer -> each Player has List of Penguins
-  // ListOfPenguin -> location and player color
-
-  // not sure about this/how to best do it
-  private static int DEFAULT_MAX_FISH = 6;
-
-
-  public FishGameBoard(int rows, int columns, int maxFish, ArrayList<Coord> holes, int minOneFishTiles) {
-
-    if (rows < 1 || columns < 1 || rows * columns - holes.size() < minOneFishTiles) {
-      // make the message better
-      throw new IllegalArgumentException("Invalid usage of Board Constructor");
+  /**
+   * Constructor for creating a game with some holes and a minimum number of one-fish tiles
+   *
+   * @param rows number of rows this board should have
+   * @param cols number of columns this board should have
+   * @param holes locations of the holes this board contains
+   * @param minOneFishTiles minimum number of one-fish tiles to have in this board
+   * @param random whether the tiles should be assigned randomly or in order
+   */
+  public FishGameBoard(int rows, int cols, List<Coord> holes, int minOneFishTiles, boolean random) {
+    if (rows < 1 || cols < 1) {
+      throw new IllegalArgumentException("There must be at least 1 row and column");
     }
-    this.board = new Tile[rows][columns];
+    if (rows * cols - holes.size() < minOneFishTiles) {
+      throw new IllegalArgumentException("There are not enough spaces for the minimum number of "
+          + "one fish tiles");
+    }
 
-    // fill in the board with tiles at all locations not in holes
-    this.fillBoard(maxFish, holes, minOneFishTiles);
+    this.tiles = new Tile[rows][cols];
+    this.width = rows;
+    this.height = cols;
+
+    this.fillBoardWithTiles(holes, minOneFishTiles, random);
+
+  }
+
+  private void fillBoardWithTiles(List<Coord> holes, int minOneFishTiles, boolean random) {
+    Random rand = new Random(System.currentTimeMillis());
+
+    List<Integer> nums = generateTilesValues(this.width * this.height - holes.size(), random, minOneFishTiles);
+    //fill in the board taking one number at a time from the nums array
+    for (int iRow = 0; iRow < tiles.length; iRow++) {
+      Tile[] row = tiles[iRow];
+      for (int iCol = 0; iCol < row.length; iCol++) {
+        if (holes.contains(new Coord(iRow, iCol))) {
+          tiles[iRow][iCol] = null;
+        }
+        else {
+          if (random) {
+            tiles[iRow][iCol] = new BasicFishTile(nums.remove(rand.nextInt(nums.size())));
+          }
+          else {
+            tiles[iRow][iCol] = new BasicFishTile(nums.remove(0));
+          }
+        }
+      }
+    }
   }
 
   /**
-   * FIll board...
-   * @param maxFish
-   * @param holes
-   * @param minOneFishTiles
+   * Generates an array of numbers to populate fish values with
+   *
+   * @param number number of values to generate
+   * @param random Whether or not to randomly assign values
+   * @param oneFish The minimum number of 1 values to return
+   * @return List of specified length with specified number of minimum one-fish tiles
    */
-  private void fillBoard(int maxFish, ArrayList<Coord> holes, int minOneFishTiles) {
+  private List<Integer> generateTilesValues(int number, boolean random, int oneFish) {
     Random rand = new Random(System.currentTimeMillis());
 
-    //Generate an Array of Integers containing the range of fish nums on tiles needed for
-    //a game
-    ArrayList<Integer> nums = new ArrayList<Integer>();
-    for (int ii = 0; ii < board.length*board[0].length - holes.size(); ii++) {
-      if (ii < minOneFishTiles) {
+    List<Integer> nums = new ArrayList<Integer>();
+    for (int ii = 0; ii < number; ii++) {
+      if (ii < oneFish) {
         nums.add(1);
       }
       else {
-        nums.add(rand.nextInt(maxFish) + 1);
-      }
-    }
-
-    //fill in the board taking one number at a time from the nums array
-    for (int iRow = 0; iRow < board.length; iRow++) {
-      Tile[] row = board[iRow];
-      for (int iCol = 0; iCol < row.length; iCol++) {
-        if (holes.contains(new Coord(iRow, iCol))) {
-          board[iRow][iCol] = null
+        if (random) {
+          nums.add(rand.nextInt(MAX_FISH) + 1);
         }
         else {
-          board[iRow][iCol] = new BasicFishTile(nums.remove(rand.nextInt(nums.size())));
+          nums.add(ii % MAX_FISH);
         }
       }
     }
+    return nums;
   }
 
-  /**
-   *
-   */
-  private ArrayList<Coord> getValidMovesFromTile(Coord tileLoc) {
-    ArrayList<Coord> moves = new ArrayList<>();
-
-    int x = tileLoc.getX();
-    int y = tileLoc.getY();
+  // 2 - same number of fish on every tile
 
 
 
-
+  @Override
+  public int getWidth() {
+    return this.width;
   }
 
-  /**
-   * Get Valid Moves
-   * @param player
-   * @return
-   */
-  private ArrayList<Coord> getValidMoves(PlayerColor player) {
-    ArrayList<Coord> moves = new ArrayList<>();
-    // figure it out
+  @Override
+  public int getHeight() {
+    return this.height;
+  }
 
-    
+  @Override
+  public Tile getTileAt(int xx, int yy) {
+    if (xx < 0 || xx >= this.width || yy < 0 || yy >= this.height) {
+      return null;
+    }
+    return tiles[xx][yy];
+  }
+
+  @Override
+  public Tile removeTileAt(int xx, int yy) throws IllegalArgumentException {
+    if (xx < 0 || xx >= this.width || yy < 0 || yy >= this.height) {
+      throw new IllegalArgumentException("Cannot remove a tile not within the array");
+    }
+    Tile tile = tiles[xx][yy];
+
+    if (tile != null) {
+      return tile;
+    }
+
+    throw new IllegalArgumentException("The tile here is already gone!");
+  }
+
+  //TODO: implement
+  @Override
+  public List<Coord> getTilesReachableFrom(Coord start) throws IllegalArgumentException {
+
+    List<Coord> moves = new ArrayList<>();
+
+    // there are six direction you can move: up, down, upleft, upright, downleft, downright
+
+    // this should get split off into new functions or something probably
+    int yStart = start.getY();
+    int xStart = start.getX();
+    // up:
+    for (int ii = yStart - 2; ii >= 0; ii -= 2) {
+      if (tiles[xStart][ii] != null) {
+        moves.add(new Coord(xStart, ii));
+      } else {
+        break;
+      }
+    }
+
+    //down:
+    for (int ii = yStart + 2; ii < this.width; ii += 2) {
+      if (tiles[xStart][ii] != null) {
+        moves.add(new Coord(xStart, ii));
+      } else {
+        break;
+      }
+    }
+
+      //upleft
+      int jj = xStart;
+      for (int ii = yStart - 1; ii >= 0; --ii) {
+        if (ii % 2 == 1) {
+          --jj;
+        }
+        if (tiles[jj][ii] != null) {
+          moves.add(new Coord(jj, ii));
+        } else {
+          break;
+        }
+      }
+
+    //upright
+    jj = xStart;
+    for (int ii = yStart - 1; ii >= 0; --ii) {
+      if (ii % 2 == 0) {
+        ++jj;
+      }
+      if (tiles[jj][ii] != null) {
+        moves.add(new Coord(jj, ii));
+      } else {
+        break;
+      }
+    }
+
+    //downleft
+    jj = xStart;
+    for (int ii = yStart + 1; ii >= 0; ++ii) {
+      if (ii % 2 == 1) {
+        --jj;
+      }
+      if (tiles[jj][ii] != null) {
+        moves.add(new Coord(jj, ii));
+      } else {
+        break;
+      }
+    }
+
+    //downright
+    jj = xStart;
+    for (int ii = yStart + 1; ii >= 0; ++ii) {
+      if (ii % 2 == 0) {
+        ++jj;
+      }
+      if (tiles[jj][ii] != null) {
+        moves.add(new Coord(jj, ii));
+      } else {
+        break;
+      }
+    }
 
 
     return moves;
   }
-
-  public Tile[][] getBoard{
-    return this.board;
-  }
-
-
 }

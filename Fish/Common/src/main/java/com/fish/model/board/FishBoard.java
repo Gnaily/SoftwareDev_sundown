@@ -1,9 +1,9 @@
 package com.fish.model.board;
 
-import com.fish.player.Player;
+import com.fish.model.Coord;
 import com.fish.model.tile.Tile;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Interface for a Board of Fish
@@ -24,14 +24,10 @@ public interface FishBoard {
 
   Tile getTileAt(int xx, int yy);
 
-  void removeTileAt(int xx, int yy);
+  Tile removeTileAt(int xx, int yy) throws IllegalArgumentException;
 
-  ArrayList<Player> getPlayers();
+  List<Coord> getTilesReachableFrom(Coord start);
 
-  // out of scope for this assignment
-
-  // get the current turn player
-  Player getCurrentPlayer();
 
 
 
