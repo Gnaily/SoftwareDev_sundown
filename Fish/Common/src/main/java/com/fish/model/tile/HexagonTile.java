@@ -1,18 +1,23 @@
 package com.fish.model.tile;
 
 /**
- * Tile implementation that allows for retrieving the number of fish on this tile
+ * Implementatoin of a Tile in the shape of a hexagon.
+ * The only functionality of the Tile implementation is to retrieve the number of fish on the tile.
  */
 public class HexagonTile implements Tile {
 
-  private int numberOfFish;
+  private int numFish;
 
   public HexagonTile(int numFish) {
-    this.numberOfFish = numFish;
+    this.numFish = numFish;
   }
 
+  /**
+   * Returns the number of fish on this Hexagon Tile.
+   * @return the number of fish on the Tile.
+   */
   @Override
-  public int getFishOnTile() {
-    return this.numberOfFish;
+  public int getNumFish() {
+    return this.numFish;
   }
 }

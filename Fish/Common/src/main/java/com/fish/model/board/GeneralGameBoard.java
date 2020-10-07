@@ -1,16 +1,24 @@
 package com.fish.model.board;
 
 import com.fish.model.Coord;
+import com.fish.model.PlayerColor;
 import com.fish.model.tile.HexagonTile;
 import com.fish.model.tile.Tile;
 
+import com.fish.player.Player;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
-public class FishGameBoard implements FishBoard {
+/**
+ * Implementation of a GameBoard for a general game of Hey, That's my Fish!
+ * This implementation allows for the specific adjustment of
+ */
+public class GeneralGameBoard implements GameBoard {
 
   private Tile[][] tiles;
+  private HashMap<Coord, PlayerColor> penguinLocs;
   private int width;
   private int height;
 
@@ -25,7 +33,7 @@ public class FishGameBoard implements FishBoard {
    * @param minOneFishTiles minimum number of one-fish tiles to have in this board
    * @param random whether the tiles should be assigned randomly or in order
    */
-  public FishGameBoard(int rows, int cols, List<Coord> holes, int minOneFishTiles, boolean random) {
+  public GeneralGameBoard(int rows, int cols, List<Coord> holes, int minOneFishTiles, boolean random) {
     if (rows < 1 || cols < 1) {
       throw new IllegalArgumentException("There must be at least 1 row and column");
     }
@@ -35,11 +43,31 @@ public class FishGameBoard implements FishBoard {
     }
 
     this.tiles = new Tile[cols][rows];
+    this.penguinLocs = new HashMap<>();
     this.width = cols;
     this.height = rows;
 
     this.fillBoardWithTiles(holes, minOneFishTiles, random);
+  }
 
+  // 2 - same number of fish on every tile
+
+  public GeneralGameBoard(int rows, int cols ,int numberOfFish) {
+    if (rows < 1 || cols < 1) {
+      throw new IllegalArgumentException("There must be at least 1 row and column");
+    }
+
+    this.tiles = new Tile[cols][rows];
+    this.penguinLocs = new HashMap<>();
+    this.width = cols;
+    this.height = rows;
+
+    for (int iRow = 0; iRow < tiles.length; iRow++) {
+      Tile[] row = tiles[iRow];
+      for (int iCol = 0; iCol < row.length; iCol++) {
+        tiles[iRow][iCol] = new HexagonTile(numberOfFish);
+      }
+    }
   }
 
   private void fillBoardWithTiles(List<Coord> holes, int minOneFishTiles, boolean random) {
@@ -93,25 +121,21 @@ public class FishGameBoard implements FishBoard {
     return nums;
   }
 
-  // 2 - same number of fish on every tile
 
-  public FishGameBoard(int rows, int cols ,int numberOfFish) {
-    if (rows < 1 || cols < 1) {
-      throw new IllegalArgumentException("There must be at least 1 row and column");
-    }
-
-    this.tiles = new Tile[cols][rows];
-    this.width = cols;
-    this.height = rows;
-
-    for (int iRow = 0; iRow < tiles.length; iRow++) {
-      Tile[] row = tiles[iRow];
-      for (int iCol = 0; iCol < row.length; iCol++) {
-        tiles[iRow][iCol] = new HexagonTile(numberOfFish);
-      }
-    }
+  @Override
+  public void placePenguin(Coord loc, PlayerColor playerColor) {
+    this.penguinLocs.put(loc, playerColor);
   }
 
+  @Override
+  public void removePenguin(Coord loc) {
+    this.penguinLocs.remove(loc);
+  }
+
+  @Override
+  public HashMap<Coord, PlayerColor> getPenguinLocations(){
+    return new HashMap<>(this.penguinLocs);
+  }
 
 
   @Override

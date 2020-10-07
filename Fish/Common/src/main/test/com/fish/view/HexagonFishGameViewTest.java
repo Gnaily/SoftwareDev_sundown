@@ -1,7 +1,7 @@
 package com.fish.view;
 
 import com.fish.model.Coord;
-import com.fish.model.board.FishBoard;
+import com.fish.model.board.GameBoard;
 import com.fish.model.board.FishGameBoard;
 
 import org.junit.Before;
@@ -14,7 +14,7 @@ import static org.junit.Assert.*;
 
 public class HexagonFishGameViewTest {
 
-  private FishBoard board;
+  private GameBoard board;
   private HexagonFishGameView hfgv;
 
   @Before

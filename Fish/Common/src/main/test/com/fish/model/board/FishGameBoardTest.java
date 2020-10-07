@@ -12,9 +12,9 @@ import static org.junit.Assert.*;
 
 public class FishGameBoardTest {
 
-  private FishBoard board1;
-  private FishBoard board2;
-  private FishBoard board3;
+  private GameBoard board1;
+  private GameBoard board2;
+  private GameBoard board3;
   private List<Coord> expectedMovesB1;
 
   @Before

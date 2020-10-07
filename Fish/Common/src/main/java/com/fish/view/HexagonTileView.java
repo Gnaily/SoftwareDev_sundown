@@ -1,6 +1,7 @@
 package com.fish.view;
 
 import com.fish.model.Coord;
+import com.fish.model.PlayerColor;
 import com.fish.model.tile.Tile;
 
 import java.awt.*;
@@ -16,7 +17,6 @@ public class HexagonTileView {
   public HexagonTileView(Graphics2D g2d, int size) {
     this.g2d = g2d;
     this.size = size;
-    //this.setPreferredSize(new Dimension(3 * size, 2 * size));
   }
 
 
@@ -39,10 +39,15 @@ public class HexagonTileView {
 
     // drawing fish
     g2d.setColor(Color.RED);
-    for (int ii = 1; ii <= tile.getFishOnTile(); ii++) {
+    for (int ii = 1; ii <= tile.getNumFish(); ii++) {
       g2d.fillOval(xx, yy + size / 3 * ii, size, size / 4);
     }
+  }
 
+  /**
+   * Renders a penguin
+   */
+  public void drawPenguin(Coord c, PlayerColor pc) {
 
   }
 

@@ -1,25 +1,27 @@
 package com.fish.view;
 
 import com.fish.model.Coord;
-import com.fish.model.board.FishBoard;
-import com.fish.model.board.FishGameBoard;
+import com.fish.model.Penguin;
+import com.fish.model.PlayerColor;
+import com.fish.model.board.GameBoard;
+import com.fish.model.board.GeneralGameBoard;
 import com.fish.model.tile.Tile;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 
+import java.util.HashMap;
 import javax.swing.*;
 
 public class HexagonFishGameView extends JPanel {
 
-  private FishBoard board;
+  private GameBoard board;
 
   // the length of one side of a hexagon
   // In the future, this should scale with number of tiles
   final static int PIXEL_STEP = 50;
 
-  public HexagonFishGameView(FishBoard board) {
+  public HexagonFishGameView(GameBoard board) {
     this.board = board;
 
     // adjust for entire board
@@ -49,6 +51,12 @@ public class HexagonFishGameView extends JPanel {
         }
       }
     }
+
+    HashMap<Coord, PlayerColor> penguinLocs = board.getPenguinLocations();
+
+    for (Coord c : penguinLocs.keySet()) {
+      htv.drawPenguin(c, penguinLocs.get(c));
+    }
   }
 
   Coord calculateTopLeftCorner(int xx, int yy) {
@@ -67,7 +75,7 @@ public class HexagonFishGameView extends JPanel {
     JFrame f = new JFrame("Hexagon");
     f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-    FishBoard board = new FishGameBoard(1, 3,
+    GameBoard board = new GeneralGameBoard(1, 3,
             //Arrays.asList(new Coord(0, 1), new Coord(0, 2), new Coord(3, 3)),
             new ArrayList<>(),
             1, false);
