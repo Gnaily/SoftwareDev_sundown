@@ -95,6 +95,23 @@ public class FishGameBoard implements FishBoard {
 
   // 2 - same number of fish on every tile
 
+  public FishGameBoard(int rows, int cols ,int numberOfFish) {
+    if (rows < 1 || cols < 1) {
+      throw new IllegalArgumentException("There must be at least 1 row and column");
+    }
+
+    this.tiles = new Tile[cols][rows];
+    this.width = cols;
+    this.height = rows;
+
+    for (int iRow = 0; iRow < tiles.length; iRow++) {
+      Tile[] row = tiles[iRow];
+      for (int iCol = 0; iCol < row.length; iCol++) {
+        tiles[iRow][iCol] = new HexagonTile(numberOfFish);
+      }
+    }
+  }
+
 
 
   @Override
@@ -110,7 +127,7 @@ public class FishGameBoard implements FishBoard {
   @Override
   public Tile getTileAt(int xx, int yy) {
     if (xx < 0 || xx >= this.width || yy < 0 || yy >= this.height) {
-      return null;
+      throw new IllegalArgumentException("Cannot get a tile not on the board!");
     }
     return tiles[xx][yy];
   }
@@ -123,6 +140,7 @@ public class FishGameBoard implements FishBoard {
     Tile tile = tiles[xx][yy];
 
     if (tile != null) {
+      tiles[xx][yy] = null;
       return tile;
     }
 
