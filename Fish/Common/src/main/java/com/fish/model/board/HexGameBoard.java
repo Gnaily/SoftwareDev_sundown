@@ -126,78 +126,71 @@ public class HexGameBoard implements GameBoard {
     int x = start.getX();
     int y = start.getY();
 
-    checkTileInBounds(x, y, "Cannot move from a tile that does not exist");
+    checkTileInBounds(start, "Cannot move from a tile that does not exist");
     List<Coord> moves = new ArrayList<>();
 
     //Moving straight down
-    for (int yy = start.getY() + 2; yy < height; yy += 2) {
-      if (this.tiles[start.getX()][yy] != null) {
-        moves.add(new Coord(start.getX(), yy));
+
+    moves.addAll(this.getTilesAboveBelow(x, y, -2));
+    moves.addAll(this.getTilesAboveBelow(x, y, 2));
+
+    moves.addAll(this.getTilesLeftDiagonal(x, y, 1));
+    moves.addAll(this.getTilesLeftDiagonal(x, y, -1));
+
+    moves.addAll(this.getTilesRightDiagonal(x, y, 1));
+    moves.addAll(this.getTilesRightDiagonal(x, y, -1));
+
+    return moves;
+  }
+
+  private List<Coord> getTilesAboveBelow(int xx, int yy, int yIncrement) {
+
+    List<Coord> moves = new ArrayList<>();
+    for (yy = yy + yIncrement; yy >= 0 && yy < this.height; yy += yIncrement) {
+      if (this.tiles[xx][yy] != null) {
+        moves.add(new Coord(xx, yy));
       }
       else {
         break;
       }
     }
 
-    //Moving straight up
-    for (int yy = start.getY() - 2; yy >= 0; yy -= 2) {
-      if (this.tiles[start.getX()][yy] != null) {
-        moves.add(new Coord(start.getX(), yy));
+    return moves;
+  }
+
+  private List<Coord> getTilesLeftDiagonal(int xx, int yy, int yIncrement) {
+
+    List<Coord> moves = new ArrayList<>();
+
+    for (yy = yy + yIncrement; yy >= 0 && yy < this.height; yy += yIncrement) {
+      xx -= yy % 2;
+      if (xx >= 0 && xx < this.width && this.tiles[xx][yy] != null
+              && this.penguinLocs.get(new Coord(xx, yy)) == null) {
+        moves.add(new Coord(xx, yy));
       }
       else {
         break;
       }
     }
 
-    //Moving up-left
-    for (int yy = start.getY() - 1; yy >= 0; yy -= 1) {
-      x -= yy % 2;
-      if (x >= 0 && this.tiles[x][yy] != null) {
-        moves.add(new Coord(x, yy));
+    return moves;
+  }
+
+  private List<Coord> getTilesRightDiagonal(int xx, int yy, int yIncrement) {
+
+    List<Coord> moves = new ArrayList<>();
+
+    for (yy = yy + yIncrement; yy >= 0 && yy < this.height; yy += yIncrement) {
+      xx += (yy + 1) % 2;
+      if (xx >= 0 && xx < this.width && this.tiles[xx][yy] != null
+              && this.penguinLocs.get(new com.fish.model.Coord(xx, yy)) == null) {
+        moves.add(new com.fish.model.Coord(xx, yy));
       }
       else {
         break;
       }
     }
 
-    x = start.getX();
-
-    //Moving up right
-    for (int yy = start.getY() - 1; yy >= 0; yy -= 1) {
-      x += (yy + 1) % 2;
-      if (x < width && this.tiles[x][yy] != null) {
-        moves.add(new Coord(x, yy));
-      }
-      else {
-        break;
-      }
-    }
-
-    x = start.getX();
-
-    //Moving down left
-    for (int yy = start.getY() + 1; yy < height; yy += 1) {
-      x -= yy % 2;
-      if (x >= 0 && this.tiles[x][yy] != null) {
-        moves.add(new Coord(x, yy));
-      }
-      else {
-        break;
-      }
-    }
-
-    x = start.getX();
-
-    //Moving down right
-    for (int yy = start.getY() + 1; yy < height; yy += 1) {
-      x += (yy + 1) % 2;
-      if (x < width && this.tiles[x][yy] != null) {
-        moves.add(new Coord(x, yy));
-      }
-      else {
-        break;
-      }
-    }
     return moves;
   }
 
@@ -206,20 +199,23 @@ public class HexGameBoard implements GameBoard {
 
   /////////////////////////////////Tile Handling
   @Override
-  public Tile getTileAt(int xx, int yy) {
-    checkTileInBounds(xx, yy, "Cannot retrieve a tile not on the board");
+  public Tile getTileAt(Coord loc) {
+    checkTileInBounds(loc, "Cannot retrieve a tile not on the board");
     //We do not check for TilePresent because we want this to return null if the tile
     //has been removed to differentiate from an arg that is out of bounds vs a tile that's
     //been removed
-    return tiles[xx][yy];
+    return tiles[loc.getX()][loc.getY()];
   }
 
   @Override
-  public Tile removeTileAt(int xx, int yy) {
-    checkTileInBounds(xx, yy, "Cannot remove a tile not on the board");
-    checkTilePresent(xx, yy, "Cannot remove a tile that has already been removed");
+  public Tile removeTileAt(Coord loc) {
+    checkTileInBounds(loc, "Cannot remove a tile not on the board");
+    checkTilePresent(loc, "Cannot remove a tile that has already been removed");
     //Will need to store num fish info for score keeping later
-    Tile returnTile = getTileAt(xx, yy);
+    int xx = loc.getX();
+    int yy = loc.getY();
+
+    Tile returnTile = getTileAt(loc);
     tiles[xx][yy] = null;
     return returnTile;
   }
@@ -228,8 +224,8 @@ public class HexGameBoard implements GameBoard {
   /////////////////////////////////Penguin Handling
   @Override
   public void placePenguin(Coord loc, PlayerColor playerColor) throws IllegalArgumentException {
-    checkTileInBounds(loc.getX(), loc.getY(), "Cannot place a penguin off the board");
-    checkTilePresent(loc.getX(), loc.getY(), "Cannot place a penguin on a tile that " +
+    checkTileInBounds(loc, "Cannot place a penguin off the board");
+    checkTilePresent(loc, "Cannot place a penguin on a tile that " +
         "does not exist");
     if (this.penguinLocs.containsKey(loc)) {
       throw new IllegalArgumentException("There is already a penguin on this tile");
@@ -262,13 +258,17 @@ public class HexGameBoard implements GameBoard {
     return this.height;
   }
 
-  private void checkTileInBounds(int xx, int yy, String specificMsg) throws IllegalArgumentException {
+  private void checkTileInBounds(Coord loc, String specificMsg) throws IllegalArgumentException {
+    int xx = loc.getX();
+    int yy = loc.getY();
     if (xx < 0 || xx >= this.width || yy < 0 || yy >= this.height) {
       throw new IllegalArgumentException(specificMsg);
     }
   }
 
-  private void checkTilePresent(int xx, int yy, String specificMsg) throws IllegalArgumentException {
+  private void checkTilePresent(Coord loc, String specificMsg) throws IllegalArgumentException {
+    int xx = loc.getX();
+    int yy = loc.getY();
     if (tiles[xx][yy] == null) {
       throw new IllegalArgumentException(specificMsg);
     }

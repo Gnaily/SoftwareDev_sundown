@@ -18,9 +18,9 @@ public interface GameBoard {
 
   List<Coord> getTilesReachableFrom(Coord start);
 
-  Tile getTileAt(int xx, int yy);
+  Tile getTileAt(Coord loc);
 
-  Tile removeTileAt(int xx, int yy) throws IllegalArgumentException;
+  Tile removeTileAt(Coord loc) throws IllegalArgumentException;
 
   PlayerColor removePenguin(Coord loc);
 

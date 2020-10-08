@@ -44,9 +44,9 @@ public class HexBoardView extends JPanel implements GameView {
     //Draw just the hex tiles
     for (int ii = 0; ii < board.getWidth(); ii++) {
       for (int jj = 0; jj < board.getHeight(); jj++) {
-        Tile tile = board.getTileAt(ii, jj);
+        Tile tile = board.getTileAt(new Coord(ii, jj));
         if (tile != null) {
-          htv.drawHexagon(tile, this.calculateTopLeftCorner(ii, jj));
+          htv.drawHexagon(tile, this.calculateTopLeftXValue(ii, jj), jj * PIXEL_STEP);
         }
       }
     }
@@ -54,14 +54,14 @@ public class HexBoardView extends JPanel implements GameView {
     //Draw the penguins where necessary
     HashMap<Coord, PlayerColor> penguinLocs = board.getPenguinLocations();
     for (Coord c : penguinLocs.keySet()) {
-      htv.drawPenguin(penguinLocs.get(c), calculateTopLeftCorner(c.getX(), c.getY()));
+      htv.drawPenguin(penguinLocs.get(c), calculateTopLeftXValue(c.getX(), c.getY()), c.getY() * PIXEL_STEP);
     }
   }
 
 
 
   //Calculates window size based off the size and number of hexagons
-  private Dimension calculateWindowSize() {
+  Dimension calculateWindowSize() {
     int w = this.board.getWidth();
     int h = this.board.getHeight();
 
@@ -71,9 +71,8 @@ public class HexBoardView extends JPanel implements GameView {
 
   //Calculates the proper top left corner pixel coordinate given
   //the center x and y values of an image
-  private Coord calculateTopLeftCorner(int xx, int yy) {
-    return new Coord(PIXEL_STEP * (4 * xx + 1 + 2 * (yy % 2)),
-        yy * PIXEL_STEP);
+  int calculateTopLeftXValue(int xx, int yy) {
+    return PIXEL_STEP * (4 * xx + 1 + 2 * (yy % 2));
   }
 
 }

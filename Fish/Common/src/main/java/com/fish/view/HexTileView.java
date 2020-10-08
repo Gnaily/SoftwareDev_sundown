@@ -21,11 +21,13 @@ public class HexTileView {
 
 
   /**
-   * Renders the image of the hexagon with fish.
+   * Draw the tile with the top-left coordinate located at (x, y)
+   *
+   * @param tile tile to draw
+   * @param xx Top Left x pixel of where to draw the hexagon
+   * @param yy Top left y pixel of where to draw the hexagon
    */
-  public void drawHexagon(Tile tile, Coord topLeft) {
-    int xx = topLeft.getX();
-    int yy = topLeft.getY();
+  public void drawHexagon(Tile tile, int xx, int yy) {
 
     g2d.setColor(Color.BLUE);
 
@@ -44,9 +46,13 @@ public class HexTileView {
   }
 
   /**
-   * Renders a penguin.
+   * Draw a penguin of given color on tile (xx, yy)
+   *
+   * @param pc Color to draw the penguin
+   * @param xx x-value of the location to draw the penguin
+   * @param yy y-value of the location to draw the penguin
    */
-  public void drawPenguin(PlayerColor pc, Coord topLeft) {
+  public void drawPenguin(PlayerColor pc, int xx, int yy) {
     switch(pc) {
       case BLACK:
         g2d.setColor(Color.BLACK);
@@ -61,7 +67,7 @@ public class HexTileView {
         g2d.setColor(new Color(102, 51, 0));
         break;
     }
-    g2d.fillOval(topLeft.getX(), topLeft.getY() + size/2, size, size);
+    g2d.fillOval(xx, yy + size/2, size, size);
   }
 
 }
