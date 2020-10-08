@@ -2,7 +2,7 @@ package com.fish.view;
 
 import com.fish.model.Coord;
 import com.fish.model.board.GameBoard;
-import com.fish.model.board.FishGameBoard;
+import com.fish.model.board.GeneralGameBoard;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -19,7 +19,7 @@ public class HexagonFishGameViewTest {
 
   @Before
   public void setUp() throws Exception {
-    this.board = new FishGameBoard(4, 5,
+    this.board = new GeneralGameBoard(4, 5,
             Arrays.asList(new Coord(0, 1), new Coord(0, 2), new Coord(3, 3)),
             4, false);
     this.hfgv = new HexagonFishGameView(this.board);

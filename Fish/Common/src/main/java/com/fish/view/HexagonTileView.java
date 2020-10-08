@@ -4,9 +4,9 @@ import com.fish.model.Coord;
 import com.fish.model.PlayerColor;
 import com.fish.model.tile.Tile;
 
+
 import java.awt.*;
 
-import javax.swing.*;
 
 public class HexagonTileView {
 
@@ -38,7 +38,7 @@ public class HexagonTileView {
     g2d.drawPolygon(xValues, yValues, 6);
 
     // drawing fish
-    g2d.setColor(Color.RED);
+    g2d.setColor(Color.PINK);
     for (int ii = 1; ii <= tile.getNumFish(); ii++) {
       g2d.fillOval(xx, yy + size / 3 * ii, size, size / 4);
     }
@@ -48,7 +48,22 @@ public class HexagonTileView {
    * Renders a penguin
    */
   public void drawPenguin(Coord c, PlayerColor pc) {
+    switch(pc) {
+      case BLACK:
+        g2d.setColor(Color.BLACK);
+        break;
+      case WHITE:
+        g2d.setColor(Color.WHITE);
+        break;
+      case RED:
+        g2d.setColor(Color.RED);
+        break;
+      case BROWN:
+        g2d.setColor(new Color(102, 51, 0));
+        break;
+    }
 
+    g2d.fillOval(c.getX(), c.getY() + size/2, size, size);
   }
 
 }

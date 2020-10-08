@@ -55,7 +55,7 @@ public class HexagonFishGameView extends JPanel {
     HashMap<Coord, PlayerColor> penguinLocs = board.getPenguinLocations();
 
     for (Coord c : penguinLocs.keySet()) {
-      htv.drawPenguin(c, penguinLocs.get(c));
+      htv.drawPenguin(calculateTopLeftCorner(c.getX(), c.getY()), penguinLocs.get(c));
     }
   }
 
@@ -79,6 +79,8 @@ public class HexagonFishGameView extends JPanel {
             //Arrays.asList(new Coord(0, 1), new Coord(0, 2), new Coord(3, 3)),
             new ArrayList<>(),
             1, false);
+
+    board.placePenguin(new Coord(0,0), PlayerColor.BROWN);
 
     JPanel panel = new HexagonFishGameView(board);
     f.add(panel);

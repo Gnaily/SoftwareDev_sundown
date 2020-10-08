@@ -19,9 +19,9 @@ public class FishGameBoardTest {
 
   @Before
   public void setUp() throws Exception {
-    this.board1 = new FishGameBoard(8, 3, new ArrayList<Coord>(), 3, false);
+    this.board1 = new GeneralGameBoard(8, 3, new ArrayList<Coord>(), 3, false);
     List<Coord> holes = Arrays.asList(new Coord(1, 1), new Coord(0, 0));
-    this.board2 = new FishGameBoard(6, 6, holes, 8, false);
+    this.board2 = new GeneralGameBoard(6, 6, holes, 8, false);
     this.expectedMovesB1 = new ArrayList<>(Arrays
         .asList(new Coord(0, 0), new Coord(0, 1), new Coord(1, 2),
             new Coord(2, 4), new Coord(2, 5),
@@ -29,7 +29,7 @@ public class FishGameBoardTest {
             new Coord(2, 2), new Coord(2, 1),
             new Coord(1, 4), new Coord(0, 5), new Coord(0, 6)));
 
-    this.board3 = new FishGameBoard(4, 4, 2);
+    this.board3 = new GeneralGameBoard(4, 4, 2);
   }
 
   @Test
@@ -46,26 +46,26 @@ public class FishGameBoardTest {
 
   @Test
   public void getTileAt() {
-    assertEquals(1, this.board1.getTileAt(0, 0).getFishOnTile());
-    assertEquals(1, this.board1.getTileAt(0, 1).getFishOnTile());
-    assertEquals(1, this.board1.getTileAt(0, 2).getFishOnTile());
-    assertEquals(3, this.board1.getTileAt(2, 6).getFishOnTile());
+    assertEquals(1, this.board1.getTileAt(0, 0).getNumFish());
+    assertEquals(1, this.board1.getTileAt(0, 1).getNumFish());
+    assertEquals(1, this.board1.getTileAt(0, 2).getNumFish());
+    assertEquals(3, this.board1.getTileAt(2, 6).getNumFish());
   }
 
   @Test
   public void testAllTilesSameValue() {
     for (int ii = 0; ii < this.board3.getWidth(); ii++) {
       for (int jj = 0; jj < this.board3.getHeight(); jj++) {
-        assertEquals(2, this.board3.getTileAt(ii, jj).getFishOnTile());
+        assertEquals(2, this.board3.getTileAt(ii, jj).getNumFish());
       }
     }
   }
 
   @Test
   public void removeTileAt() {
-    assertEquals(1, this.board1.removeTileAt(0, 0).getFishOnTile());
-    assertEquals(1, this.board1.removeTileAt(0, 2).getFishOnTile());
-    assertEquals(4, this.board1.removeTileAt(2, 7).getFishOnTile());
+    assertEquals(1, this.board1.removeTileAt(0, 0).getNumFish());
+    assertEquals(1, this.board1.removeTileAt(0, 2).getNumFish());
+    assertEquals(4, this.board1.removeTileAt(2, 7).getNumFish());
   }
 
   @Test(expected = IllegalArgumentException.class)

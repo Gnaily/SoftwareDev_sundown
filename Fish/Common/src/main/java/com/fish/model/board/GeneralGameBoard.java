@@ -175,9 +175,80 @@ public class GeneralGameBoard implements GameBoard {
   @Override
   public List<Coord> getTilesReachableFrom(Coord start) throws IllegalArgumentException {
 
+    int x = start.getX();
+    int y = start.getY();
+
     List<Coord> moves = new ArrayList<>();
 
+    //Moving straight down
+    for (int yy = start.getY() + 2; yy < height; yy += 2) {
+      if (this.tiles[start.getX()][yy] != null) {
+        moves.add(new Coord(start.getX(), yy));
+      }
+      else {
+        break;
+      }
+    }
 
+    //Moving straight up
+    for (int yy = start.getY() - 2; yy >= 0; yy -= 2) {
+      if (this.tiles[start.getX()][yy] != null) {
+        moves.add(new Coord(start.getX(), yy));
+      }
+      else {
+        break;
+      }
+    }
+
+    //Moving up-left
+    for (int yy = start.getY() - 1; yy >= 0; yy -= 1) {
+      x -= yy % 2;
+      if (x >= 0 && this.tiles[x][yy] != null) {
+        moves.add(new Coord(x, yy));
+      }
+      else {
+        break;
+      }
+    }
+
+    x = start.getX();
+
+    //Moving up right
+    for (int yy = start.getY() - 1; yy >= 0; yy -= 1) {
+      x += (yy + 1) % 2;
+      if (x < width && this.tiles[x][yy] != null) {
+        moves.add(new Coord(x, yy));
+      }
+      else {
+        break;
+      }
+    }
+
+    x = start.getX();
+
+    //Moving down left
+    for (int yy = start.getY() + 1; yy < height; yy += 1) {
+      x -= yy % 2;
+      if (x >= 0 && this.tiles[x][yy] != null) {
+        moves.add(new Coord(x, yy));
+      }
+      else {
+        break;
+      }
+    }
+
+    x = start.getX();
+
+    //Moving down right
+    for (int yy = start.getY() + 1; yy < height; yy += 1) {
+      x += (yy + 1) % 2;
+      if (x < width && this.tiles[x][yy] != null) {
+        moves.add(new Coord(x, yy));
+      }
+      else {
+        break;
+      }
+    }
     return moves;
   }
 }
