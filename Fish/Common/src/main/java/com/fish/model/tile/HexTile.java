@@ -8,7 +8,13 @@ public class HexTile implements Tile {
 
   private int numFish;
 
+  public static final int MAX_FISH = 5;
+
   public HexTile(int numFish) {
+    if (numFish > MAX_FISH) {
+      throw new IllegalArgumentException("Too many fish on the tile!");
+    }
+
     this.numFish = numFish;
   }
 

@@ -23,8 +23,6 @@ public class HexGameBoard implements GameBoard {
   private int height;
   private Random rand;
 
-  private static final int MAX_FISH = 5;
-
   /**
    * Constructor to build a general game board.
    * (The Random arg allows you to generate the same board multiple times)
@@ -112,7 +110,7 @@ public class HexGameBoard implements GameBoard {
         fishValues.add(1);
       }
       else {
-        fishValues.add(this.rand.nextInt(MAX_FISH) + 1);
+        fishValues.add(this.rand.nextInt(HexTile.MAX_FISH) + 1);
       }
     }
     return fishValues;
