@@ -1,8 +1,41 @@
 # Sundown
 
-testing
-Git Repository for Brock Fenbert and Alanna Pasco's Software Dev class.
+<h3>Dot Game System</h3>
 
-xyes is a shell executable program that echos command line arguments to standard output. The basic task logic found in the Xyes.java file is to concatenate all command line arguments into one line, separated by a single ASCII spaces, and to display the final output an infinite number of times. If the first command line argument is '-limit', however, the final output will print only 20 times. If the program is run with no command line arguments, the default output line is "hello world."
+<b>Purpose</b>
 
-An interesting article on why this is useful can be found here: https://www.howtogeek.com/415535/how-to-use-the-yes-command-on-linux/ 
+<b>Use Cases</b>
+
+<b>How to Run</b>
+
+
+<b>Navigating Directories</b>
+```
+Common/src/main/java/com.fish/
+|--/model
+  |--/board
+      |--GameBoard.java
+      |--HexGameBoard.java
+  |--/tile
+      |--HexTile.java
+      |--Tile.java
+  |--Coord.java
+  |--PlayerColor.java
+```
+
+
+```
+Common/src/main/java/com.fish/
+|--/view
+  |--GameView.java
+  |--HexBoardView.java
+  |--HexTileView.java
+```
+
+
+
+
+<b>How to Run Test Script</b>
+
+
+<b>How to Run Unit Tests</b>
