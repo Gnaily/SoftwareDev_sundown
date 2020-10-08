@@ -1,6 +1,9 @@
 package com.fish.model;
 
-// add comments/explanations
+/**
+ * Represents a single point on a Cartesian coordinate plane with an x and y value,
+ * denoted xx and yy.
+ */
 public class Coord {
 
   private int xx;

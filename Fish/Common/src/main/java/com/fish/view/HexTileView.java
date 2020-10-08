@@ -4,24 +4,24 @@ import com.fish.model.Coord;
 import com.fish.model.PlayerColor;
 import com.fish.model.tile.Tile;
 
-
 import java.awt.*;
 
-
-public class HexagonTileView {
+/**
+ * Renders a single hexagon tile with fish and a penguin if necessary.
+ */
+public class HexTileView {
 
   private Graphics2D g2d;
   private int size;
 
-
-  public HexagonTileView(Graphics2D g2d, int size) {
+  public HexTileView(Graphics2D g2d, int size) {
     this.g2d = g2d;
     this.size = size;
   }
 
 
   /**
-   * Renders the image of the hexagon using lines. Sets the color of the hexagon to red.
+   * Renders the image of the hexagon with fish.
    */
   public void drawHexagon(Tile tile, Coord topLeft) {
     int xx = topLeft.getX();
@@ -33,11 +33,10 @@ public class HexagonTileView {
     int[] yValues = {yy, yy, yy + size, yy + 2 * size, yy + 2 * size, yy + size};
 
     g2d.fillPolygon(xValues, yValues, 6);
-
     g2d.setColor(Color.WHITE);
     g2d.drawPolygon(xValues, yValues, 6);
 
-    // drawing fish
+    // drawing all fish on tile
     g2d.setColor(Color.PINK);
     for (int ii = 1; ii <= tile.getNumFish(); ii++) {
       g2d.fillOval(xx, yy + size / 3 * ii, size, size / 4);
@@ -45,9 +44,9 @@ public class HexagonTileView {
   }
 
   /**
-   * Renders a penguin
+   * Renders a penguin.
    */
-  public void drawPenguin(Coord c, PlayerColor pc) {
+  public void drawPenguin(PlayerColor pc, Coord topLeft) {
     switch(pc) {
       case BLACK:
         g2d.setColor(Color.BLACK);
@@ -62,8 +61,7 @@ public class HexagonTileView {
         g2d.setColor(new Color(102, 51, 0));
         break;
     }
-
-    g2d.fillOval(c.getX(), c.getY() + size/2, size, size);
+    g2d.fillOval(topLeft.getX(), topLeft.getY() + size/2, size, size);
   }
 
 }

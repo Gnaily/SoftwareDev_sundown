@@ -9,29 +9,30 @@ import java.util.List;
 
 /**
  * Interface for a GameBoard object in a game of Hey, That's my Fish!
- * An implementation of the GameBoard object's functionality must hangle a few features that impact
- * the level of challenge a game starts off with:
+ * An implementation of the GameBoard object's functionality must handle a few required features:
  * -- How many holes to initiate the board with
  * -- where to put those holes
  * -- minimum number of 1-fish tiles to start out with (more 1-fish tiles means more challenge)
  */
 public interface GameBoard {
 
+  List<Coord> getTilesReachableFrom(Coord start);
+
   Tile getTileAt(int xx, int yy);
 
   Tile removeTileAt(int xx, int yy) throws IllegalArgumentException;
 
-  List<Coord> getTilesReachableFrom(Coord start);
+  PlayerColor removePenguin(Coord loc);
+
+  void placePenguin(Coord loc, PlayerColor playerColor);
+
+  HashMap<Coord, PlayerColor> getPenguinLocations();
 
   int getWidth();
 
   int getHeight();
 
-  void removePenguin(Coord loc);
 
-  void placePenguin(Coord loc, PlayerColor playerColor);
-
-  HashMap<Coord, PlayerColor> getPenguinLocations();
 
 
 
