@@ -86,6 +86,8 @@ The following UML diagrams support the maintaining of this repository. Pictured 
 <div align="center">
   <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/ModelUML.png"
        width="450"/>
+    
+    
   <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/ViewUML.png"
        width="350"/>
 </div>
@@ -108,7 +110,7 @@ For all of our tests the seed is set to 1, and our three examples used to test t
 
 <div align="center">
 <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/holesBoard.png" alt="holesBoard" width="420"/>
-<img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/noHolesBoard.png" alt="noHolesBoard" width="350"/>
+<img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/noHolesBoard.png" alt="noHolesBoard" width="355"/>
 <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/constantBoard.png" alt="constantFishNumBoard" width="540"/>
 </div>
 
