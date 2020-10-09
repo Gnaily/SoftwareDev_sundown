@@ -16,20 +16,19 @@ import java.util.List;
 public class HeyThatsMyFishMain {
 
   public static void main(String[] args) {
-    //Examples to Draw
+
+    //Example : A board with no holes and random number of fish on each tile
     GameBoard noHolesBoard = new HexGameBoard(6, 2,
         new ArrayList<Coord>(), 5, 1);
 
+    //Example : A board with holes and random number of fish on each tile
     List<Coord> holes = Arrays.asList(new Coord(0, 0), new Coord(1, 1),
         new Coord(2, 2), new Coord(1, 4));
     GameBoard holesBoard = new HexGameBoard(8, 3, holes,
         8, 1);
 
+    //Example : A board with no holes and constant number of fish on each tile
     GameBoard constantFishNumBoard = new HexGameBoard(4, 4, 2);
-
-    //Place a penguin to see the penguin visual implemented
-    noHolesBoard.placePenguin(new Coord(0,0), PlayerColor.BROWN);
-
 
     //Calling the View on one example
     GameView gv = new HexBoardView(noHolesBoard);
