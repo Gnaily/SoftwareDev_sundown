@@ -63,8 +63,9 @@ In order to test a random generated board, there exists a convenience constructo
     
 For all of our tests the seed is set to 1, and our three examples used to test the board look like the following. Please click each photo for a closer look, and to examine the exact constructor used to generate it captured at the top of the screenshot.
 
-<img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/holesBoard.png" alt="holesBoard" width="440"/>
-<img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/noHolesBoard.png" alt="noHolesBoard" width="300"/>
+<div class="imageContainer">
+<img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/holesBoard.png" alt="holesBoard" width="420"/>
+<img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/noHolesBoard.png" alt="noHolesBoard" width="410"/></div>
 <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/constantBoard.png" alt="constantFishNumBoard" width="540"/>
 
 
