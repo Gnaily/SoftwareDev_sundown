@@ -28,20 +28,20 @@ Our external interface for the Hey, That's my Fish! Game-State will be a
 Java Interface with the following functionality:
 
 * Starting the Game
- * Decide what type of `GameBoard` to use
- * Determine how many players will be participating in the game
- * Advance `GameStage` from `NOT_STARTED` to `PLACING_PENGUINS`
+  * Decide what type of `GameBoard` to use
+  * Determine how many players will be participating in the game
+  * Advance `GameStage` from `NOT_STARTED` to `PLACING_PENGUINS`
 * Placing a penguin on the Board
- * Confirm with the referee that it is a valid placement
- * Determine if the game should be advanced from `PLACING_PENGUINS` to `IN_PLAY`
+  * Confirm with the referee that it is a valid placement
+  * Determine if the game should be advanced from `PLACING_PENGUINS` to `IN_PLAY`
 * Moving a penguin
- * Confirm with the referee that it is a valid movement
- * Manipulate the `GameBoard` and player scores to reflect the penguin movement
+  * Confirm with the referee that it is a valid movement
+  * Manipulate the `GameBoard` and player scores to reflect the penguin movement
 * Removing a `Player` from the game
- * If the referee decides a player has made an invalid move, the model must be able to
+  * If the referee decides a player has made an invalid move, the model must be able to
  remove the player and their penguins from the game
 * Checking if the game is over
- * After every move of a penguin, the model will need to evaluate if the game is over
+  * After every move of a penguin, the model will need to evaluate if the game is over
 * Deciding the winners of the gameplay
 * Getting the current board state
- * Return a Read-Only version of the `GameBoard` to allow players/AI to strategize
+  * Return a Read-Only version of the `GameBoard` to allow players/AI to strategize
