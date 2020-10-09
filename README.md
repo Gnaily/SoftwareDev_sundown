@@ -8,7 +8,7 @@
 
 <h3><i>Hey, That's my Fish!</i> Implementation</h3>
 <b>How to Run</b>
-<p>For now, in the absence of an executable, navigate to the HeyThatsMyFishMain.java file and run the main method from an IDE. There are three example boards available/instantiated in the main method: One with no holes and a random number of fish on tiles, one with holes and a random number of fish on tiles, and lastly a board with no holes and a fixed number of fish on the tiles. They are named noHolesBoard, holesBoard, and constantFishNumBoard, respectively. Pick your favorite board and use it as an argument to instantiate the HexBoardView that will call draw.Game(). Run the main method to view the view.</p>
+<p>For now, in the absence of an executable, navigate to the HeyThatsMyFishMain.java file and run the main method from an IDE. There are three example boards available/instantiated in the main method: One with no holes and a random number of fish on tiles, one with holes and a random number of fish on tiles, and lastly a board with no holes and a fixed number of fish on the tiles. They are named noHolesBoard, holesBoard, and constantFishNumBoard, respectively. Pick your favorite board and use it as an argument to instantiate the HexBoardView that calls draw.Game(). Run the main method to view the view.</p>
 
 # Navigating Directories 
   <b>Model</b>
@@ -49,9 +49,22 @@ Common/src/main/java/com.fish/
 `HexTileView` is the class that handles the rendering of a single hexagon tile and all that can be drawn over it, including how to position and scale the fish and penguins and which color penguin to render. 
 
 # Testing
+<b>How to Run Unit Tests</b>
+From the Common directory, run `./xtest` This will run all unit tests through Maven and output feedback on the number of tests passed/failed, and where the failed tests are. 
+
+In order to test a random generated board, there exists a convenience constructor in the HexGameBoard class just for testing. It takes in the regular arguments required by a HexGameBoard plus a integer to seed the Random object in the fields of HexGameBoard.
+
+    public HexGameBoard(int rows, int cols, List<Coord> holes, int minOneFishTiles,
+      int randSeed) {
+    this(rows, cols, holes, minOneFishTiles);
+    this.rand = new Random(randSeed);
+    this.fillBoardWithTiles(holes, minOneFishTiles);
+    }
+    
+For all of our tests the seed is set to 1, and our three primary examples used to test the board look like the following:
+
+![holesBoard](https://github.ccs.neu.edu/alannapasco/sundown/Fish/Common/holesBoard.png)
+
+
 <b>How to Run Test Harness</b>
 <p><i>(To be filled in with the further development of the system.)</i></p>
-
-<b>How to Run Unit Tests</b>
-From the Common directory, run `./xtest`
-This will run all unit tests through Maven and output feedback on the number of tests passed/failed, and where the failed tests are. 
