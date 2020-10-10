@@ -14,6 +14,25 @@ import java.util.Random;
  * Implementation of a GameBoard for a general game of Hey, That's my Fish!
  * Contains data representations for the tiles on the board, the locations of penguins/players,
  * and dimensions of the board.
+ *
+ * <p>
+ *  The Coordinate system for a hexagonal game is used as follows:
+ *
+ *    ,--.     >--.
+ *   /    \___/    \___
+ *   \0,0 /   \1,0 /   \
+ *    >--< 0,1 >--< 1,1|
+ *   /    \___/    \___/
+ *   \0,2 /   \1,2 /   \
+ *    >--< 0,3 >--< 1,3|
+ *   /    \___/    \___/
+ *   \0,4 /   \1,4 /   \
+ *    `--< 0,5 >--< 1,5|
+ *        \___/    \___/
+ *
+ *   This is an example of a board with 6 rows and 2 columns. For any given coordinate (x, y) the
+ *   x value represents the column number and the y value represents the row number.
+ * </p>
  */
 public class HexGameBoard implements GameBoard {
 
