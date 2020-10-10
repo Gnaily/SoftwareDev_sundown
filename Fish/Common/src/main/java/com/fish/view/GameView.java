@@ -5,6 +5,9 @@ package com.fish.view;
  */
 public interface GameView {
 
+  /**
+   * Draws the game of Fish
+   */
   void drawGame();
 
 }

@@ -13,6 +13,7 @@ import java.util.List;
  * -- How many holes to initiate the board with
  * -- where to put those holes
  * -- minimum number of 1-fish tiles to start out with (more 1-fish tiles means more challenge)
+ *
  */
 public interface GameBoard {
 
