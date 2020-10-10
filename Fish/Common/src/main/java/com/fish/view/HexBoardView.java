@@ -11,7 +11,13 @@ import java.util.HashMap;
 import javax.swing.*;
 
 /**
- * Implementation of the drawing of a board of a game of Hey, That's my Fish!
+ * Implementation of the drawing the GUI a game of Hey, that's my fish! (HTMF).
+ * This implementation uses hexagon-shaped images to represent a Tile in the HTMF game.
+ * Each hexagon image may over-lay an image of a pink oval, which is a fish,
+ * and a colored circle with a penguin face, which represents a player's penguin of the associated
+ * player color.
+ * The dimensions of the board are determined by...
+ * (FILL IN LATER)
  */
 public class HexBoardView extends JPanel implements GameView {
 
@@ -21,12 +27,19 @@ public class HexBoardView extends JPanel implements GameView {
   //in a single window.
   final static int PIXEL_STEP = 50;
 
+  /**
+   * Constructor for rendering the image of the hexagon board.
+   * @param board a GameView object that contains all of the logistical data for placing images in
+   * the correct location in the view
+   */
   public HexBoardView(GameBoard board) {
     this.board = board;
     this.setPreferredSize(this.calculateWindowSize());
   }
 
-
+  /**
+   * Draws each game piece needed in a game of HTMF and brings together the layout of the game.
+   */
   @Override
   public void drawGame() {
     JFrame f = new JFrame("Hey, That's my Fish!");
@@ -36,11 +49,12 @@ public class HexBoardView extends JPanel implements GameView {
     f.setVisible(true);
   }
 
+  //Draw the collection of hex tiles, skipping over null values
+  //Then draw the peguins at the appropriate locations
   public void paintComponent(Graphics g) {
     super.paintComponent(g);
     Graphics2D g2d = (Graphics2D) g;
 
-    //Draw just the hex tiles
     for (int ii = 0; ii < board.getWidth(); ii++) {
       for (int jj = 0; jj < board.getHeight(); jj++) {
         Tile tile = board.getTileAt(new Coord(ii, jj));
@@ -50,15 +64,16 @@ public class HexBoardView extends JPanel implements GameView {
       }
     }
 
-    //Draw the penguins where necessary
     HashMap<Coord, PlayerColor> penguinLocs = board.getPenguinLocations();
     for (Coord c : penguinLocs.keySet()) {
-      this.drawPenguin(penguinLocs.get(c), calculateTopLeftXValue(c.getX(), c.getY()), c.getY() * PIXEL_STEP, g2d);
+      this.drawPenguin(penguinLocs.get(c), calculateTopLeftXValue(c.getX(), c.getY()),
+          c.getY() * PIXEL_STEP, g2d);
     }
   }
 
   /**
-   * Draw the tile with the top-left coordinate located at (x, y)
+   * Render the image of a single hexagon-shaped tile with the top-left coordinate located at (x, y)
+   * Then, render the image of pink fish on that hexagon tile
    *
    * @param tile tile to draw
    * @param xx Top Left x pixel of where to draw the hexagon
@@ -87,7 +102,8 @@ public class HexBoardView extends JPanel implements GameView {
       g2d.fillPolygon(xs, ys, 3);
 
       g2d.setColor(Color.BLACK);
-      g2d.fillOval(xx + PIXEL_STEP * 3 / 4, yy + PIXEL_STEP / 3 * ii + PIXEL_STEP / 16, PIXEL_STEP / 16, PIXEL_STEP / 16);
+      g2d.fillOval(xx + PIXEL_STEP * 3 / 4, yy + PIXEL_STEP / 3 * ii + PIXEL_STEP / 16,
+          PIXEL_STEP / 16, PIXEL_STEP / 16);
     }
   }
 
@@ -132,8 +148,6 @@ public class HexBoardView extends JPanel implements GameView {
     int[] ys = {yy + PIXEL_STEP * 9 / 8, yy + PIXEL_STEP * 9 / 8, yy + PIXEL_STEP * 11 / 8};
     g2d.fillPolygon(xs, ys, 3);
   }
-
-
 
   //Calculates window size based off the PIXEL_STEP and number of hexagons
   Dimension calculateWindowSize() {

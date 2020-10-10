@@ -21,8 +21,6 @@ public class HeyThatsMyFishMain {
     GameBoard noHolesBoard = new HexGameBoard(1, 2,
         new ArrayList<Coord>(), 0, 1);
 
-    //6 x 2
-
     //Example : A board with holes and random number of fish on each tile
     List<Coord> holes = Arrays.asList(new Coord(0, 0), new Coord(1, 1),
         new Coord(2, 2), new Coord(1, 4));
