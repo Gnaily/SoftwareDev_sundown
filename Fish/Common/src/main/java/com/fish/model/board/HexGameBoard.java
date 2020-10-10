@@ -42,6 +42,8 @@ public class HexGameBoard implements GameBoard {
   private int height;
   private Random rand;
 
+  public static final int MAX_FISH = 5;
+
   /**
    * Constructor to build a general game board.
    * (The Random arg allows you to generate the same board multiple times)
@@ -135,7 +137,7 @@ public class HexGameBoard implements GameBoard {
         fishValues.add(1);
       }
       else {
-        fishValues.add(this.rand.nextInt(HexTile.MAX_FISH) + 1);
+        fishValues.add(this.rand.nextInt(MAX_FISH) + 1);
       }
     }
     return fishValues;
@@ -237,8 +239,16 @@ public class HexGameBoard implements GameBoard {
 
 
   /////////////////////////////////Tile Handling
+
+  /**
+   * Given a coordinate location within the dimensions of the game board,
+   * returns the Tile object at that coordinate location.
+   * @param loc the coordinate location of the desired tile on the board
+   * @return the Tile object at that location
+   * @throws IllegalArgumentException if the requested tile is out of the bounds of the board
+   */
   @Override
-  public Tile getTileAt(Coord loc) {
+  public Tile getTileAt(Coord loc) throws IllegalArgumentException {
     checkTileInBounds(loc, "Cannot retrieve a tile not on the board");
     //We do not check for TilePresent because we want this to return null if the tile
     //has been removed to differentiate from an arg that is out of bounds vs a tile that's
@@ -246,11 +256,19 @@ public class HexGameBoard implements GameBoard {
     return tiles[loc.getX()][loc.getY()];
   }
 
+  /**
+   * Given a coordinate location within the dimensions of the game board,
+   * removes the tile from that coordinate location on the board, replacing it with null,
+   * and returns the Tile.
+   * @param loc the coordinate location of the tile to remove on the board
+   * @return the Tile object at that location
+   * @throws IllegalArgumentException if the requested tile is out of bounds or is already a hole
+   * on the board, represented by a null value
+   */
   @Override
-  public Tile removeTileAt(Coord loc) {
+  public Tile removeTileAt(Coord loc) throws IllegalArgumentException {
     checkTileInBounds(loc, "Cannot remove a tile not on the board");
     checkTilePresent(loc, "Cannot remove a tile that has already been removed");
-    //Will need to store num fish info for score keeping later
     int xx = loc.getX();
     int yy = loc.getY();
 
@@ -261,6 +279,26 @@ public class HexGameBoard implements GameBoard {
 
 
   /////////////////////////////////Penguin Handling
+
+  /**
+   * Returns a HashMap of penguin locations, formatted such that the Coord is the unique
+   * identifier of the location (since only one penguin can be on a tile at a time) and
+   * the PlayerColor is the value, to identify which player's penguin is on that location.
+   * @return a HashMap of Coord to PlayerColor values
+   */
+  @Override
+  public HashMap<Coord, PlayerColor> getPenguinLocations(){
+    return new HashMap<>(this.penguinLocs);
+  }
+
+  /**
+   * Adds a penguin to the board at the given Coord location. Stores the PlayerColor of the
+   * particular player whose penguin is being placed. This method it only to be used at game
+   * start-up as players may not place a penguin once gameplay has begun.
+   * @param loc the coordinate location to place a penguin
+   * @param playerColor the color associated with the player placing the penguin
+   * @throws IllegalArgumentException if given Coord is out of bounds or there is a hole there
+   */
   @Override
   public void placePenguin(Coord loc, PlayerColor playerColor) throws IllegalArgumentException {
     checkTileInBounds(loc, "Cannot place a penguin off the board");
@@ -272,6 +310,12 @@ public class HexGameBoard implements GameBoard {
     this.penguinLocs.put(loc, playerColor);
   }
 
+  /**
+   * Removes the element of the penguinLocs HashMap with the given unique Coord.
+   * @param loc the coordinate location to remove the penguin
+   * @return the playerColor that was at that location
+   * @throws IllegalArgumentException if there is no penguin present in the given location
+   */
   @Override
   public PlayerColor removePenguin(Coord loc) throws IllegalArgumentException {
     //--> Needs a check in place to make sure the user can not remove another player's penguin
@@ -281,22 +325,28 @@ public class HexGameBoard implements GameBoard {
     return this.penguinLocs.remove(loc);
   }
 
-  @Override
-  public HashMap<Coord, PlayerColor> getPenguinLocations(){
-    return new HashMap<>(this.penguinLocs);
-  }
-
   /////////////////////////////////Getters and Helpers
+
+  /**
+   * Returns the width of the game board, defined by the number of columns on the visual board
+   * @return an int with the width
+   */
   @Override
   public int getWidth() {
     return this.width;
   }
 
+  /**
+   * Returns the height of the game board, defined by the number of rows on the visual board
+   * @return an int with the height
+   */
   @Override
   public int getHeight() {
     return this.height;
   }
 
+  //Purpose: To reduce the amount of times we need to write out checks that a Coord is within
+  //the dimensions of the board (which is in almost every method)
   private void checkTileInBounds(Coord loc, String specificMsg) throws IllegalArgumentException {
     int xx = loc.getX();
     int yy = loc.getY();
@@ -305,6 +355,8 @@ public class HexGameBoard implements GameBoard {
     }
   }
 
+  //Purpose: To reduce the amount of times we need to write out checks that a tile at the given
+  //Coord is present, and not a hole.
   private void checkTilePresent(Coord loc, String specificMsg) throws IllegalArgumentException {
     int xx = loc.getX();
     int yy = loc.getY();
