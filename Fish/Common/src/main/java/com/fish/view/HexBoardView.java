@@ -59,14 +59,14 @@ public class HexBoardView extends JPanel implements GameView {
       for (int jj = 0; jj < board.getHeight(); jj++) {
         Tile tile = board.getTileAt(new Coord(ii, jj));
         if (tile != null) {
-          this.drawHexagon(tile, this.calculateTopLeftXValue(ii, jj), jj * PIXEL_STEP, g2d);
+          this.drawHexagon(tile, this.calculateTopLeftXValue(new Coord(ii, jj)), jj * PIXEL_STEP, g2d);
         }
       }
     }
 
     HashMap<Coord, PlayerColor> penguinLocs = board.getPenguinLocations();
     for (Coord c : penguinLocs.keySet()) {
-      this.drawPenguin(penguinLocs.get(c), calculateTopLeftXValue(c.getX(), c.getY()),
+      this.drawPenguin(penguinLocs.get(c), calculateTopLeftXValue(c),
           c.getY() * PIXEL_STEP, g2d);
     }
   }
@@ -84,6 +84,9 @@ public class HexBoardView extends JPanel implements GameView {
     // light blue, icy color
     g2d.setColor(new Color(158, 195, 255));
 
+    // the (x, y) coordinates on the panel for each of the points in the hexagon
+    // starting with the top left corner of the hexagon and moving in a clockwise direction to
+    // each vertex.
     int[] xValues = {xx, xx + PIXEL_STEP, xx + 2 * PIXEL_STEP, xx + PIXEL_STEP, xx, xx - PIXEL_STEP};
     int[] yValues = {yy, yy, yy + PIXEL_STEP, yy + 2 * PIXEL_STEP, yy + 2 * PIXEL_STEP, yy + PIXEL_STEP};
 
@@ -94,13 +97,17 @@ public class HexBoardView extends JPanel implements GameView {
     // drawing all fish on tile
     for (int ii = 1; ii <= tile.getNumFish(); ii++) {
       g2d.setColor(Color.PINK);
+      // main body of the fish
       g2d.fillOval(xx, yy + PIXEL_STEP / 3 * ii, PIXEL_STEP, PIXEL_STEP / 4);
+
+      // the (x, y) coordinates of the triangle for the fish's tail
       int[] xs = {xx, xx, xx + PIXEL_STEP / 4};
       int[] ys = {yy + PIXEL_STEP / 3 * ii,
               yy + PIXEL_STEP / 3 * ii + PIXEL_STEP / 4, yy + PIXEL_STEP / 3 * ii + PIXEL_STEP  / 8};
 
       g2d.fillPolygon(xs, ys, 3);
 
+      // The fish eyeball dot
       g2d.setColor(Color.BLACK);
       g2d.fillOval(xx + PIXEL_STEP * 3 / 4, yy + PIXEL_STEP / 3 * ii + PIXEL_STEP / 16,
           PIXEL_STEP / 16, PIXEL_STEP / 16);
@@ -139,11 +146,14 @@ public class HexBoardView extends JPanel implements GameView {
     g2d.setColor(Color.BLACK);
     g2d.drawOval(xx + PIXEL_STEP / 4, yy + 3 * PIXEL_STEP / 4, PIXEL_STEP / 4, PIXEL_STEP / 4);
     g2d.drawOval(xx + PIXEL_STEP / 2, yy + 3 * PIXEL_STEP / 4, PIXEL_STEP / 4, PIXEL_STEP / 4);
+
+    // penguin pupils
     g2d.fillOval(xx + PIXEL_STEP * 5 / 16, yy + PIXEL_STEP * 13 / 16, PIXEL_STEP / 8, PIXEL_STEP / 8);
     g2d.fillOval(xx + PIXEL_STEP * 9 / 16, yy + PIXEL_STEP * 13 / 16, PIXEL_STEP / 8, PIXEL_STEP / 8);
 
     // penguin beak
     g2d.setColor(Color.ORANGE);
+    // (x, y) coordinates for the triangular beak
     int[] xs = {xx + PIXEL_STEP / 4, xx + PIXEL_STEP * 3 / 4, xx + PIXEL_STEP / 2};
     int[] ys = {yy + PIXEL_STEP * 9 / 8, yy + PIXEL_STEP * 9 / 8, yy + PIXEL_STEP * 11 / 8};
     g2d.fillPolygon(xs, ys, 3);
@@ -154,14 +164,47 @@ public class HexBoardView extends JPanel implements GameView {
     int w = this.board.getWidth();
     int h = this.board.getHeight();
 
-    return new Dimension(PIXEL_STEP * ((4 * w) + 1 - (2 * (h % 2))),
+
+    /*
+     The width of the window is determined as follows:
+      - 4 times the width of the board (number of columns) + 1
+
+      Each hexagon has a width of 3 units. The first column consists of 5 total units of width.
+      Each additional column adds 4 more units of width to the total.
+
+      | -- 5 ---| -- 4 -- |
+        ,--.     >--.
+       /    \___/    \___
+       \0,0 /   \1,0 /   \
+        >--< 0,1 >--< 1,1|
+            \___/    \___/
+
+
+     */
+
+
+    return new Dimension(PIXEL_STEP * ((4 * w) + 1),
         PIXEL_STEP * (1 + h));
   }
 
   //Calculates the proper top left corner pixel coordinate given
   //the center x and y values of an image
-  int calculateTopLeftXValue(int xx, int yy) {
-    return PIXEL_STEP * (4 * xx + 1 + 2 * (yy % 2));
+  int calculateTopLeftXValue(Coord hexLocation) {
+
+    /*
+      |1| - 4 - | -2-|
+        ,--.     >--.
+       /    \___/    \___
+       \0,0 /   \1,0 /   \
+        >--< 0,1 >--< 1,1|
+            \___/    \___/
+
+        The top left x value of a hexagon's location moves by 4 every increase in x.
+        For hexagons on odd y values (for example, (1,1), the x location is increased by 2 from the
+        previous drawing point.
+        All of these values are offset by an initial value of 1
+     */
+    return PIXEL_STEP * (4 * hexLocation.getX() + 1 + 2 * (hexLocation.getY() % 2));
   }
 
 }

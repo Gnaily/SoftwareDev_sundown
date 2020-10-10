@@ -140,10 +140,10 @@ public class HexGameBoardTest {
   /////Tests for Tile Handling
   @Test
   public void getTileAtValid() {
-    assertEquals(4, this.holesBoard.getTileAt(new Coord(0, 1)).getNumFish());
+    assertEquals(3, this.holesBoard.getTileAt(new Coord(0, 1)).getNumFish());
     assertEquals(1, this.holesBoard.getTileAt(new Coord(1, 0)).getNumFish());
-    assertEquals(4, this.noHolesBoard.getTileAt(new Coord(1, 2)).getNumFish());
-    assertEquals(3, this.noHolesBoard.getTileAt(new Coord(0, 5)).getNumFish());
+    assertEquals(5, this.noHolesBoard.getTileAt(new Coord(1, 2)).getNumFish());
+    assertEquals(1, this.noHolesBoard.getTileAt(new Coord(0, 5)).getNumFish());
   }
 
   @Test
@@ -167,9 +167,9 @@ public class HexGameBoardTest {
 
   @Test
   public void removeTileAt() {
-    assertEquals(4, this.holesBoard.removeTileAt(new Coord(0, 1)).getNumFish());
-    assertEquals(2, this.holesBoard.removeTileAt(new Coord(0, 6)).getNumFish());
-    assertEquals(1, this.holesBoard.removeTileAt(new Coord(2, 7)).getNumFish());
+    assertEquals(3, this.holesBoard.removeTileAt(new Coord(0, 1)).getNumFish());
+    assertEquals(5, this.holesBoard.removeTileAt(new Coord(0, 6)).getNumFish());
+    assertEquals(3, this.holesBoard.removeTileAt(new Coord(2, 7)).getNumFish());
   }
 
   @Test(expected = IllegalArgumentException.class)

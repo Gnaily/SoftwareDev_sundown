@@ -30,9 +30,9 @@ public class HexBoardViewTest {
   public void testCalculateTopLeftCorner() {
     //We know that PIXEL_STEP is set to 50 for now
     int step = 50;
-    Assert.assertEquals(step, this.hbv.calculateTopLeftXValue(0, 0));
-    Assert.assertEquals(step * 15, this.hbv.calculateTopLeftXValue(3, 3));
-    Assert.assertEquals(step * 37,  this.hbv.calculateTopLeftXValue(9, 12));
+    Assert.assertEquals(step, this.hbv.calculateTopLeftXValue(new Coord(0, 0)));
+    Assert.assertEquals(step * 15, this.hbv.calculateTopLeftXValue(new Coord(3, 3)));
+    Assert.assertEquals(step * 37,  this.hbv.calculateTopLeftXValue(new Coord(9, 12)));
   }
 
   @Test
