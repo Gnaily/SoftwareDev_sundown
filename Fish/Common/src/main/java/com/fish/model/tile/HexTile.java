@@ -18,6 +18,10 @@ public class HexTile implements Tile {
     this.numFish = numFish;
   }
 
+  /**
+   * Returns the number of fish on the Tile.
+   * @return an int with the number of fish on the tile
+   */
   @Override
   public int getNumFish() {
     return this.numFish;

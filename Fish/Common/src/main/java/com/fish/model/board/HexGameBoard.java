@@ -73,8 +73,14 @@ public class HexGameBoard implements GameBoard {
     }
   }
 
+
   /**
-   * Convenience constructor for testing. Includes arg for Rand seed for consistent testing outcomes.
+   * Convenience constructor for testing. Includes arg for Rand seed for consistent test outcomes.
+   * @param rows the number of rows of tiles on the board
+   * @param cols the number of columns of tiles on the board
+   * @param holes the specific number of holes to start the game with
+   * @param minOneFishTiles the minimum number of 1-fish tiles to start the game with
+   * @param randSeed random seed to produce the same outcome multiple times
    */
   public HexGameBoard(int rows, int cols, List<Coord> holes, int minOneFishTiles,
       int randSeed) {
@@ -117,17 +123,24 @@ public class HexGameBoard implements GameBoard {
   }
 
 
-  /////////////////////////////////
+  /////////////////////////////////Move Handling
+
+  /**
+   * Given a coordinate of origin, returns a list of all possible coordinates a player can
+   * make a valid move to from the origin.
+   * @param start the coord of origin
+   * @return a list of Coord indicating the possible valid moves
+   * @throws IllegalArgumentException if the coord of origin is out of bounds or is a hole
+   */
   @Override
   public List<Coord> getTilesReachableFrom(Coord start) throws IllegalArgumentException {
 
     int x = start.getX();
     int y = start.getY();
 
-    checkTileInBounds(start, "Cannot move from a tile that does not exist");
+    checkTileInBounds(start, "Cannot move from a tile that is out of bounds");
+    checkTilePresent(start, "Cannot move from a tile that does not exist");
     List<Coord> moves = new ArrayList<>();
-
-    //Moving straight down
 
     moves.addAll(this.getTilesAboveBelow(x, y, -2));
     moves.addAll(this.getTilesAboveBelow(x, y, 2));
@@ -141,6 +154,9 @@ public class HexGameBoard implements GameBoard {
     return moves;
   }
 
+  //Get valid moves directly above and below tile of origin
+  //yIncrement == -2 -> up
+  //yIncrement == 2 -> down
   private List<Coord> getTilesAboveBelow(int xx, int yy, int yIncrement) {
 
     List<Coord> moves = new ArrayList<>();
@@ -156,6 +172,9 @@ public class HexGameBoard implements GameBoard {
     return moves;
   }
 
+  //Get valid moves up-left diagonal OR down-left diagonal of tile of origin, depending on:
+  //yIncrement == -1 -> up left
+  //yIncrement == 1 -> down left
   private List<Coord> getTilesLeftDiagonal(int xx, int yy, int yIncrement) {
 
     List<Coord> moves = new ArrayList<>();
@@ -174,6 +193,9 @@ public class HexGameBoard implements GameBoard {
     return moves;
   }
 
+  //Get valid moves up-right diagonal OR down-right diagonal of tile of origin, depending on:
+  //yIncrement == -1 -> up right
+  //yIncrement == 1 -> down right
   private List<Coord> getTilesRightDiagonal(int xx, int yy, int yIncrement) {
 
     List<Coord> moves = new ArrayList<>();
