@@ -154,7 +154,7 @@ public class HexBoardView extends JPanel implements GameView {
     int w = this.board.getWidth();
     int h = this.board.getHeight();
 
-    return new Dimension(PIXEL_STEP * ((4 * w) + 1 - (2 * (h % 2))),
+    return new Dimension(PIXEL_STEP * ((4 * w) + 1 + (2 * (h % 2))),
         PIXEL_STEP * (1 + h));
   }
 
