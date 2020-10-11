@@ -1,6 +1,7 @@
 package com.fish.model;
 
 import com.fish.model.tile.Tile;
+import java.util.HashMap;
 
 /**
  * Add Later
@@ -26,6 +27,14 @@ public interface GameState {
    * @param playerColor the color assigned to the Player
    */
   void placePenguin(Coord loc, PlayerColor playerColor);
+
+  /**
+   * Returns a HashMap of penguin locations, formatted such that the Coord is the unique
+   * identifier of the location (since only one penguin can be on a tile at a time) and
+   * the PlayerColor is the value, to identify which player's penguin is on that location.
+   * @return a HashMap of Coord to PlayerColor values
+   */
+  HashMap<Coord, PlayerColor> getPenguinLocations();
 
   /**
    * Move a penguin from a coordinate location on a GameBoard to another coordinate location
