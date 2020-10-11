@@ -24,7 +24,7 @@ public class HeyThatsMyFishMain {
     //Example : A board with holes and random number of fish on each tile
     List<Coord> holes = Arrays.asList(new Coord(0, 0), new Coord(1, 1),
         new Coord(2, 2), new Coord(1, 4));
-    GameBoard holesBoard = new HexGameBoard(8, 3, holes,
+    GameBoard holesBoard = new HexGameBoard(7, 3, holes,
         8, 1);
     holesBoard.placePenguin(new Coord(1, 2), PlayerColor.BLACK);
     holesBoard.placePenguin(new Coord(0, 1), PlayerColor.BROWN);

@@ -131,14 +131,28 @@ public class HexGameBoard implements GameBoard {
 
   //Generates random tile fish values
   private List<Integer> generateTileValues(int numValsNeeded, int minOneFishTiles) {
-    List<Integer> fishValues = new ArrayList<Integer>();
+    int ones = 0;
+
+    // generate a list of random tile values
+    List<Integer> fishValues = new ArrayList<>();
     for (int ii = 0; ii < numValsNeeded; ii++) {
-      if (ii < minOneFishTiles) {
-        fishValues.add(1);
+      int nextVal = this.rand.nextInt(MAX_FISH) + 1;
+      if (nextVal == 1) {
+        ones++;
       }
-      else {
-        fishValues.add(this.rand.nextInt(MAX_FISH) + 1);
+      fishValues.add(nextVal);
+    }
+
+    // enforce there is the minimum number of one-fish tiles requested
+    int ii = 0;
+    while (ones < minOneFishTiles && ii < numValsNeeded) {
+      if (fishValues.get(ii) != 1) {
+        fishValues.remove(ii);
+        fishValues.add(ii, 1);
+        ones++;
       }
+
+      ii++;
     }
     return fishValues;
   }
@@ -163,45 +177,55 @@ public class HexGameBoard implements GameBoard {
     checkTilePresent(start, "Cannot move from a tile that does not exist");
     List<Coord> moves = new ArrayList<>();
 
-    moves.addAll(this.getTilesAboveBelow(x, y, -2));
-    moves.addAll(this.getTilesAboveBelow(x, y, 2));
+    // These TwoNumberOperations define different rules for incrementing x values while
+    // finding reachable tiles (see hexagon coordinate diagram at the top of the file for how
+    // tile coordinates are determined).
 
-    moves.addAll(this.getTilesLeftDiagonal(x, y, 1));
-    moves.addAll(this.getTilesLeftDiagonal(x, y, -1));
+    // Does not perform an operation and returns the first value. this is used for when going
+    //  directly above and below the starting tile.
+    TwoNumberOperation returnFirstInput = (int aa, int bb) -> aa;
 
-    moves.addAll(this.getTilesRightDiagonal(x, y, 1));
-    moves.addAll(this.getTilesRightDiagonal(x, y, -1));
+    // Decreases the first value by 1 whenever the second value is odd. This rule is used when
+    //  traversing either left-handed diagonal from the starting tile.
+    TwoNumberOperation decrementXonYOdd = (int aa, int bb) -> aa - bb % 2;
+
+    // Increases the first value by 1 whenever the second value is even. This rule is used when
+    //  traversing either left-handed diagonal from the starting tile.
+    TwoNumberOperation incrementXonYEven = (int aa, int bb) -> aa + (bb + 1) % 2;
+
+    // directly up and down
+    moves.addAll(this.getTilesStraightLine(x, y, -2, returnFirstInput));
+    moves.addAll(this.getTilesStraightLine(x, y, 2, returnFirstInput));
+
+    // right side diagonals
+    moves.addAll(this.getTilesStraightLine(x, y, -1, incrementXonYEven));
+    moves.addAll(this.getTilesStraightLine(x, y, 1, incrementXonYEven));
+
+    // left side diagonals
+    moves.addAll(this.getTilesStraightLine(x, y, -1, decrementXonYOdd));
+    moves.addAll(this.getTilesStraightLine(x, y, 1, decrementXonYOdd));
 
     return moves;
   }
 
-  //Get valid moves directly above and below tile of origin
-  //yIncrement == -2 -> up
-  //yIncrement == 2 -> down
-  private List<Coord> getTilesAboveBelow(int xx, int yy, int yIncrement) {
-
+  /**
+   * Get tiles reachable from a starting (x, y) location
+   *
+   * <p>
+   *   Holes (null values for a tile location) and Penguins are considered blockers that stop
+   *   tiles from being reachable.
+   * </p>
+   *
+   * @param xx starting x location
+   * @param yy starting y location
+   * @param yIncrement value to increment/decrement y by for every new tile to search
+   * @param op Operation that defines how the x value should be changed
+   * @return A list of all tiles reachable from the given location following the increment rules
+   */
+  private List<Coord> getTilesStraightLine(int xx, int yy, int yIncrement, TwoNumberOperation op) {
     List<Coord> moves = new ArrayList<>();
     for (yy = yy + yIncrement; yy >= 0 && yy < this.height; yy += yIncrement) {
-      if (this.tiles[xx][yy] != null) {
-        moves.add(new Coord(xx, yy));
-      }
-      else {
-        break;
-      }
-    }
-
-    return moves;
-  }
-
-  //Get valid moves up-left diagonal OR down-left diagonal of tile of origin, depending on:
-  //yIncrement == -1 -> up left
-  //yIncrement == 1 -> down left
-  private List<Coord> getTilesLeftDiagonal(int xx, int yy, int yIncrement) {
-
-    List<Coord> moves = new ArrayList<>();
-
-    for (yy = yy + yIncrement; yy >= 0 && yy < this.height; yy += yIncrement) {
-      xx -= yy % 2;
+      xx = op.performOperation(xx, yy);
       if (xx >= 0 && xx < this.width && this.tiles[xx][yy] != null
               && this.penguinLocs.get(new Coord(xx, yy)) == null) {
         moves.add(new Coord(xx, yy));
@@ -213,29 +237,6 @@ public class HexGameBoard implements GameBoard {
 
     return moves;
   }
-
-  //Get valid moves up-right diagonal OR down-right diagonal of tile of origin, depending on:
-  //yIncrement == -1 -> up right
-  //yIncrement == 1 -> down right
-  private List<Coord> getTilesRightDiagonal(int xx, int yy, int yIncrement) {
-
-    List<Coord> moves = new ArrayList<>();
-
-    for (yy = yy + yIncrement; yy >= 0 && yy < this.height; yy += yIncrement) {
-      xx += (yy + 1) % 2;
-      if (xx >= 0 && xx < this.width && this.tiles[xx][yy] != null
-              && this.penguinLocs.get(new com.fish.model.Coord(xx, yy)) == null) {
-        moves.add(new com.fish.model.Coord(xx, yy));
-      }
-      else {
-        break;
-      }
-    }
-
-    return moves;
-  }
-
-
 
 
   /////////////////////////////////Tile Handling
