@@ -1,7 +1,6 @@
 package com.fish.model.board;
 
 import com.fish.model.Coord;
-import com.fish.model.PlayerColor;
 
 import java.util.*;
 

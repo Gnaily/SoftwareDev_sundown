@@ -1,6 +1,8 @@
 package com.fish.view;
 
 import com.fish.model.Coord;
+import com.fish.model.GameState;
+import com.fish.model.HexGameState;
 import com.fish.model.board.GameBoard;
 
 import com.fish.model.board.HexGameBoard;
@@ -9,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 
@@ -23,7 +26,9 @@ public class HexBoardViewTest {
         Arrays.asList(new Coord(0, 1), new Coord(0, 2), new Coord(3, 3)),
         4, 1);
 
-    this.hbv = new HexBoardView(this.board);
+    GameState state = new HexGameState();
+    state.startGame(this.board, new ArrayList<>());
+    this.hbv = new HexBoardView(state);
   }
 
   @Test

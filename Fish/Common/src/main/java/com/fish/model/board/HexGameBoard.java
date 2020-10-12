@@ -1,12 +1,10 @@
 package com.fish.model.board;
 
 import com.fish.model.Coord;
-import com.fish.model.PlayerColor;
 import com.fish.model.tile.HexTile;
 import com.fish.model.tile.Tile;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 

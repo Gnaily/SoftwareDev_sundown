@@ -1,6 +1,7 @@
 package com.fish.view;
 
 import com.fish.model.Coord;
+import com.fish.model.GameState;
 import com.fish.model.PlayerColor;
 import com.fish.model.board.GameBoard;
 import com.fish.model.tile.Tile;
@@ -21,19 +22,19 @@ import javax.swing.*;
  */
 public class HexBoardView extends JPanel implements GameView {
 
-  private GameBoard board;
+  private GameState state;
   //Pixel Step is the length of the side of a single hex.
-  //In the future this will be calculated by the dimensions of the board and what can fit
+  //In the future this will be calculated by the dimensions of the state and what can fit
   //in a single window.
   final static int PIXEL_STEP = 50;
 
   /**
    * Constructor for rendering the image of the hexagon board.
-   * @param board a GameView object that contains all of the logistical data for placing images in
+   * @param state a GameView object that contains all of the logistical data for placing images in
    * the correct location in the view
    */
-  public HexBoardView(GameBoard board) {
-    this.board = board;
+  public HexBoardView(GameState state) {
+    this.state = state;
     this.setPreferredSize(this.calculateWindowSize());
   }
 
@@ -55,20 +56,20 @@ public class HexBoardView extends JPanel implements GameView {
     super.paintComponent(g);
     Graphics2D g2d = (Graphics2D) g;
 
-    for (int ii = 0; ii < board.getWidth(); ii++) {
-      for (int jj = 0; jj < board.getHeight(); jj++) {
-        Tile tile = board.getTileAt(new Coord(ii, jj));
+    for (int ii = 0; ii < state.getWidth(); ii++) {
+      for (int jj = 0; jj < state.getHeight(); jj++) {
+        Tile tile = state.getTileAt(new Coord(ii, jj));
         if (tile != null) {
           this.drawHexagon(tile, this.calculateTopLeftXValue(new Coord(ii, jj)), jj * PIXEL_STEP, g2d);
         }
       }
     }
 
-//    HashMap<Coord, PlayerColor> penguinLocs = board.getPenguinLocations();
-//    for (Coord c : penguinLocs.keySet()) {
-//      this.drawPenguin(penguinLocs.get(c), calculateTopLeftXValue(c),
-//          c.getY() * PIXEL_STEP, g2d);
-//    }
+    HashMap<Coord, PlayerColor> penguinLocs = state.getPenguinLocations();
+    for (Coord c : penguinLocs.keySet()) {
+      this.drawPenguin(penguinLocs.get(c), calculateTopLeftXValue(c),
+          c.getY() * PIXEL_STEP, g2d);
+    }
   }
 
   /**
@@ -161,8 +162,8 @@ public class HexBoardView extends JPanel implements GameView {
 
   //Calculates window size based off the PIXEL_STEP and number of hexagons
   Dimension calculateWindowSize() {
-    int w = this.board.getWidth();
-    int h = this.board.getHeight();
+    int w = this.state.getWidth();
+    int h = this.state.getHeight();
 
     /*
      The width of the window is determined as follows:

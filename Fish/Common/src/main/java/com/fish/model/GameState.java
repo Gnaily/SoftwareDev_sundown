@@ -1,12 +1,23 @@
 package com.fish.model;
 
+import com.fish.model.board.GameBoard;
 import com.fish.model.tile.Tile;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Add Later
  */
 public interface GameState {
+
+  // TODO: Fill out comments
+
+  /**
+   *
+   * @param board
+   * @param players
+   */
+  void startGame(GameBoard board, List<Player> players);
 
   /**
    * Retrieves the Tile located at the coordinate in the GameBoard.
@@ -70,6 +81,13 @@ public interface GameState {
    * @return an int with the height
    */
   int getHeight();
+
+  /**
+   *
+   */
+  void advanceToNextPlayer();
+
+  void removePlayer(PlayerColor color);
 
 
 }
