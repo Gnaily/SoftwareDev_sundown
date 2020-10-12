@@ -26,10 +26,11 @@ public interface GameBoard {
    * Given a coordinate of origin, returns a list of all possible coordinates a player can
    * make a valid move to from the origin.
    * @param start the coord of origin
+   * @param penguinLocs the location of all penguins on the board
    * @return a list of Coord indicating the possible valid moves
    * @throws IllegalArgumentException if the coord of origin is out of bounds or is a hole
    */
-  List<Coord> getTilesReachableFrom(Coord start);
+  List<Coord> getTilesReachableFrom(Coord start, List<Coord> penguinLocs);
 
   /**
    * Given a coordinate location within the dimensions of the game board,
@@ -51,31 +52,6 @@ public interface GameBoard {
    */
   Tile removeTileAt(Coord loc) throws IllegalArgumentException;
 
-  /**
-   * Returns a HashMap of penguin locations, formatted such that the Coord is the unique
-   * identifier of the location (since only one penguin can be on a tile at a time) and
-   * the PlayerColor is the value, to identify which player's penguin is on that location.
-   * @return a HashMap of Coord to PlayerColor values
-   */
-  HashMap<Coord, PlayerColor> getPenguinLocations();
-
-  /**
-   * Adds a penguin to the board at the given Coord location. Stores the PlayerColor of the
-   * particular player whose penguin is being placed. This method it only to be used at game
-   * start-up as players may not place a penguin once gameplay has begun.
-   * @param loc the coordinate location to place a penguin
-   * @param playerColor the color associated with the player placing the penguin
-   * @throws IllegalArgumentException if given Coord is out of bounds or there is a hole there
-   */
-  void placePenguin(Coord loc, PlayerColor playerColor);
-
-  /**
-   * Removes the element of the penguinLocs HashMap with the given unique Coord.
-   * @param loc the coordinate location to remove the penguin
-   * @return the playerColor that was at that location
-   * @throws IllegalArgumentException if there is no penguin present in the given location
-   */
-  PlayerColor removePenguin(Coord loc);
 
   /**
    * Returns the width of the game board, defined by the number of columns on the visual board.

@@ -26,10 +26,13 @@ public class HeyThatsMyFishMain {
         new Coord(2, 2), new Coord(1, 4));
     GameBoard holesBoard = new HexGameBoard(7, 3, holes,
         8, 1);
-    holesBoard.placePenguin(new Coord(1, 2), PlayerColor.BLACK);
-    holesBoard.placePenguin(new Coord(0, 1), PlayerColor.BROWN);
-    holesBoard.placePenguin(new Coord(0, 2), PlayerColor.WHITE);
-    holesBoard.placePenguin(new Coord(0, 3), PlayerColor.RED);
+
+    // this will need to be handled by the model now
+    // TODO: FIX MAIN METHOD
+//    holesBoard.placePenguin(new Coord(1, 2), PlayerColor.BLACK);
+//    holesBoard.placePenguin(new Coord(0, 1), PlayerColor.BROWN);
+//    holesBoard.placePenguin(new Coord(0, 2), PlayerColor.WHITE);
+//    holesBoard.placePenguin(new Coord(0, 3), PlayerColor.RED);
 
     //Example : A board with no holes and constant number of fish on each tile
     GameBoard constantFishNumBoard = new HexGameBoard(4, 4, 2);

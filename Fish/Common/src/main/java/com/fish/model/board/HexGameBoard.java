@@ -37,7 +37,6 @@ import java.util.Random;
 public class HexGameBoard implements GameBoard {
 
   private Tile[][] tiles;
-  private HashMap<Coord, PlayerColor> penguinLocs;
   private int width;
   private int height;
   private Random rand;
@@ -61,7 +60,6 @@ public class HexGameBoard implements GameBoard {
           + "one fish tiles");
     }
     this.tiles = new Tile[cols][rows];
-    this.penguinLocs = new HashMap<>();
     this.width = cols;
     this.height = rows;
     this.rand = new Random(System.currentTimeMillis());
@@ -82,7 +80,6 @@ public class HexGameBoard implements GameBoard {
     }
 
     this.tiles = new Tile[cols][rows];
-    this.penguinLocs = new HashMap<>();
     this.width = cols;
     this.height = rows;
 
@@ -164,11 +161,12 @@ public class HexGameBoard implements GameBoard {
    * Given a coordinate of origin, returns a list of all possible coordinates a player can
    * make a valid move to from the origin.
    * @param start the coord of origin
+   * @param penguinLocs the locations of all penguins on this board
    * @return a list of Coord indicating the possible valid moves
    * @throws IllegalArgumentException if the coord of origin is out of bounds or is a hole
    */
   @Override
-  public List<Coord> getTilesReachableFrom(Coord start) throws IllegalArgumentException {
+  public List<Coord> getTilesReachableFrom(Coord start, List<Coord> penguinLocs) throws IllegalArgumentException {
 
     int x = start.getX();
     int y = start.getY();
@@ -194,16 +192,16 @@ public class HexGameBoard implements GameBoard {
     TwoNumberOperation incrementXonYEven = (int aa, int bb) -> aa + (bb + 1) % 2;
 
     // directly up and down
-    moves.addAll(this.getTilesStraightLine(x, y, -2, returnFirstInput));
-    moves.addAll(this.getTilesStraightLine(x, y, 2, returnFirstInput));
+    moves.addAll(this.getTilesStraightLine(x, y, -2, returnFirstInput, penguinLocs));
+    moves.addAll(this.getTilesStraightLine(x, y, 2, returnFirstInput, penguinLocs));
 
     // right side diagonals
-    moves.addAll(this.getTilesStraightLine(x, y, -1, incrementXonYEven));
-    moves.addAll(this.getTilesStraightLine(x, y, 1, incrementXonYEven));
+    moves.addAll(this.getTilesStraightLine(x, y, -1, incrementXonYEven, penguinLocs));
+    moves.addAll(this.getTilesStraightLine(x, y, 1, incrementXonYEven, penguinLocs));
 
     // left side diagonals
-    moves.addAll(this.getTilesStraightLine(x, y, -1, decrementXonYOdd));
-    moves.addAll(this.getTilesStraightLine(x, y, 1, decrementXonYOdd));
+    moves.addAll(this.getTilesStraightLine(x, y, -1, decrementXonYOdd, penguinLocs));
+    moves.addAll(this.getTilesStraightLine(x, y, 1, decrementXonYOdd, penguinLocs));
 
     return moves;
   }
@@ -222,12 +220,13 @@ public class HexGameBoard implements GameBoard {
    * @param op Operation that defines how the x value should be changed
    * @return A list of all tiles reachable from the given location following the increment rules
    */
-  private List<Coord> getTilesStraightLine(int xx, int yy, int yIncrement, TwoNumberOperation op) {
+  private List<Coord> getTilesStraightLine(int xx, int yy, int yIncrement, TwoNumberOperation op,
+      List<Coord> penguinLocs) {
     List<Coord> moves = new ArrayList<>();
     for (yy = yy + yIncrement; yy >= 0 && yy < this.height; yy += yIncrement) {
       xx = op.performOperation(xx, yy);
       if (xx >= 0 && xx < this.width && this.tiles[xx][yy] != null
-              && this.penguinLocs.get(new Coord(xx, yy)) == null) {
+              && !penguinLocs.contains(new Coord(xx, yy))) {
         moves.add(new Coord(xx, yy));
       }
       else {
@@ -278,53 +277,6 @@ public class HexGameBoard implements GameBoard {
     return returnTile;
   }
 
-
-  /////////////////////////////////Penguin Handling
-
-  /**
-   * Returns a HashMap of penguin locations, formatted such that the Coord is the unique
-   * identifier of the location (since only one penguin can be on a tile at a time) and
-   * the PlayerColor is the value, to identify which player's penguin is on that location.
-   * @return a HashMap of Coord to PlayerColor values
-   */
-  @Override
-  public HashMap<Coord, PlayerColor> getPenguinLocations(){
-    return new HashMap<>(this.penguinLocs);
-  }
-
-  /**
-   * Adds a penguin to the board at the given Coord location. Stores the PlayerColor of the
-   * particular player whose penguin is being placed. This method it only to be used at game
-   * start-up as players may not place a penguin once gameplay has begun.
-   * @param loc the coordinate location to place a penguin
-   * @param playerColor the color associated with the player placing the penguin
-   * @throws IllegalArgumentException if given Coord is out of bounds or there is a hole there
-   */
-  @Override
-  public void placePenguin(Coord loc, PlayerColor playerColor) throws IllegalArgumentException {
-    checkTileInBounds(loc, "Cannot place a penguin off the board");
-    checkTilePresent(loc, "Cannot place a penguin on a tile that " +
-        "does not exist");
-    if (this.penguinLocs.containsKey(loc)) {
-      throw new IllegalArgumentException("There is already a penguin on this tile");
-    }
-    this.penguinLocs.put(loc, playerColor);
-  }
-
-  /**
-   * Removes the element of the penguinLocs HashMap with the given unique Coord.
-   * @param loc the coordinate location to remove the penguin
-   * @return the playerColor that was at that location
-   * @throws IllegalArgumentException if there is no penguin present in the given location
-   */
-  @Override
-  public PlayerColor removePenguin(Coord loc) throws IllegalArgumentException {
-    //--> Needs a check in place to make sure the user can not remove another player's penguin
-    if (this.penguinLocs.get(loc) == null) {
-      throw new IllegalArgumentException("There is no Penguin here to move");
-    }
-    return this.penguinLocs.remove(loc);
-  }
 
   /////////////////////////////////Getters and Helpers
 

@@ -2,13 +2,11 @@ package com.fish.model.board;
 
 import com.fish.model.Coord;
 import com.fish.model.PlayerColor;
-import java.util.HashMap;
+
+import java.util.*;
+
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -90,7 +88,7 @@ public class HexGameBoardTest {
             new Coord(2, 2), new Coord(2, 1),
             new Coord(1, 4), new Coord(0, 5), new Coord(0, 6)));
 
-    List<Coord> actualMoves = noHolesExpanded.getTilesReachableFrom(new Coord(1, 3));
+    List<Coord> actualMoves = noHolesExpanded.getTilesReachableFrom(new Coord(1, 3), new ArrayList<>());
 
 
     assertEquals(13, actualMoves.size());
@@ -101,7 +99,7 @@ public class HexGameBoardTest {
 
     // remove a tile and test it still works
     noHolesExpanded.removeTileAt(new Coord(1,2));
-    actualMoves = noHolesExpanded.getTilesReachableFrom(new Coord(1, 3));
+    actualMoves = noHolesExpanded.getTilesReachableFrom(new Coord(1, 3), new ArrayList<>());
     expectedMoves.remove(new Coord(1, 2));
     expectedMoves.remove(new Coord(0, 1));
     expectedMoves.remove(new Coord(0, 0));
@@ -121,8 +119,8 @@ public class HexGameBoardTest {
             new Coord(2, 2), new Coord(2, 1),
             new Coord(1, 4), new Coord(0, 5), new Coord(0, 6)));
 
-    noHolesExpanded.placePenguin(new Coord(1,2), PlayerColor.BROWN);
-    List<Coord> actualMoves = noHolesExpanded.getTilesReachableFrom(new Coord(1, 3));
+    List<Coord> actualMoves = noHolesExpanded.getTilesReachableFrom(new Coord(1, 3),
+        Collections.singletonList(new Coord(1, 2)));
 
     for (Coord c : expectedMoves) {
       assertTrue(actualMoves.contains(c));
@@ -132,7 +130,7 @@ public class HexGameBoardTest {
 
   @Test
   public void testGetTilesReachableMoreRemoved() {
-    List<Coord> moves = this.holesBoard.getTilesReachableFrom(new Coord(1, 2));
+    List<Coord> moves = this.holesBoard.getTilesReachableFrom(new Coord(1, 2), new ArrayList<>());
     assertEquals(7, moves.size());
   }
 
@@ -197,49 +195,6 @@ public class HexGameBoardTest {
     this.holesBoard.removeTileAt(new Coord(0, 0));
   }
 
-
-  /////Tests for Penguin Handling
-  @Test
-  public void testPutGetPenguin() {
-    assertEquals(0, this.holesBoard.getPenguinLocations().size());
-
-    this.holesBoard.placePenguin(new Coord(0, 2), PlayerColor.BROWN);
-    this.holesBoard.placePenguin(new Coord(1, 3), PlayerColor.BLACK);
-
-    HashMap<Coord, PlayerColor> pengs = this.holesBoard.getPenguinLocations();
-    assertEquals(2, pengs.size());
-    assertEquals(PlayerColor.BROWN, pengs.get(new Coord(0, 2)));
-    assertEquals(PlayerColor.BLACK, pengs.get(new Coord(1, 3)));
-    //A tile that doesnt exist on the board:
-    assertNull(pengs.get(new Coord(0, 0)));
-    //A tile that does:
-    assertNull(pengs.get(new Coord(0, 1)));
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void testPutTwoPenguinsSameLocation() {
-    this.holesBoard.placePenguin(new Coord(1, 0), PlayerColor.BROWN);
-    this.holesBoard.placePenguin(new Coord(1, 0), PlayerColor.BROWN);
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void testPutPenguinNoTile() {
-    this.holesBoard.placePenguin(new Coord(1, 1), PlayerColor.BROWN);
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void testRemovePenguinNoPenguin() {
-    this.noHolesBoard.removePenguin(new Coord(1, 1));
-  }
-
-  @Test
-  public void testPutRemovePenguin() {
-    assertEquals(0, this.noHolesBoard.getPenguinLocations().size());
-    this.noHolesBoard.placePenguin(new Coord(1, 1), PlayerColor.BROWN);
-    assertEquals(1, this.noHolesBoard.getPenguinLocations().size());
-    assertEquals(PlayerColor.BROWN, this.noHolesBoard.removePenguin(new Coord(1, 1)));
-    assertEquals(0, this.noHolesBoard.getPenguinLocations().size());
-  }
 
 
   /////Tests for basic getters and helper methods

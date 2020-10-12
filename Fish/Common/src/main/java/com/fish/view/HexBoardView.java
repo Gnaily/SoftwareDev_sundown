@@ -64,11 +64,11 @@ public class HexBoardView extends JPanel implements GameView {
       }
     }
 
-    HashMap<Coord, PlayerColor> penguinLocs = board.getPenguinLocations();
-    for (Coord c : penguinLocs.keySet()) {
-      this.drawPenguin(penguinLocs.get(c), calculateTopLeftXValue(c),
-          c.getY() * PIXEL_STEP, g2d);
-    }
+//    HashMap<Coord, PlayerColor> penguinLocs = board.getPenguinLocations();
+//    for (Coord c : penguinLocs.keySet()) {
+//      this.drawPenguin(penguinLocs.get(c), calculateTopLeftXValue(c),
+//          c.getY() * PIXEL_STEP, g2d);
+//    }
   }
 
   /**
