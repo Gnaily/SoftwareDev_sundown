@@ -1,4 +1,7 @@
-# Sundown | Dot Game System
+<div align="center">
+    <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/Logo.png" width="300"/>
+    <h1>Sundown | Dot Game System</h1>
+</div>
 
 **Purpose**  
 The Dot Game System is the ideal outlet for hackers to practice their coding skills. The system will provide game servers to which hackers can connect player software and compete in tournaments for cash prizes. 
