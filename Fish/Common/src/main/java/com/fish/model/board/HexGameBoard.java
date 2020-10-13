@@ -190,16 +190,16 @@ public class HexGameBoard implements GameBoard {
     TwoNumberOperation incrementXonYEven = (int aa, int bb) -> aa + (bb + 1) % 2;
 
     // directly up and down
-    moves.addAll(this.getTilesStraightLine(x, y, -2, returnFirstInput, penguinLocs));
-    moves.addAll(this.getTilesStraightLine(x, y, 2, returnFirstInput, penguinLocs));
+    moves.addAll(this.getTilesStraightLine(x, y, returnFirstInput, -2, penguinLocs));
+    moves.addAll(this.getTilesStraightLine(x, y, returnFirstInput, 2, penguinLocs));
 
     // right side diagonals
-    moves.addAll(this.getTilesStraightLine(x, y, -1, incrementXonYEven, penguinLocs));
-    moves.addAll(this.getTilesStraightLine(x, y, 1, incrementXonYEven, penguinLocs));
+    moves.addAll(this.getTilesStraightLine(x, y, incrementXonYEven, -1, penguinLocs));
+    moves.addAll(this.getTilesStraightLine(x, y, incrementXonYEven, 1, penguinLocs));
 
     // left side diagonals
-    moves.addAll(this.getTilesStraightLine(x, y, -1, decrementXonYOdd, penguinLocs));
-    moves.addAll(this.getTilesStraightLine(x, y, 1, decrementXonYOdd, penguinLocs));
+    moves.addAll(this.getTilesStraightLine(x, y, decrementXonYOdd, -1, penguinLocs));
+    moves.addAll(this.getTilesStraightLine(x, y, decrementXonYOdd, 1, penguinLocs));
 
     return moves;
   }
@@ -218,7 +218,7 @@ public class HexGameBoard implements GameBoard {
    * @param op Operation that defines how the x value should be changed
    * @return A list of all tiles reachable from the given location following the increment rules
    */
-  private List<Coord> getTilesStraightLine(int xx, int yy, int yIncrement, TwoNumberOperation op,
+  private List<Coord> getTilesStraightLine(int xx, int yy, TwoNumberOperation op, int yIncrement,
       List<Coord> penguinLocs) {
     List<Coord> moves = new ArrayList<>();
     for (yy = yy + yIncrement; yy >= 0 && yy < this.height; yy += yIncrement) {

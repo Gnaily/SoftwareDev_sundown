@@ -19,7 +19,6 @@ public class HexGameState implements GameState {
   private GameStage gameStage;
   private GameBoard gameBoard;
   private List<Player> players;
-  // List - RED, BROWN, ...
   // int index = 0, 1, 2, 3
   private int currentPlayerIndex;
   private Map<Coord, PlayerColor> penguinLocs;
@@ -34,11 +33,9 @@ public class HexGameState implements GameState {
   }
 
   public void startGame(GameBoard board, List<Player> players) {
-
     this.gameStage = GameStage.PLACING_PENGUINS;
     this.penguinLocs = new HashMap<>();
     this.gameBoard = board;
-
     this.players = players;
     this.currentPlayerIndex = 0;
   }
@@ -48,18 +45,12 @@ public class HexGameState implements GameState {
     return this.gameBoard.getTileAt(loc);
   }
 
-  @Override
-  public PlayerColor getCurrentPlayer() {
-    return this.players.get(this.currentPlayerIndex).getColor();
-  }
 
   /////////////////////////////////Penguin Handling
-
   @Override
   public HashMap<Coord, PlayerColor> getPenguinLocations(){
     return new HashMap<>(this.penguinLocs);
   }
-
 
   @Override
   public void placePenguin(Coord loc, PlayerColor playerColor) throws IllegalArgumentException {
@@ -72,10 +63,8 @@ public class HexGameState implements GameState {
     this.penguinLocs.put(loc, playerColor);
   }
 
-
   @Override
   public void movePenguin(Coord from, Coord to) throws IllegalArgumentException {
-    //--> Needs a check in place to make sure the user can not remove another player's penguin
     if (this.penguinLocs.get(from) == null) {
       throw new IllegalArgumentException("There is no Penguin here to move");
     }
@@ -96,7 +85,42 @@ public class HexGameState implements GameState {
   }
 
 
+  /////////////////////////////////Player Handling
 
+  @Override
+  public PlayerColor getCurrentPlayer() {
+    return this.players.get(this.currentPlayerIndex).getColor();
+  }
+
+  @Override
+  public void advanceToNextPlayer() {
+    this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.size();
+  }
+
+
+  @Override
+  public int getPlayerScore(PlayerColor playerColor) {
+    Player player = this.findPlayer(playerColor);
+
+    return player.getScore();
+  }
+
+
+  @Override
+  public void removePlayer(PlayerColor color) {
+    Player toRemove = this.findPlayer(color);
+
+    for (Coord cc : this.penguinLocs.keySet()) {
+      if (this.penguinLocs.get(cc) == color) {
+        this.penguinLocs.remove(cc);
+      }
+    }
+
+    this.players.remove(toRemove);
+    this.currentPlayerIndex %= this.players.size();
+  }
+
+  //Returns the player indicated by the given PlayerColor
   private Player findPlayer(PlayerColor color) {
     for (Player pp : this.players) {
       if (pp.getColor() == color) {
@@ -108,14 +132,11 @@ public class HexGameState implements GameState {
   }
 
 
-
+  ///////////////////////State Handling
   @Override
-  public int getPlayerScore(PlayerColor playerColor) {
-    Player player = this.findPlayer(playerColor);
-
-    return player.getScore();
+  public GameStage getGameStage() {
+    return this.gameStage;
   }
-
 
   @Override
   public boolean isGameOver() {
@@ -130,6 +151,7 @@ public class HexGameState implements GameState {
     return true;
   }
 
+  ///////////////////////Helpers
   @Override
   public int getWidth() {
     return this.gameBoard.getWidth();
@@ -138,28 +160,5 @@ public class HexGameState implements GameState {
   @Override
   public int getHeight() {
     return this.gameBoard.getHeight();
-  }
-
-  @Override
-  public void advanceToNextPlayer() {
-    this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.size();
-  }
-
-  @Override
-  public void removePlayer(PlayerColor color) {
-    /*
-     this.playerMap.remove(color)
-     */
-
-    Player toRemove = this.findPlayer(color);
-
-    for (Coord cc : this.penguinLocs.keySet()) {
-      if (this.penguinLocs.get(cc) == color) {
-        this.penguinLocs.remove(cc);
-      }
-    }
-
-    this.players.remove(toRemove);
-    this.currentPlayerIndex %= this.players.size();
   }
 }

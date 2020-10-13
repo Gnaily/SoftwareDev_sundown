@@ -59,6 +59,10 @@ public class Coord {
    */
   @Override
   public int hashCode() {
-    return xx * 67 + yy * 71;
+    int code = 17;
+    code = 31*code + xx;
+    code = 31*code + yy;
+
+    return code;
   }
 }

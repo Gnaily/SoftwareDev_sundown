@@ -27,12 +27,6 @@ public interface GameState {
   Tile getTileAt(Coord loc);
 
   /**
-   * Returns the Player whose current turn it is.
-   * @return the PlayerColor assigned to that Player
-   */
-  PlayerColor getCurrentPlayer();
-
-  /**
    * Places a penguin on a GameBoard in the PLACING_PENGUINS stage of a game of HTMF
    * @param loc the coordinate location on the GameBoard
    * @param playerColor the color assigned to the Player
@@ -56,11 +50,33 @@ public interface GameState {
   void movePenguin(Coord from, Coord to);
 
   /**
+   * Returns the Player whose current turn it is.
+   * @return the PlayerColor assigned to that Player
+   */
+  PlayerColor getCurrentPlayer();
+
+  /**
+   *
+   */
+  void advanceToNextPlayer();
+
+  /**
    * Given a specific playerColor, returns the score of that player.
    * @param playerColor the player's color
    * @return the player's score
    */
   int getPlayerScore(PlayerColor playerColor);
+
+  /**
+   *
+   * @param color
+   */
+  void removePlayer(PlayerColor color);
+
+  /**
+   *
+   */
+  GameStage getGameStage();
 
   /**
    * Determines whether there remains any valid move for any Player in the game.
@@ -81,13 +97,5 @@ public interface GameState {
    * @return an int with the height
    */
   int getHeight();
-
-  /**
-   *
-   */
-  void advanceToNextPlayer();
-
-  void removePlayer(PlayerColor color);
-
 
 }
