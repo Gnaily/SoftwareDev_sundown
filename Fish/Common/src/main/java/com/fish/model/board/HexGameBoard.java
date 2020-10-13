@@ -121,6 +121,33 @@ public class HexGameBoard implements GameBoard {
   }
 
 
+  // TODO: make null safe / 0,0 safe
+  // TODO: tests
+  /**
+   *
+   * @param values
+   */
+  public HexGameBoard(int[][] values) {
+
+    this.tiles = new Tile[values.length][values[0].length];
+    this.height = values[0].length;
+    this.width = values.length;
+
+    for (int iRow = 0; iRow < this.width; iRow++) {
+
+      for (int iCol = 0; iCol < this.height; iCol++) {
+        if (values[iRow][iCol] == 0) {
+          tiles[iRow][iCol] = new HexTile();
+        }
+        else {
+          tiles[iRow][iCol] = new HexTile(values[iRow][iCol]);
+        }
+      }
+    }
+
+  }
+
+
   /////////////////////////////////Initialize board
 
   //Fills the board with randomized tiles

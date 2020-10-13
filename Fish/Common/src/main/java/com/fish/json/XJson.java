@@ -65,4 +65,9 @@ public class XJson {
       }
     }
   }
+
+  public JsonArray getJsonArray() {
+    return this.jsonArray;
+  }
+
 }
