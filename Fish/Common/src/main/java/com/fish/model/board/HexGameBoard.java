@@ -13,7 +13,14 @@ import java.util.Random;
  *
  * The GameBoard object is a collection of Tile objects that represent the tiles used to play out
  * a game of HTMF. This implementation handles hexagon-shaped tiles, the layout of which is described
- * below:
+ * below. The location of each Tile in the data representation of the board can be found using a
+ * Coord object, which has one x and one y value that directly refer to the indices of
+ * the 2-d Array where the Tiles are stored. For example, the Tile at the top-left of the board
+ * illustrated below can be located using either one of the following methods:
+ * tiles[0][0] OR
+ * this.getTileAT(new Coord(0,0))
+ * But in this implementation the later is used throughout because the method implements checks that
+ * enforce the Tile object being retrieved is in fact on this board.
  *
  * <p>
  *  The Coordinate system for a hexagonal game is used as follows:
@@ -44,7 +51,7 @@ public class HexGameBoard implements GameBoard {
   private int height;
   private Random rand;
 
-  public static final int MAX_FISH = 5;
+  private static final int MAX_FISH = 5;
 
   /**
    * Constructor to build a general hex game board with randomized fish numbers per tile.
@@ -168,9 +175,12 @@ public class HexGameBoard implements GameBoard {
   /**
    * Given a coordinate of origin, returns a list of all possible coordinates a player can
    * make a valid move to from the origin.
-   * A valid move is defined by landing on any Coord location reachable by the start in either the
-   * up, down, up-left, up-right, down-left, or down-right directions.
-   * 'Reachable' means that there is no hole or penguin in the way to get there in a straight line.
+   * A valid move is defined by landing on any Coord location in a straight line from the
+   * Coord of origin in either the up, down, up-left, up-right, down-left, or down-right directions
+   * on the visible board.
+   * The coordinates of each direction are calculated by observing the change in x and y values
+   * as the coordinates move away from the Coord of origin.
+   * 'Reachable' also means that there is no hole or penguin in the way to get there in a straight line.
    * @param start the coord of origin
    * @param penguinLocs the locations of all penguins on this board
    * @return a list of Coord indicating the possible valid moves
