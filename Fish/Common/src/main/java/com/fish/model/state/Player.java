@@ -10,12 +10,10 @@ public class Player {
   private int age;
   private PlayerColor color;
   private int score;
-  //private List<Coord> penguinLocs;
 
   public Player(int age) {
     this.age = age;
     this.score = 0;
-    //this.penguinLocs = new ArrayList<>();
   }
 
 
@@ -58,27 +56,4 @@ public class Player {
   public PlayerColor getColor() {
     return this.color;
   }
-
-
-//  /**
-//   *
-//   * @param loc
-//   */
-//  public void removePenguin(Coord loc) {
-//    this.penguinLocs.remove(loc);
-//  }
-//
-//
-//  /**
-//   *
-//   * @param loc
-//   */
-//  public void addPenguin(Coord loc) {
-//    this.penguinLocs.add(loc);
-//  }
-//
-//  public List<Coord> getPenguinLocations() {
-//    return new ArrayList<>(this.penguinLocs);
-//  }
-
 }

@@ -37,7 +37,7 @@ public class HTMFMain {
     //Create the GameState
     GameState state = new HexGameState();
     List<Player> players = initilizePlayers();
-    state.startGame(holesBoard, players);
+    state.initGame(holesBoard, players);
 
     state.placePenguin(new Coord(1, 2), PlayerColor.BLACK);
     state.placePenguin(new Coord(0, 1), PlayerColor.BROWN);

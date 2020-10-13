@@ -27,7 +27,7 @@ public class HexBoardViewTest {
         4, 1);
 
     GameState state = new HexGameState();
-    state.startGame(this.board, new ArrayList<>());
+    state.initGame(this.board, new ArrayList<>());
     this.hbv = new HexBoardView(state);
   }
 

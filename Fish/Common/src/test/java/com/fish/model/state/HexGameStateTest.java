@@ -1,11 +1,7 @@
-package com.fish.model;
+package com.fish.model.state;
 
+import com.fish.model.Coord;
 import com.fish.model.board.HexGameBoard;
-import com.fish.model.state.GameStage;
-import com.fish.model.state.GameState;
-import com.fish.model.state.HexGameState;
-import com.fish.model.state.Player;
-import com.fish.model.state.PlayerColor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -33,18 +29,18 @@ public class HexGameStateTest {
     players.get(3).setColorColor(PlayerColor.RED);
 
     this.noHolesState = new HexGameState();
-    this.noHolesState.startGame(new HexGameBoard(6, 2, new ArrayList<>(),
+    this.noHolesState.initGame(new HexGameBoard(6, 2, new ArrayList<>(),
         5, 1), players);
 
 
     List<Coord> holes = Arrays.asList(new Coord(0, 0), new Coord(1, 1),
         new Coord(2, 2), new Coord(1, 4));
     this.holesState = new HexGameState();
-    this.holesState.startGame(new HexGameBoard(8, 3, holes, 8, 1),
+    this.holesState.initGame(new HexGameBoard(8, 3, holes, 8, 1),
         players);
 
     this.constantFishNumState = new HexGameState();
-    this.constantFishNumState.startGame(new HexGameBoard(4, 4, 2), players);
+    this.constantFishNumState.initGame(new HexGameBoard(4, 4, 2), players);
   }
 
 
@@ -73,7 +69,7 @@ public class HexGameStateTest {
 
   @Test
   public void testGetTileRemoved() {
-    assertEquals(null, this.holesState.getTileAt(new Coord(1, 4)));
+    assertFalse(this.holesState.getTileAt(new Coord(1, 4)).isPresent());
   }
 
   /////Penguin Handling
@@ -106,6 +102,7 @@ public class HexGameStateTest {
 
   @Test
   public void testPutMovePenguin() {
+    noHolesState.startPlay();
     assertEquals(0, this.noHolesState.getPenguinLocations().size());
     this.noHolesState.placePenguin(new Coord(1, 1), PlayerColor.BROWN);
     assertEquals(1, this.noHolesState.getPenguinLocations().size());
@@ -153,6 +150,7 @@ public class HexGameStateTest {
 
   @Test
   public void testGetPlayerScore() {
+    this.constantFishNumState.startPlay();
     //First move one tile over
     this.constantFishNumState.placePenguin(new Coord(0,0), PlayerColor.BLACK);
     this.constantFishNumState.movePenguin(new Coord(0,0), new Coord(0,1));
@@ -180,7 +178,7 @@ public class HexGameStateTest {
     //Create a situation wherein the game would be over
     List<Coord> holes = Arrays.asList(new Coord(0, 2), new Coord(0, 1));
     GameState gO =  new HexGameState();
-    gO.startGame(new HexGameBoard(3, 2, holes, 4, 1),
+    gO.initGame(new HexGameBoard(3, 2, holes, 4, 1),
         players);
     gO.placePenguin(new Coord(0,0), PlayerColor.WHITE);
     //Then call gameover
