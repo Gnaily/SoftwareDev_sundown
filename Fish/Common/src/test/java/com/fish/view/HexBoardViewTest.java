@@ -1,8 +1,8 @@
 package com.fish.view;
 
 import com.fish.model.Coord;
-import com.fish.model.GameState;
-import com.fish.model.HexGameState;
+import com.fish.model.state.GameState;
+import com.fish.model.state.HexGameState;
 import com.fish.model.board.GameBoard;
 
 import com.fish.model.board.HexGameBoard;

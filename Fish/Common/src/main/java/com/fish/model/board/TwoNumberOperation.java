@@ -6,7 +6,7 @@ package com.fish.model.board;
 public interface TwoNumberOperation {
 
   /**
-   * Perform an operation on two numbers and return the result
+   * Perform an operation on two numbers and return the result.
    *
    * @param aa first input number
    * @param bb second input number

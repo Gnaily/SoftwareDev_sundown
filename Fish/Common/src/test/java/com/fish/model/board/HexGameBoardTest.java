@@ -38,9 +38,14 @@ public class HexGameBoardTest {
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testSameNumberConstructorNegativeArgument() {
+  public void testConstantConstructorNegativeArgument() {
     GameBoard boardr = new HexGameBoard(4, -4, 2);
     GameBoard boardc = new HexGameBoard(-4, 4, 2);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testConstantConstructorTooManyFish() {
+    GameBoard tooManyFish = new HexGameBoard(4, 4, 20);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -54,7 +59,7 @@ public class HexGameBoardTest {
     int minOneFish = 0;
     for (int ii = 0; ii < this.noHolesBoard.getWidth(); ii++) {
       for (int jj = 0; jj < this.noHolesBoard.getHeight(); jj++) {
-        if (this.noHolesBoard.getTileAt(new Coord(ii, jj)) != null &&
+        if (this.noHolesBoard.getTileAt(new Coord(ii, jj)).isPresent() &&
             this.noHolesBoard.getTileAt(new Coord(ii, jj)).getNumFish() == 1) {
           minOneFish++;
         }
@@ -138,9 +143,14 @@ public class HexGameBoardTest {
   @Test
   public void getTileAtValid() {
     assertEquals(3, this.holesBoard.getTileAt(new Coord(0, 1)).getNumFish());
+    assertEquals(true, this.holesBoard.getTileAt(new Coord(0, 1)).isPresent());
     assertEquals(1, this.holesBoard.getTileAt(new Coord(1, 0)).getNumFish());
-    assertEquals(5, this.noHolesBoard.getTileAt(new Coord(1, 2)).getNumFish());
+    assertEquals(true, this.holesBoard.getTileAt(new Coord(1, 0)).isPresent());
+
     assertEquals(1, this.noHolesBoard.getTileAt(new Coord(0, 5)).getNumFish());
+    noHolesBoard.removeTileAt(new Coord(0,5));
+    assertEquals(1, this.noHolesBoard.getTileAt(new Coord(0, 5)).getNumFish());
+    assertEquals(false, this.noHolesBoard.getTileAt(new Coord(0, 5)).isPresent());
   }
 
   @Test
@@ -159,7 +169,7 @@ public class HexGameBoardTest {
 
   @Test
   public void testGetTileRemoved() {
-    assertEquals(null, this.holesBoard.getTileAt(new Coord(1, 4)));
+    assertEquals(false, this.holesBoard.getTileAt(new Coord(1, 4)).isPresent());
   }
 
   @Test

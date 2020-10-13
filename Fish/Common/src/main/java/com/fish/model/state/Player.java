@@ -1,7 +1,4 @@
-package com.fish.model;
-
-import java.util.ArrayList;
-import java.util.List;
+package com.fish.model.state;
 
 // TODO: fill out comments
 

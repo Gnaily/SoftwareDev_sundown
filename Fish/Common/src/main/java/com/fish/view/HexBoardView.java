@@ -1,9 +1,8 @@
 package com.fish.view;
 
 import com.fish.model.Coord;
-import com.fish.model.GameState;
-import com.fish.model.PlayerColor;
-import com.fish.model.board.GameBoard;
+import com.fish.model.state.GameState;
+import com.fish.model.state.PlayerColor;
 import com.fish.model.tile.Tile;
 
 import java.awt.*;

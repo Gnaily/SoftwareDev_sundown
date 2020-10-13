@@ -1,6 +1,11 @@
 package com.fish.model;
 
 import com.fish.model.board.HexGameBoard;
+import com.fish.model.state.GameStage;
+import com.fish.model.state.GameState;
+import com.fish.model.state.HexGameState;
+import com.fish.model.state.Player;
+import com.fish.model.state.PlayerColor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

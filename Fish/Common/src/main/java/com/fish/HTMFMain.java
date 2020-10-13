@@ -1,10 +1,10 @@
 package com.fish;
 
 import com.fish.model.Coord;
-import com.fish.model.GameState;
-import com.fish.model.HexGameState;
-import com.fish.model.Player;
-import com.fish.model.PlayerColor;
+import com.fish.model.state.GameState;
+import com.fish.model.state.HexGameState;
+import com.fish.model.state.Player;
+import com.fish.model.state.PlayerColor;
 import com.fish.model.board.GameBoard;
 import com.fish.model.board.HexGameBoard;
 import com.fish.view.GameView;
@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * Main method that launches a game of Hey, that's my Fish!
  */
-public class HeyThatsMyFishMain {
+public class HTMFMain {
 
   public static void main(String[] args) {
 

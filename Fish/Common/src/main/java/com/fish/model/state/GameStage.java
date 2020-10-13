@@ -1,4 +1,4 @@
-package com.fish.model;
+package com.fish.model.state;
 
 /**
  * What phase a current game of HTMF is in.

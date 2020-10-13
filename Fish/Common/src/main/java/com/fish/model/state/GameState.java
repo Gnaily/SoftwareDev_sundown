@@ -1,5 +1,6 @@
-package com.fish.model;
+package com.fish.model.state;
 
+import com.fish.model.Coord;
 import com.fish.model.board.GameBoard;
 import com.fish.model.tile.Tile;
 import java.util.HashMap;

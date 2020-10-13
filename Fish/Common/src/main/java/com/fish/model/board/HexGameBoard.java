@@ -9,9 +9,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Implementation of a GameBoard for a general game of Hey, That's my Fish!
- * Contains data representations for the tiles on the board, the locations of penguins/players,
- * and dimensions of the board.
+ * Implementation for a GameBoard object in a game of Hey, That's my Fish! (HTMF)
+ *
+ * The GameBoard object is a collection of Tile objects that represent the tiles used to play out
+ * a game of HTMF. This implementation handles hexagon-shaped tiles, the layout of which is described
+ * below:
  *
  * <p>
  *  The Coordinate system for a hexagonal game is used as follows:
@@ -31,6 +33,9 @@ import java.util.Random;
  *   This is an example of a board with 6 rows and 2 columns. For any given coordinate (x, y) the
  *   x value represents the column number and the y value represents the row number.
  * </p>
+ *
+ * A Tile that isPresent represents a Tile still visible on the game board, whereas a Tile that
+ * returns false for isPresent represents a hole in the visible/playable board.
  */
 public class HexGameBoard implements GameBoard {
 
@@ -42,8 +47,7 @@ public class HexGameBoard implements GameBoard {
   public static final int MAX_FISH = 5;
 
   /**
-   * Constructor to build a general game board.
-   * (The Random arg allows you to generate the same board multiple times)
+   * Constructor to build a general hex game board with randomized fish numbers per tile.
    * @param rows the number of rows of tiles on the board
    * @param cols the number of columns of tiles on the board
    * @param holes the specific number of holes to start the game with
@@ -77,6 +81,10 @@ public class HexGameBoard implements GameBoard {
       throw new IllegalArgumentException("There must be at least 1 row and column");
     }
 
+    if (numberOfFish > MAX_FISH) {
+      throw new IllegalArgumentException("The number of fish per tile is too many to fit on one tile");
+    }
+
     this.tiles = new Tile[cols][rows];
     this.width = cols;
     this.height = rows;
@@ -106,15 +114,18 @@ public class HexGameBoard implements GameBoard {
   }
 
 
+  /////////////////////////////////Initialize board
+
   //Fills the board with randomized tiles
   private void fillBoardWithTiles(List<Coord> holes, int minOneFishTiles) {
-    List<Integer> tileFishValues = generateTileValues(this.width * this.height - holes.size(),
-        minOneFishTiles);
+    List<Integer> tileFishValues = generateTileValues(
+        this.width * this.height - holes.size(), minOneFishTiles);
+
     //fill in the board taking one number at a time from the tileFishValues array
     for (int iRow = 0; iRow < this.tiles.length; iRow++) {
       for (int iCol = 0; iCol < this.tiles[iRow].length; iCol++) {
         if (holes.contains(new Coord(iRow, iCol))) {
-          this.tiles[iRow][iCol] = null;
+          this.tiles[iRow][iCol] = new HexTile();
         }
         else {
           this.tiles[iRow][iCol] = new HexTile(tileFishValues.remove(
@@ -142,8 +153,7 @@ public class HexGameBoard implements GameBoard {
     int ii = 0;
     while (ones < minOneFishTiles && ii < numValsNeeded) {
       if (fishValues.get(ii) != 1) {
-        fishValues.remove(ii);
-        fishValues.add(ii, 1);
+        fishValues.set(ii, 1);
         ones++;
       }
 
@@ -158,6 +168,9 @@ public class HexGameBoard implements GameBoard {
   /**
    * Given a coordinate of origin, returns a list of all possible coordinates a player can
    * make a valid move to from the origin.
+   * A valid move is defined by landing on any Coord location reachable by the start in either the
+   * up, down, up-left, up-right, down-left, or down-right directions.
+   * 'Reachable' means that there is no hole or penguin in the way to get there in a straight line.
    * @param start the coord of origin
    * @param penguinLocs the locations of all penguins on this board
    * @return a list of Coord indicating the possible valid moves
@@ -170,28 +183,29 @@ public class HexGameBoard implements GameBoard {
     int y = start.getY();
 
     checkTileInBounds(start, "Cannot move from a tile that is out of bounds");
-    checkTilePresent(start, "Cannot move from a tile that does not exist");
+    checkTilePresent(start, "Cannot move from a hole");
     List<Coord> moves = new ArrayList<>();
 
     // These TwoNumberOperations define different rules for incrementing x values while
     // finding reachable tiles (see hexagon coordinate diagram at the top of the file for how
     // tile coordinates are determined).
 
-    // Does not perform an operation and returns the first value. this is used for when going
-    //  directly above and below the starting tile.
-    TwoNumberOperation returnFirstInput = (int aa, int bb) -> aa;
+    // Does not perform an operation and returns the first value, which is the xx value.
+    // This is used for when moving directly above and below the starting tile, because in this case
+    // the xx value does not change.
+    TwoNumberOperation returnX = (int aa, int bb) -> aa;
 
-    // Decreases the first value by 1 whenever the second value is odd. This rule is used when
-    //  traversing either left-handed diagonal from the starting tile.
+    // Use to traverse Up-Left OR Down-Left
+    // Decreases the first value by 1 whenever the second value is odd.
     TwoNumberOperation decrementXonYOdd = (int aa, int bb) -> aa - bb % 2;
 
-    // Increases the first value by 1 whenever the second value is even. This rule is used when
-    //  traversing either left-handed diagonal from the starting tile.
+    // Use to traverse Up-Right OR Down-Right
+    // Increases the first value by 1 whenever the second value is even.
     TwoNumberOperation incrementXonYEven = (int aa, int bb) -> aa + (bb + 1) % 2;
 
     // directly up and down
-    moves.addAll(this.getTilesStraightLine(x, y, returnFirstInput, -2, penguinLocs));
-    moves.addAll(this.getTilesStraightLine(x, y, returnFirstInput, 2, penguinLocs));
+    moves.addAll(this.getTilesStraightLine(x, y, returnX, -2, penguinLocs));
+    moves.addAll(this.getTilesStraightLine(x, y, returnX, 2, penguinLocs));
 
     // right side diagonals
     moves.addAll(this.getTilesStraightLine(x, y, incrementXonYEven, -1, penguinLocs));
@@ -208,30 +222,32 @@ public class HexGameBoard implements GameBoard {
    * Get tiles reachable from a starting (x, y) location
    *
    * <p>
-   *   Holes (null values for a tile location) and Penguins are considered blockers that stop
+   *   Holes (isPresent == false for a tile location) and Penguins are considered blockers that stop
    *   tiles from being reachable.
    * </p>
    *
    * @param xx starting x location
    * @param yy starting y location
-   * @param yIncrement value to increment/decrement y by for every new tile to search
    * @param op Operation that defines how the x value should be changed
+   * @param yIncrement value to increment/decrement y by for every new tile to search
    * @return A list of all tiles reachable from the given location following the increment rules
    */
-  private List<Coord> getTilesStraightLine(int xx, int yy, TwoNumberOperation op, int yIncrement,
-      List<Coord> penguinLocs) {
+  private List<Coord> getTilesStraightLine(int xx, int yy,
+      TwoNumberOperation op, int yIncrement, List<Coord> penguinLocs) {
+
     List<Coord> moves = new ArrayList<>();
+
     for (yy = yy + yIncrement; yy >= 0 && yy < this.height; yy += yIncrement) {
       xx = op.performOperation(xx, yy);
-      if (xx >= 0 && xx < this.width && this.tiles[xx][yy] != null
-              && !penguinLocs.contains(new Coord(xx, yy))) {
+      if (xx >= 0 && xx < this.width
+          && this.tiles[xx][yy].isPresent()
+          && !penguinLocs.contains(new Coord(xx, yy))) {
         moves.add(new Coord(xx, yy));
       }
       else {
         break;
       }
     }
-
     return moves;
   }
 
@@ -241,6 +257,8 @@ public class HexGameBoard implements GameBoard {
   /**
    * Given a coordinate location within the dimensions of the game board,
    * returns the Tile object at that coordinate location.
+   * The Tile object that is returned may be a hole, in which case if you call
+   * isPresent on that Tile it returns false.
    * @param loc the coordinate location of the desired tile on the board
    * @return the Tile object at that location
    * @throws IllegalArgumentException if the requested tile is out of the bounds of the board
@@ -248,9 +266,6 @@ public class HexGameBoard implements GameBoard {
   @Override
   public Tile getTileAt(Coord loc) throws IllegalArgumentException {
     checkTileInBounds(loc, "Cannot retrieve a tile not on the board");
-    //We do not check for TilePresent because we want this to return null if the tile
-    //has been removed to differentiate from an arg that is out of bounds vs a tile that's
-    //been removed
     return tiles[loc.getX()][loc.getY()];
   }
 
@@ -265,13 +280,11 @@ public class HexGameBoard implements GameBoard {
    */
   @Override
   public Tile removeTileAt(Coord loc) throws IllegalArgumentException {
-    checkTileInBounds(loc, "Cannot remove a tile not on the board");
-    checkTilePresent(loc, "Cannot remove a tile that has already been removed");
-    int xx = loc.getX();
-    int yy = loc.getY();
+    checkTileInBounds(loc, "Cannot remove a tile that is not on the board");
+    checkTilePresent(loc, "Cannot remove a tile where a hole is already located");
 
     Tile returnTile = getTileAt(loc);
-    tiles[xx][yy] = null;
+    returnTile.meltTile();
     return returnTile;
   }
 
@@ -309,11 +322,8 @@ public class HexGameBoard implements GameBoard {
   //Purpose: To reduce the amount of times we need to write out checks that a tile at the given
   //Coord is present, and not a hole.
   private void checkTilePresent(Coord loc, String specificMsg) throws IllegalArgumentException {
-    int xx = loc.getX();
-    int yy = loc.getY();
-    if (tiles[xx][yy] == null) {
+    if (!this.getTileAt(loc).isPresent()) {
       throw new IllegalArgumentException(specificMsg);
     }
   }
-
 }

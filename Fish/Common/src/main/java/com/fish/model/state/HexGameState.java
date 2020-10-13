@@ -1,6 +1,7 @@
-package com.fish.model;
+package com.fish.model.state;
 
 
+import com.fish.model.Coord;
 import com.fish.model.board.GameBoard;
 import com.fish.model.tile.Tile;
 
@@ -18,7 +19,7 @@ public class HexGameState implements GameState {
 
   private GameStage gameStage;
   private GameBoard gameBoard;
-  private List<Player> players;
+  private List<Player> players; //only purpose is to increment score
   // int index = 0, 1, 2, 3
   private int currentPlayerIndex;
   private Map<Coord, PlayerColor> penguinLocs;

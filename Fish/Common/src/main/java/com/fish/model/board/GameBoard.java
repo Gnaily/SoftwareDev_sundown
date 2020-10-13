@@ -7,6 +7,7 @@ import java.util.List;
 
 /**
  * Interface for a GameBoard object in a game of Hey, That's my Fish! (HTMF)
+ *
  * The GameBoard object is a representation of the collection of tiles used to play out a game of
  * HTMF. The user of this interface has control over how to generate the precise design of the
  * board, including the shape of the tiles, determining the number of fish on tiles, and where

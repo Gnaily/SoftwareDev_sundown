@@ -1,4 +1,4 @@
-package com.fish.model;
+package com.fish.model.state;
 
 /**
  * Represents the assigned color of a player in a game of Hey, That's my Fish!
