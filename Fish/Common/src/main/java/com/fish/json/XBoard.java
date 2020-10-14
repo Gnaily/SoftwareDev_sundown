@@ -43,8 +43,8 @@ public class XBoard {
    * Assumes well-formatted JSON as specific in the testing guidelines. Turns the given JSON object's
    *  "board" field into a 2D array of ints to be used for board creation
    *
-   * @param jsonObject The properly formatted JSON object
-   * @return 2D array of ints representing tile values
+   * @param jsonObject (JsonObject) The properly formatted JSON object
+   * @return (int[][]) 2D array of ints representing tile values
    */
   public static int[][] getTileValues(JsonObject jsonObject) {
 
@@ -74,8 +74,8 @@ public class XBoard {
   /**
    * Assuming well-formatted JSON, parse the position field into a coordinate
    *
-   * @param obj JSON object containing position field to turn into a coordinate
-   * @return the coordinate found in the json object
+   * @param obj (JsonObject) JSON object containing position field to turn into a coordinate
+   * @return (Coord) the coordinate found in the json object
    */
   public static Coord getStartingCoordinate(JsonObject obj) {
     JsonArray array = obj.getAsJsonArray("position");

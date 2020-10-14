@@ -61,22 +61,22 @@ public class HexGameState implements GameState {
    * Moves the gameStage to the next stage, PLACING_PENGUINS, during which the players and gameboard
    * are constructed.
    *
-   * @param board the board to construct for the game
-   * @param players the list of players involved in the game
+   * @param board (GameBoard) the board to construct for the game
+   * @param players (List of Players) the list of players involved in the game
    */
   @Override
   public void initGame(GameBoard board, List<Player> players) {
     this.gameStage = GameStage.PLACING_PENGUINS;
     this.gameBoard = board;
-    this.players = players;
+    this.players = new ArrayList<>(players);
   }
 
   /**
    * Places a penguin on the board at the given location on behalf of the Player with the given
    * PlayerColor.
    *
-   * @param loc the coordinate location on the GameBoard
-   * @param playerColor the color assigned to the Player
+   * @param loc (Coord) the coordinate location on the GameBoard
+   * @param playerColor (PlayerColor) the color assigned to the Player
    * @throws IllegalArgumentException if there is no tile there to place the penguin on or if it is
    * already occupied by another penguin
    */
@@ -106,8 +106,8 @@ public class HexGameState implements GameState {
    * Updates the penguinLocs Hashmap to reflect the movement of penguins on the board.
    * Interpretation: Moves a penguin from one location of the visual playing board to another.
    *
-   * @param from the tile of origin
-   * @param to the tile to move the penguin to
+   * @param from (Coord) the tile of origin
+   * @param to (Coord) the tile to move the penguin to
    * @throws IllegalArgumentException if the from or to Coord is not present, if there is no penguin
    * to move on the from coord, or if the to Coord is already occupied by another penguin.
    * @throws IllegalStateException if the method is called before or after a game has been in play.
@@ -139,6 +139,9 @@ public class HexGameState implements GameState {
     player.addToScore(tile.getNumFish());
   }
 
+  /**
+   * Advance the game to be the next player's turn
+   */
   @Override
   public void advanceToNextPlayer() {
     this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.size();
@@ -148,7 +151,7 @@ public class HexGameState implements GameState {
    * Removes a player from the game by removing all of its penguins off the board and deleting its
    * score from the scoreKeeper field.
    *
-   * @param color the color of the player to remove
+   * @param color (PlayerColor) the color of the player to remove
    */
   @Override
   public void removePlayer(PlayerColor color) {
@@ -172,7 +175,7 @@ public class HexGameState implements GameState {
    * the length of the list returned by 'getTilesReachableFrom' is > 0 that implies that there are
    * tiles reachable from where a penguin currently stands and therefore the game is not yet over.
    *
-   * @return a boolean that determines whether the game is over
+   * @return (boolean) a boolean that determines whether the game is over
    */
   @Override
   public boolean isGameOver() {
@@ -189,12 +192,22 @@ public class HexGameState implements GameState {
 
   /////////////////////////////////Info Retrieval
 
+  /**
+   * Return the current gameStage of this game of HTMF
+   *
+   * @return (GameStage) the current gameStage
+   */
   @Override
   public GameStage getGameStage() {
     return this.gameStage;
   }
 
 
+  /**
+   * Return the current Player's color
+   *
+   * @return (PlayerColor) the current player's color
+   */
   @Override
   public PlayerColor getCurrentPlayer() {
     return this.players.get(this.currentPlayerIndex).getColor();
@@ -211,16 +224,33 @@ public class HexGameState implements GameState {
     throw new IllegalArgumentException("Player not found");
   }
 
+  /**
+   * Get the tile at the given location on the board
+   *
+   * @param loc (Coord) the coordinate location of the desired Tile
+   * @return (Tile) the tile at the given location
+   */
   @Override
   public Tile getTileAt(Coord loc) {
     return this.gameBoard.getTileAt(loc);
   }
 
+  /**
+   * Get the current locations of penguins on the board
+   *
+   * @return (Map<Coord, PlayerColor>) the current penguin locations on the board
+   */
   @Override
   public HashMap<Coord, PlayerColor> getPenguinLocations() {
     return new HashMap<>(this.penguinLocs);
   }
 
+  /**
+   * Get all of the given player's penguin locations
+   *
+   * @param playerColor (PlayerColor) the color assigned to the player
+   * @return (List<Coord>) the player's penguin locations
+   */
   @Override
   public List<Coord> getOnePlayersPenguins(PlayerColor playerColor) {
     List<Coord> pengs = new ArrayList<>();
@@ -232,6 +262,12 @@ public class HexGameState implements GameState {
     return pengs;
   }
 
+  /**
+   * Get the given player's score
+   *
+   * @param playerColor (PlayerColor) the player's color
+   * @return (int) the given player's score
+   */
   @Override
   public int getPlayerScore(PlayerColor playerColor) {
     Player player = this.findPlayer(playerColor);
@@ -239,11 +275,21 @@ public class HexGameState implements GameState {
     return player.getScore();
   }
 
+  /**
+   * Get the current width of the board
+   *
+   * @return (int) this board's width
+   */
   @Override
   public int getWidth() {
     return this.gameBoard.getWidth();
   }
 
+  /**
+   * Get the height of this game's board
+   *
+   * @return (int) the height of the board
+   */
   @Override
   public int getHeight() {
     return this.gameBoard.getHeight();

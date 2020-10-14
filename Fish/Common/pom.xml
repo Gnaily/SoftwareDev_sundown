@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.example</groupId>
-    <artifactId>Other</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>HTMF</artifactId>
+    <version>1.0</version>
     <properties>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
@@ -20,7 +20,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>TCPConnection</mainClass>
+                            <mainClass>${my.mainClass}</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

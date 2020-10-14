@@ -2,7 +2,9 @@ package com.fish.model.state;
 
 
 /**
- * Class to represent the internal player during a game of Fish
+ * Class to represent the internal player during a game of Fish. The Player of a game of HTMF
+ *  contains information about their score, age, and color. Before a game of HTMF begins, the
+ *  referee will assign each of the Player's a color and send them to the GameState.
  */
 public class Player {
 
@@ -20,7 +22,7 @@ public class Player {
    * Sets the player's color for a game of HTMF. This method will be used by the referee to assign
    * colors to players
    *
-   * @param color Color to set this player to
+   * @param color (PlayerColor) Color to set this player to
    */
   public void setColorColor(PlayerColor color) {
     this.color = color;
@@ -29,7 +31,7 @@ public class Player {
   /**
    * Get the age of this player
    *
-   * @return the player's age
+   * @return (int) the player's age
    */
   public int getAge() {
     return this.age;
@@ -38,7 +40,7 @@ public class Player {
   /**
    * Get this player's score during a game of HTMF
    *
-   * @return this player's score
+   * @return (int) this player's score
    */
   public int getScore() {
     return this.score;
@@ -47,7 +49,7 @@ public class Player {
   /**
    * Add points to this player's score during a game of HTMF
    *
-   * @param points the points to add
+   * @param points (int) the points to add
    */
   public void addToScore(int points) {
     this.score += points;
@@ -56,7 +58,7 @@ public class Player {
   /**
    * Get this player's assigned color
    *
-   * @return the player's color
+   * @return (PlayerColor) the player's color
    */
   public PlayerColor getColor() {
     return this.color;
