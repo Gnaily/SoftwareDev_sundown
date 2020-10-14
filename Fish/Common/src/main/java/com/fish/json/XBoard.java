@@ -8,11 +8,17 @@ import com.fish.model.board.GameBoard;
 import com.fish.model.board.HexGameBoard;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Scanner;
 
 public class XBoard {
 
+  /**
+   * Main function for running the XBoard integration tests. Consumes valid JSON from Standard,
+   *   parses that into a HexGameBoard, and then prints how many tiles are reachable from the
+   *   given position.
+   *
+   * @param args Command line arguments, not used
+   */
   public static void main(String[] args) {
 
     Scanner scan = new Scanner(System.in);
@@ -33,11 +39,12 @@ public class XBoard {
   }
 
 
-  // TODO: testing
   /**
+   * Assumes well-formatted JSON as specific in the testing guidelines. Turns the given JSON object's
+   *  "board" field into a 2D array of ints to be used for board creation
    *
-   * @param jsonObject
-   * @return
+   * @param jsonObject The properly formatted JSON object
+   * @return 2D array of ints representing tile values
    */
   public static int[][] getTileValues(JsonObject jsonObject) {
 
@@ -65,9 +72,10 @@ public class XBoard {
 
 
   /**
+   * Assuming well-formatted JSON, parse the position field into a coordinate
    *
-   * @param obj
-   * @return
+   * @param obj JSON object containing position field to turn into a coordinate
+   * @return the coordinate found in the json object
    */
   public static Coord getStartingCoordinate(JsonObject obj) {
     JsonArray array = obj.getAsJsonArray("position");

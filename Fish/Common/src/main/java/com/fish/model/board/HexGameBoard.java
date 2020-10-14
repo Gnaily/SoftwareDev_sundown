@@ -121,13 +121,15 @@ public class HexGameBoard implements GameBoard {
   }
 
 
-  // TODO: make null safe / 0,0 safe
   // TODO: tests
   /**
    *
    * @param values
    */
   public HexGameBoard(int[][] values) {
+    if (values.length == 0 || values[0].length == 0) {
+      throw new IllegalArgumentException("Tiles must be at least 1 by 1");
+    }
 
     this.tiles = new Tile[values.length][values[0].length];
     this.height = values[0].length;

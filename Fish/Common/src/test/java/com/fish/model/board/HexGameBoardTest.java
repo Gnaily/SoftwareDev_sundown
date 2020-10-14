@@ -79,6 +79,29 @@ public class HexGameBoardTest {
     assertTrue(minOneFish >= 8);
   }
 
+  // xBoard constructor tests
+  @Test(expected = IllegalArgumentException.class)
+  public void testXBoardBadInput() {
+    GameBoard board = new HexGameBoard(new int[0][1]);
+
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testXBoardBadInputRow() {
+    GameBoard board = new HexGameBoard(new int[2][0]);
+
+  }
+
+  @Test
+  public void testXBoardConstructor() {
+    int[][] nums = {{1, 1},{0, 2}};
+    GameBoard board = new HexGameBoard(nums);
+
+    assertEquals(2, board.getHeight());
+    assertFalse(board.getTileAt(new Coord(1, 0)).isPresent());
+    assertEquals(1, board.getTileAt(new Coord(0, 0)).getNumFish());
+  }
+
 
   /////Tests for Moves
   @Test
