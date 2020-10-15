@@ -13,6 +13,7 @@ public class XBoardTest {
 
   private JsonObject obj1;
   private JsonObject obj2;
+  private JsonObject obj3;
 
   @Before
   public void setUp() {
@@ -22,12 +23,20 @@ public class XBoardTest {
         + "        \"board\" : [[2,3,4],[1,1,1],[5,5,5],[4,4,4],[3,3,3],[2,2,2],[1,1,1],[4,4,4],[3,4,2]]\n"
         + "}\n";
 
+    String in3 = "{\n" + "        \"position\": [1,3],\n"
+            + "        \"board\" : [[2,3],[1,1,1],[5,5,5],[4,4],[3,3,3],[2,2,2],[1],[4,4,4],[3,4,2,1]]\n"
+            + "}\n";
+
     XJson xjson = new XJson();
     xjson.processInput(new Scanner(input));
     obj1 = xjson.getJsonArray().get(0).getAsJsonObject();
     xjson = new XJson();
     xjson.processInput(new Scanner(in2));
     obj2 = xjson.getJsonArray().get(0).getAsJsonObject();
+
+    xjson = new XJson();
+    xjson.processInput(new Scanner(in3));
+    obj3 = xjson.getJsonArray().get(0).getAsJsonObject();
 
   }
 
@@ -41,6 +50,21 @@ public class XBoardTest {
     assertEquals(1, nums[0][0]);
     assertEquals(4, nums[0][4]);
     assertEquals(0, nums[1][0]);
+  }
+
+  @Test
+  public void testGetTileValuesUnequalLength() {
+
+    int[][] nums = XBoard.getTileValues(obj3);
+
+    assertEquals(4, nums.length);
+    assertEquals(9, nums[0].length);
+
+    assertEquals(0, nums[2][6]);
+    assertEquals(0, nums[3][6]);
+    assertEquals(1, nums[3][8]);
+    assertEquals(2, nums[0][0]);
+
   }
 
   @Test public void getStartingCoordinate() {

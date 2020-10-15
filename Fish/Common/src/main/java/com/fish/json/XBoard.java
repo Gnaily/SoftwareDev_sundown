@@ -54,7 +54,7 @@ public class XBoard {
       return new int[0][0];
     }
 
-    int cols = array.get(0).getAsJsonArray().size();
+    int cols = findMaxLengthInArray(array);
 
     int[][] values = new int[cols][array.size()];
 
@@ -62,12 +62,28 @@ public class XBoard {
       JsonArray row = array.get(ii).getAsJsonArray();
 
       for (int jj = 0; jj < cols; jj++) {
-        values[jj][ii] = row.get(jj).getAsInt();
-
+        if (jj >= row.size()) {
+          values[jj][ii] = 0;
+        }
+        else {
+          values[jj][ii] = row.get(jj).getAsInt();
+        }
 
       }
     }
     return values;
+  }
+
+  public static int findMaxLengthInArray(JsonArray array) {
+
+    int max = 0;
+    for (int ii = 0; ii < array.size(); ii++) {
+      if (array.get(ii).getAsJsonArray().size() > max) {
+        max = array.get(ii).getAsJsonArray().size();
+      }
+    }
+
+    return max;
   }
 
 

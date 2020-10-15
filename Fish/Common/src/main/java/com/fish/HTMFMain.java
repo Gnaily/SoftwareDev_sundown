@@ -1,5 +1,9 @@
 package com.fish;
 
+import com.google.gson.JsonObject;
+
+import com.fish.json.XBoard;
+import com.fish.json.XJson;
 import com.fish.model.Coord;
 import com.fish.model.state.GameState;
 import com.fish.model.state.HexGameState;
@@ -12,6 +16,7 @@ import com.fish.view.HexBoardView;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 
 /**
  * Main method that launches a game of Hey, that's my Fish!

@@ -1,0 +1,3 @@
+#!/bin/bash
+
+mvn -f ./Common/pom.xml test -q -Dmy.exe=XTest

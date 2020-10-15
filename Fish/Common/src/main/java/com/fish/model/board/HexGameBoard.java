@@ -121,7 +121,6 @@ public class HexGameBoard implements GameBoard {
   }
 
 
-  // TODO: tests
   /**
    *
    * @param values

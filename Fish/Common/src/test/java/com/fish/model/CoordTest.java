@@ -14,9 +14,9 @@ public class CoordTest {
     Coord notEqualCoordY = new Coord(1, 8);
     Coord notEqualCoordX = new Coord(2, 0);
 
-    assertEquals(true, firstCoord.equals(equalCoord));
-    assertEquals(false, firstCoord.equals(notEqualCoordX));
-    assertEquals(false, firstCoord.equals(notEqualCoordY));
+    assertEquals(firstCoord, equalCoord);
+    assertNotEquals(firstCoord, notEqualCoordX);
+    assertNotEquals(firstCoord, notEqualCoordY);
   }
 
 

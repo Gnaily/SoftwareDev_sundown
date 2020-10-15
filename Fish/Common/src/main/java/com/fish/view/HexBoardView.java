@@ -58,7 +58,7 @@ public class HexBoardView extends JPanel implements GameView {
     for (int ii = 0; ii < state.getWidth(); ii++) {
       for (int jj = 0; jj < state.getHeight(); jj++) {
         Tile tile = state.getTileAt(new Coord(ii, jj));
-        if (!tile.isPresent()) {
+        if (tile.isPresent()) {
           this.drawHexagon(tile, this.calculateTopLeftXValue(new Coord(ii, jj)), jj * PIXEL_STEP, g2d);
         }
       }
