@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Other/Logo.png" width="300"/>
+    <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/images/Logo.png" width="300"/>
     <h1>Sundown | Dot Game System</h1>
 </div>
 
@@ -50,7 +50,7 @@ Run the main method to view the board in a new window.
 Foundations for the model have been laid in the Other/src/main/java/com/fish/model directory, in compliance with Maven file structure requirements.  
 
 ```
-Other/src/main/java/com.fish/
+Common/src/main/java/com.fish/
 |--/model
   |--/board
       |--GameBoard.java
@@ -72,7 +72,7 @@ Other/src/main/java/com.fish/
 Foundations for the view can be found in the Other/src/main/java/com/fish/view directory.
 
 ```
-Other/src/main/java/com.fish/
+Common/src/main/java/com.fish/
 |--/view
   |--GameView.java
   |--HexBoardView.java
@@ -87,11 +87,11 @@ Other/src/main/java/com.fish/
 The following UML diagrams support the maintaining of this repository. Pictured first is the model logic components. Second, visual components. Coord and PlayerColor are not pointing to any other class because they are additional tools that are used to facilitate the transfer of information between all other classes. 
 
 <div align="center">
-  <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Other/ModelUML.png"
+  <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/images/ModelUML.png"
        width="450"/>
     
     
-  <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Other/ViewUML.png"
+  <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/images/ViewUML.png"
        width="350"/>
 </div>
  
@@ -112,9 +112,9 @@ In order to test a random generated board, there exists a convenience constructo
 For all of our tests the seed is set to 1, and our three examples used to test the board, referenced above in [Running](#running) look like the following. Please click each photo for a closer look. To examine the exact constructor used to generate it captured at the top of the screenshot.  
 
 <div align="center">
-<img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Other/holesBoard.png" alt="holesBoard" width="420"/>
-<img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Other/noHolesBoard.png" alt="noHolesBoard" width="355"/>
-<img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Other/constantBoard.png" alt="constantFishNumBoard" width="540"/>
+<img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/images/holesBoard.png" alt="holesBoard" width="420"/>
+<img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/images/noHolesBoard.png" alt="noHolesBoard" width="355"/>
+<img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/images/constantBoard.png" alt="constantFishNumBoard" width="540"/>
 </div>
 
   
