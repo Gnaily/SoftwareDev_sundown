@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/Logo.png" width="300"/>
+    <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Other/Logo.png" width="300"/>
     <h1>Sundown | Dot Game System</h1>
 </div>
 
@@ -47,10 +47,10 @@ Run the main method to view the board in a new window.
 
 ### ii. Navigating Directories <a name="navDir"></a>
 **Model**  
-Foundations for the model have been laid in the Common/src/main/java/com/fish/model directory, in compliance with Maven file structure requirements.  
+Foundations for the model have been laid in the Other/src/main/java/com/fish/model directory, in compliance with Maven file structure requirements.  
 
 ```
-Common/src/main/java/com.fish/
+Other/src/main/java/com.fish/
 |--/model
   |--/board
       |--GameBoard.java
@@ -69,10 +69,10 @@ Common/src/main/java/com.fish/
 `GameBoard` is an interface implemented by `HexGameBoard` that manages the state of the board throughout gameplay. The `HexGameBoard` contains a 2-d Array of `Tile` in which null elements represent a hole. It also contains a HashMap of Coordinate keys and `PenguinColor` values that is updated with every move to reflect the location of penguins on the board.
 
 **View**  
-Foundations for the view can be found in the Common/src/main/java/com/fish/view directory.
+Foundations for the view can be found in the Other/src/main/java/com/fish/view directory.
 
 ```
-Common/src/main/java/com.fish/
+Other/src/main/java/com.fish/
 |--/view
   |--GameView.java
   |--HexBoardView.java
@@ -87,11 +87,11 @@ Common/src/main/java/com.fish/
 The following UML diagrams support the maintaining of this repository. Pictured first is the model logic components. Second, visual components. Coord and PlayerColor are not pointing to any other class because they are additional tools that are used to facilitate the transfer of information between all other classes. 
 
 <div align="center">
-  <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/ModelUML.png"
+  <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Other/ModelUML.png"
        width="450"/>
     
     
-  <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/ViewUML.png"
+  <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Other/ViewUML.png"
        width="350"/>
 </div>
  
@@ -112,9 +112,9 @@ In order to test a random generated board, there exists a convenience constructo
 For all of our tests the seed is set to 1, and our three examples used to test the board, referenced above in [Running](#running) look like the following. Please click each photo for a closer look. To examine the exact constructor used to generate it captured at the top of the screenshot.  
 
 <div align="center">
-<img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/holesBoard.png" alt="holesBoard" width="420"/>
-<img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/noHolesBoard.png" alt="noHolesBoard" width="355"/>
-<img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/constantBoard.png" alt="constantFishNumBoard" width="540"/>
+<img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Other/holesBoard.png" alt="holesBoard" width="420"/>
+<img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Other/noHolesBoard.png" alt="noHolesBoard" width="355"/>
+<img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Other/constantBoard.png" alt="constantFishNumBoard" width="540"/>
 </div>
 
   

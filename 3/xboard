@@ -1,4 +1,4 @@
 #!/bin/bash
 
-java -jar ../Fish/Common/target/XBoard-1.0.jar $@
+java -jar ../Fish/Other/target/XBoard-1.0.jar $@
 
