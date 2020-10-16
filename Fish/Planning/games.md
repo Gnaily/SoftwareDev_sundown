@@ -16,7 +16,7 @@ leads to a subsequent `GameState`. If a node does not have any outgoing edges,
 that means there are no legal moves from that position and the game is over.
 
 <div align="center">
-    <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/images/gameData.PNG" width="300"/>
+    <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/images/gameData.PNG"/>
     <p>Visual representation of `GameTree`</p>
 </div>
 
