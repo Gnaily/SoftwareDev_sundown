@@ -1,10 +1,10 @@
 <div align="center">
     <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/images/Logo.png" width="300"/>
-    <h1>Sundown | Dot Game System</h1>
+    <h1>Sundown | Game System</h1>
 </div>
 
 **Purpose**  
-The Dot Game System is the ideal outlet for hackers to practice their coding skills. The system will provide game servers to which hackers can connect player software and compete in tournaments for cash prizes. 
+The Fish Game System is the ideal outlet for hackers to practice their coding skills. The system will provide game servers to which hackers can connect player software and compete in tournaments for cash prizes. 
 
 **Use Cases**  
 While the primary audience of this system are AI software developers, there are three total use cases for this system:
@@ -37,55 +37,65 @@ In the absence of an executable, navigate to the HeyThatsMyFishMain.java file an
     //Example : A board with no holes and constant number of fish on each tile
     GameBoard constantFishNumBoard = new HexGameBoard(4, 4, 2);
 
-Pick your favorite GameBoard and use it as an argument to instantiate the HexBoardView that calls draw.Game(). For Example
+Pick your favorite GameBoard and use it as an argument to instantiate the GameState that calls draw.Game(). For Example
 
-    //Calling the View on one example
-    GameView gv = new HexBoardView(noHolesBoard);
+    //Create the GameState
+    GameState state = new HexGameState();
+    List<Player> players = initilizePlayers(); //initializePlayers is a method defined below the main method to generate players
+    state.initGame(holesBoard, players);
+    
+    //Call the View
+    GameView gv = new HexBoardView(state);
     gv.drawGame();
 
 Run the main method to view the board in a new window.
 
 ### ii. Navigating Directories <a name="navDir"></a>
 **Model**  
-Foundations for the model have been laid in the Other/src/main/java/com/fish/model directory, in compliance with Maven file structure requirements.  
+Foundations for the model have been built in the Other/src/main/java/com/fish/model directory, in compliance with Maven file structure requirements.  
 
 ```
 Common/src/main/java/com.fish/
-|--/model
-  |--/board
-      |--GameBoard.java
-      |--HexGameBoard.java
-  |--/tile
-      |--HexTile.java
-      |--Tile.java
-  |--Coord.java
-  |--PlayerColor.java
+    model/
+     |  board/
+     |   | GameBoard.java
+     |   | HexGameBoard.java
+     |   | TwoNumberOperation.java
+     |  state/
+     |   | GameStage.java
+     |   | GameState.java
+     |   | HexGameState.java
+     |   | Player.java
+     |   | PlayerColor.java
+     |  tile/
+     |   | HexTile.java
+     |   | Tile.java
+     |  Coord.java
 ```
 
-`Coord` is a class that represents a coordinate point on a cartesian plane and `PlayerColor` is an enumeration that represents one of the four colors a player's penguins can be. These two classes fascilitate the transfer of information between components.
+`GameBoard` is an interface implemented by `HexGameBoard` that represents the collection of tiles a game of HTMF is played on. The `HexGameBoard` contains a 2-d Array of `Tile`, and each individual `Tile` holds informaiton about whether or not it should be present on the visible playing plane. A GameBoard's only functionality is to maintain the layout and visibility of `Tile` objects. 
 
-`Tile` is an interface implemented by `HexTile` that has one single functionality: to return the number of fish on that tile.
+`GameState` is an interface implemented by `HexGameState` that manages the HTMF gaeme logic. A HexGameState has a `GameStage`, which is an enumeration that represents the different stages of a game: NOT_STARTED, PLACING_PENGUINS, IN_PLAY, and GAMEOVER. A `Player` represents an internal player and holds information about the player's age, score, and `PlayerColor`, which is an enumeration representing one of the four colors a player's avatars can be assigned. 
 
-`GameBoard` is an interface implemented by `HexGameBoard` that manages the state of the board throughout gameplay. The `HexGameBoard` contains a 2-d Array of `Tile` in which null elements represent a hole. It also contains a HashMap of Coordinate keys and `PenguinColor` values that is updated with every move to reflect the location of penguins on the board.
+`Tile` is an interface implemented by `HexTile` and has two purposes: to hold and return the number of fish on a tile, and to hold information about whether or not the tile has 'melted' eg disappears after a penguin departs from it. 
+
+`Coord` is a class that represents a coordinate point on a cartesian plane. Its xx and yy values correspond to the ii and jj indices of the 2-d Array of Tiles in the GameBoard object. This class fascilitates the transfer of information between components. 
 
 **View**  
 Foundations for the view can be found in the Other/src/main/java/com/fish/view directory.
 
 ```
 Common/src/main/java/com.fish/
-|--/view
-  |--GameView.java
-  |--HexBoardView.java
-  |--HexTileView.java
+    view/
+     |  GameView.java
+     |  HexBoardView.java
 ```
 
 `GameView` is an interface implemented by `HexBoardView` with one single method: drawGame(), which launches the image of the HTMF gameboard. 
 
-`HexTileView` is the class that handles the rendering of a single hexagon tile and all that can be drawn over it, including how to position and scale the fish and penguins and which color penguin to render. 
-
 ### iii. Maintaining Repository <a name="maintain"></a>
 The following UML diagrams support the maintaining of this repository. Pictured first is the model logic components. Second, visual components. Coord and PlayerColor are not pointing to any other class because they are additional tools that are used to facilitate the transfer of information between all other classes. 
-
+*Needs Updating*
 <div align="center">
   <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/images/ModelUML.png"
        width="450"/>
@@ -98,9 +108,9 @@ The following UML diagrams support the maintaining of this repository. Pictured 
 
 ### iv. Testing <a name="testing"></a>
 **How to Run Unit Tests**  
-From the Common directory, run `./xtest` This will run all unit tests through Maven and output feedback on the number of tests passed/failed, and where the failed tests are.  
+From the Fish directory, run `./xtest`. This will run all unit tests and output feedback on the number of tests passed/failed, and where the failed tests are.  
 
-In order to test a random generated board, there exists a convenience constructor in the HexGameBoard class just for testing. It takes in the regular arguments required by a HexGameBoard plus an integer to seed the Random object in HexGameBoard.  
+For individual test classes, in order to test a random generated board, there exists a convenience constructor in the HexGameBoard class just for testing. It takes in the regular arguments required by a HexGameBoard plus an integer to seed the Random object in HexGameBoard.  
 
     //Convenience Constructor for Testing:
     public HexGameBoard(int rows, int cols, List<Coord> holes, int minOneFishTiles, int randSeed) {
@@ -109,7 +119,7 @@ In order to test a random generated board, there exists a convenience constructo
         this.fillBoardWithTiles(holes, minOneFishTiles);
     }
     
-For all of our tests the seed is set to 1, and our three examples used to test the board, referenced above in [Running](#running) look like the following. Please click each photo for a closer look. To examine the exact constructor used to generate it captured at the top of the screenshot.  
+For all of our tests the seed is set to 1. Our three examples used throughout the test classes, and referenced above in [Running](#running), looked like the following during our prototype stage (we have since improved the visual component but the placement of holes and number of fish are the same). Please click each photo for a closer look. The constructor for the board object used to generate each board is captured in the screenshot above the board. 
 
 <div align="center">
 <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/images/holesBoard.png" alt="holesBoard" width="420"/>
@@ -117,7 +127,27 @@ For all of our tests the seed is set to 1, and our three examples used to test t
 <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/images/constantBoard.png" alt="constantFishNumBoard" width="540"/>
 </div>
 
-  
     
 **How to Run Test Harness**  
-*(To be filled in with the further development of the system.)*
+From the 3 directory run `./xboard`. 
+This will expect input from STD in. The input is expected to be in the format 
+```
+Board-Posn is
+      { "position" : Position,
+        "board" : Board}
+    Board is a JSON array of JSON arrays where each element is
+    either 0 or a number between 1 and 5.
+    The size of the board may not exceed a total of 25 tiles.
+    INTERPRETATION A 0 denotes a hole in the board configuration. All other
+    numbers specify the number of fish displayed on the tile.
+    
+    Position is a JSON array that contains two natural numbers:
+      [board-row,board-column].
+    INTERPRETATION The position uses the computer graphics coordinate system
+      meaning the Y axis points downwards. The position refers to a tile with at least one fish on it.
+
+```
+
+To send in a file instead of typing directly into STD in, run `./xboard < /path/to/file.json`
+        
+The output will be the number of tiles reachable from the given position on the given board. 
