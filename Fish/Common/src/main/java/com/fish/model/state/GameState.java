@@ -7,7 +7,13 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * Add Later
+ * Interface for a GameState in a game of Hey Thats my Fish (HTMF)
+ *
+ * Interpretation:
+ *  - Manages the player turns
+ *  - Ability to place and move penguins on the board
+ *  - Determine if the game is over
+ *  - Calculate score and winning players
  */
 public interface GameState {
 

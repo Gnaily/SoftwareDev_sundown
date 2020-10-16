@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * Implementation for a GameState object in a game of Hey, That's my Fish! (HTMF)
  *
- * GameStage Interpretations:
+ * GameState Interpretations:
  * GameStage.NOT_STARTED:
  *   The 'waiting room' stage wherein a GameState (or simply just a game) has been instantiated
  *   but the referee is waiting for players to gather. Therefore, when a HxGameState is instantiated
@@ -65,6 +65,9 @@ public class HexGameState implements GameState {
    */
   @Override
   public void initGame(GameBoard board, List<Player> players) {
+    if (players.size() < 2) {
+      throw new IllegalArgumentException("Needs at least 2 players");
+    }
     this.gameStage = GameStage.PLACING_PENGUINS;
     this.gameBoard = board;
     this.players = new ArrayList<>(players);
@@ -86,6 +89,7 @@ public class HexGameState implements GameState {
     this.checkIfTilePresent(loc);
 
     this.penguinLocs.put(loc, playerColor);
+    this.advanceToNextPlayer();
   }
 
   /////////////////////////////////ADVANCE TO IN_PLAY
@@ -119,6 +123,7 @@ public class HexGameState implements GameState {
     this.penguinLocs.put(to, color);
     Tile tile = this.gameBoard.removeTileAt(from);
     player.addToScore(tile.getNumFish());
+    this.advanceToNextPlayer();
   }
 
   //Checks that the move being made is valid for the current player and returns that Player

@@ -1,9 +1,5 @@
 package com.fish;
 
-import com.google.gson.JsonObject;
-
-import com.fish.json.XBoard;
-import com.fish.json.XJson;
 import com.fish.model.Coord;
 import com.fish.model.state.GameState;
 import com.fish.model.state.HexGameState;
@@ -16,7 +12,6 @@ import com.fish.view.HexBoardView;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Scanner;
 
 /**
  * Main method that launches a game of Hey, that's my Fish!
@@ -57,10 +52,10 @@ public class HTMFMain {
 
   private static List<Player> initilizePlayers() {
     List<Player> players = Arrays.asList(new Player(10), new Player(12), new Player(44), new Player(55));
-    players.get(0).setColorColor(PlayerColor.BROWN);
-    players.get(1).setColorColor(PlayerColor.BLACK);
-    players.get(2).setColorColor(PlayerColor.WHITE);
-    players.get(3).setColorColor(PlayerColor.RED);
+    players.get(0).setPlayerColor(PlayerColor.BROWN);
+    players.get(1).setPlayerColor(PlayerColor.BLACK);
+    players.get(2).setPlayerColor(PlayerColor.WHITE);
+    players.get(3).setPlayerColor(PlayerColor.RED);
     return players;
   }
 

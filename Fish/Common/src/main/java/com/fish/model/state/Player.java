@@ -24,7 +24,7 @@ public class Player {
    *
    * @param color (PlayerColor) Color to set this player to
    */
-  public void setColorColor(PlayerColor color) {
+  public void setPlayerColor(PlayerColor color) {
     this.color = color;
   }
 

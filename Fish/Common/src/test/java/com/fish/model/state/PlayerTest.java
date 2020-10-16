@@ -19,7 +19,7 @@ public class PlayerTest {
 
   @Test public void setColorColor() {
     assertNull(this.player1.getColor());
-    this.player1.setColorColor(PlayerColor.BLACK);
+    this.player1.setPlayerColor(PlayerColor.BLACK);
     assertEquals(PlayerColor.BLACK, this.player1.getColor());
   }
 

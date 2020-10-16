@@ -1,6 +1,7 @@
 package com.fish.model.state;
 
 import com.fish.model.Coord;
+import com.fish.model.board.GameBoard;
 import com.fish.model.board.HexGameBoard;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,10 +24,10 @@ public class HexGameStateTest {
 
     List<Player> players = new ArrayList<>(Arrays.asList(new Player(10), new Player(12),
         new Player(44), new Player(55)));
-    players.get(0).setColorColor(PlayerColor.BROWN);
-    players.get(1).setColorColor(PlayerColor.BLACK);
-    players.get(2).setColorColor(PlayerColor.WHITE);
-    players.get(3).setColorColor(PlayerColor.RED);
+    players.get(0).setPlayerColor(PlayerColor.BROWN);
+    players.get(1).setPlayerColor(PlayerColor.BLACK);
+    players.get(2).setPlayerColor(PlayerColor.WHITE);
+    players.get(3).setPlayerColor(PlayerColor.RED);
 
     this.noHolesState = new HexGameState();
     this.noHolesState.initGame(new HexGameBoard(6, 2, new ArrayList<>(),
@@ -39,10 +40,22 @@ public class HexGameStateTest {
     this.holesState.initGame(new HexGameBoard(8, 3, holes, 8, 1),
         players);
 
+    List<Player> lessPlayers = new ArrayList<>(Arrays.asList(new Player(10), new Player(12)));
+    lessPlayers.get(0).setPlayerColor(PlayerColor.BROWN);
+    lessPlayers.get(1).setPlayerColor(PlayerColor.BLACK);
     this.constantFishNumState = new HexGameState();
-    this.constantFishNumState.initGame(new HexGameBoard(4, 4, 2), players);
+    this.constantFishNumState.initGame(new HexGameBoard(4, 4, 2), lessPlayers);
   }
 
+
+  @Test
+  public void testInitGame() {
+    GameBoard gb = new HexGameBoard(5, 5, 3);
+    GameState gs = new HexGameState();
+    gs.initGame(gb, new ArrayList<>(Arrays.asList(new Player(10), new Player(12))));
+    assertEquals(GameStage.PLACING_PENGUINS, gs.getGameStage());
+    assertEquals(3, gs.getTileAt(new Coord(0,0)).getNumFish());
+  }
 
   /////Tests for Tile Handling
   @Test
@@ -86,6 +99,13 @@ public class HexGameStateTest {
     assertEquals(PlayerColor.BLACK, pengs.get(new Coord(1, 3)));
   }
 
+  @Test(expected = IllegalArgumentException.class)
+  public void testPlaceInvalidNotTurn() {
+    this.holesState.placePenguin(new Coord(0, 2), PlayerColor.BROWN);
+    holesState.advanceToNextPlayer();
+    this.holesState.placePenguin(new Coord(1, 3), PlayerColor.BLACK);
+  }
+
   @Test
   public void testPlaceThenGetNullPenguin() {
     assertEquals(0, this.holesState.getPenguinLocations().size());
@@ -101,15 +121,30 @@ public class HexGameStateTest {
   }
 
   @Test
-  public void testPutMovePenguin() {
-    noHolesState.startPlay();
-    assertEquals(0, this.noHolesState.getPenguinLocations().size());
-    this.noHolesState.placePenguin(new Coord(1, 1), PlayerColor.BROWN);
-    assertEquals(1, this.noHolesState.getPenguinLocations().size());
-    this.noHolesState.movePenguin(new Coord(1, 1), new Coord(0, 0));
-    assertEquals(1, this.noHolesState.getPenguinLocations().size());
-    assertNull(this.noHolesState.getPenguinLocations().get(new Coord(1, 1)));
-    assertEquals(PlayerColor.BROWN, this.noHolesState.getPenguinLocations().get(new Coord(0, 0)));
+  public void testPutThenMovePenguin() {
+    GameBoard gb = new HexGameBoard(3, 3, 2);
+    GameState gs = new HexGameState();
+
+    List<Player> players = new ArrayList<>(Arrays.asList(new Player(10), new Player(12)));
+    players.get(0).setPlayerColor(PlayerColor.WHITE);
+    players.get(1).setPlayerColor(PlayerColor.RED);
+
+    gs.initGame(gb, players);
+
+    gs.placePenguin(new Coord(1,2), PlayerColor.WHITE);
+    gs.placePenguin(new Coord(1,1), PlayerColor.RED);
+
+    gs.startPlay();
+
+    gs.movePenguin(new Coord(1,2), new Coord(0,0));
+    gs.movePenguin(new Coord(1,1), new Coord(1,0));
+    gs.movePenguin(new Coord(0,0), new Coord(0,2));
+    gs.movePenguin(new Coord(1,0), new Coord(0,1));
+
+    assertEquals(2, gs.getPenguinLocations().size());
+    assertNull(gs.getPenguinLocations().get(new Coord(1, 1)));
+    assertEquals(PlayerColor.WHITE, gs.getPenguinLocations().get(new Coord(0, 2)));
+
   }
 
 
@@ -135,6 +170,9 @@ public class HexGameStateTest {
   public void testGetOnePlayersPenguins() {
     this.noHolesState.placePenguin(new Coord(0, 2), PlayerColor.BROWN);
     assertEquals(1, this.noHolesState.getOnePlayersPenguins(PlayerColor.BROWN).size());
+    noHolesState.advanceToNextPlayer();
+    noHolesState.advanceToNextPlayer();
+    noHolesState.advanceToNextPlayer();
     this.noHolesState.placePenguin(new Coord(1,2), PlayerColor.BROWN);
     assertEquals(2, this.noHolesState.getOnePlayersPenguins(PlayerColor.BROWN).size());
   }
@@ -160,40 +198,118 @@ public class HexGameStateTest {
 
   @Test
   public void testGetPlayerScore() {
+
+    assertEquals(PlayerColor.BROWN, this.constantFishNumState.getCurrentPlayer());
+
+    this.constantFishNumState.placePenguin(new Coord(0,0), PlayerColor.BROWN);
+    this.constantFishNumState.placePenguin(new Coord(2,2), PlayerColor.BLACK);
     this.constantFishNumState.startPlay();
-    //First move one tile over
-    this.constantFishNumState.placePenguin(new Coord(0,0), PlayerColor.BLACK);
     this.constantFishNumState.movePenguin(new Coord(0,0), new Coord(0,1));
-    assertEquals(2, this.constantFishNumState.getPlayerScore(PlayerColor.BLACK));
+
+    assertEquals(2, this.constantFishNumState.getPlayerScore(PlayerColor.BROWN));
     //Now move across multiple tiles but make sure only the tile of origin is counted in score
+    constantFishNumState.advanceToNextPlayer();
     this.constantFishNumState.movePenguin(new Coord(0,1), new Coord(1,3));
-    assertEquals(4, this.constantFishNumState.getPlayerScore(PlayerColor.BLACK));
+    assertEquals(4, this.constantFishNumState.getPlayerScore(PlayerColor.BROWN));
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testRemovePlayer() {
-    this.holesState.removeCurrentPlayer(PlayerColor.WHITE);
-    this.holesState.getPlayerScore(PlayerColor.WHITE);
+  public void testPlayerIsGoneAtferRemove() {
+    this.holesState.removeCurrentPlayer();
+    this.holesState.getPlayerScore(PlayerColor.BROWN);
   }
+
+  @Test
+  public void testRemoveCurrentPlayer() {
+    this.holesState.removeCurrentPlayer();
+    assertEquals(PlayerColor.BLACK, this.holesState.getCurrentPlayer());
+  }
+
+  @Test
+  public void testRemoveCurrentPlayerLastIndex() {
+    this.holesState.advanceToNextPlayer();
+    this.holesState.advanceToNextPlayer();
+    this.holesState.advanceToNextPlayer();
+    this.holesState.removeCurrentPlayer();
+    assertEquals(PlayerColor.BROWN, this.holesState.getCurrentPlayer());
+  }
+
 
   @Test
   public void testIsGameOver() {
     List<Player> players = new ArrayList<>(Arrays.asList(new Player(10), new Player(12),
         new Player(44), new Player(55)));
-    players.get(0).setColorColor(PlayerColor.BROWN);
-    players.get(1).setColorColor(PlayerColor.BLACK);
-    players.get(2).setColorColor(PlayerColor.WHITE);
-    players.get(3).setColorColor(PlayerColor.RED);
+    players.get(0).setPlayerColor(PlayerColor.BROWN);
+    players.get(1).setPlayerColor(PlayerColor.BLACK);
+    players.get(2).setPlayerColor(PlayerColor.WHITE);
+    players.get(3).setPlayerColor(PlayerColor.RED);
 
     //Create a situation wherein the game would be over
     List<Coord> holes = Arrays.asList(new Coord(0, 2), new Coord(0, 1));
     GameState gO =  new HexGameState();
     gO.initGame(new HexGameBoard(3, 2, holes, 4, 1),
         players);
-    gO.placePenguin(new Coord(0,0), PlayerColor.WHITE);
+    gO.placePenguin(new Coord(0,0), PlayerColor.BROWN);
     //Then call gameover
     assertEquals(true, gO.isGameOver());
     assertEquals(GameStage.GAMEOVER, gO.getGameStage());
+  }
+
+  @Test
+  public void testIsGameOverWithMoves() {
+    GameBoard gb = new HexGameBoard(3, 3, 2);
+    GameState gs = new HexGameState();
+
+    List<Player> players = new ArrayList<>(Arrays.asList(new Player(10), new Player(12)));
+    players.get(0).setPlayerColor(PlayerColor.WHITE);
+    players.get(1).setPlayerColor(PlayerColor.RED);
+
+    gs.initGame(gb, players);
+
+    gs.placePenguin(new Coord(1,2), PlayerColor.WHITE);
+    gs.placePenguin(new Coord(1,1), PlayerColor.RED);
+
+    gs.startPlay();
+
+    gs.movePenguin(new Coord(1,2), new Coord(0,0));
+    gs.movePenguin(new Coord(1,1), new Coord(1,0));
+    gs.movePenguin(new Coord(0,0), new Coord(0,2));
+    gs.movePenguin(new Coord(1,0), new Coord(0,1));
+
+    assertEquals(true, gs.isGameOver());
+    assertEquals(2, gs.getWinners().size());
+  }
+
+  @Test
+  public void testGetWinners() {
+    GameBoard gb = new HexGameBoard(6, 2, 2);
+    GameState gs = new HexGameState();
+
+    List<Player> players = new ArrayList<>(Arrays.asList(new Player(10), new Player(12)));
+    players.get(0).setPlayerColor(PlayerColor.WHITE);
+    players.get(1).setPlayerColor(PlayerColor.RED);
+
+    gs.initGame(gb, players);
+
+    gs.placePenguin(new Coord(0,3), PlayerColor.WHITE);
+    gs.placePenguin(new Coord(1,2), PlayerColor.RED);
+
+    gs.startPlay();
+
+    gs.movePenguin(new Coord(0,3), new Coord(1,4));
+    gs.movePenguin(new Coord(1,2), new Coord(0,0));
+    gs.movePenguin(new Coord(1,4), new Coord(1,5));
+    gs.movePenguin(new Coord(0,0), new Coord(0,4));
+    gs.movePenguin(new Coord(1,5), new Coord(1,3));
+    gs.movePenguin(new Coord(0,4), new Coord(0,5));
+    gs.movePenguin(new Coord(1,3), new Coord(1,1));
+
+    gb.removeTileAt(new Coord(1,0));
+
+    assertEquals(true, gs.isGameOver());
+    assertEquals(1, gs.getWinners().size());
+    assertEquals(PlayerColor.WHITE, gs.getWinners().get(0));
+
   }
 
   @Test
