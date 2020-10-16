@@ -172,7 +172,7 @@ public class HexGameStateTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testRemovePlayer() {
-    this.holesState.removePlayer(PlayerColor.WHITE);
+    this.holesState.removeCurrentPlayer(PlayerColor.WHITE);
     this.holesState.getPlayerScore(PlayerColor.WHITE);
   }
 

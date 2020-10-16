@@ -30,5 +30,4 @@ public interface Tile {
    * Melts a tile, meaning changing the tile from visible in a game of HTMF to a hole.
    */
   void meltTile();
-
 }

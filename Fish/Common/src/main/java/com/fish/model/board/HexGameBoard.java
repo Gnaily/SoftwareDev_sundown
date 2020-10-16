@@ -122,7 +122,7 @@ public class HexGameBoard implements GameBoard {
 
 
   /**
-   *
+   * Convenience constructor for the test harness.
    * @param values
    */
   public HexGameBoard(int[][] values) {

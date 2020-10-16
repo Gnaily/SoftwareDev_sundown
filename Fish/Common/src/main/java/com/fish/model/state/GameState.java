@@ -49,15 +49,22 @@ public interface GameState {
   /**
    * Removes a player from the game by removing all of its penguins off the board and deleting
    * its score from the scoreKeeper field.
-   * @param color the color of the player to remove
    */
-  void removePlayer(PlayerColor color);
+  void removeCurrentPlayer();
 
   /**
    * Determines whether there remains any valid move for any Player in the game.
    * @return a boolean which determines if the game is over
    */
   boolean isGameOver();
+
+  /**
+   * If the game has ended, returns the list of winners.
+   * The list may have one playerColor on it, or if there is a tie then the list includes all
+   * tied winners.
+   * @return a list of playerColor of winners
+   */
+  List<PlayerColor> getWinners();
 
   /**
    * Return the GameStage emuneration that represents the current stage of the game, either
