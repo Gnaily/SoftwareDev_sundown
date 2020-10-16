@@ -40,13 +40,13 @@ public class XBoard {
 
 
   /**
-   * Assumes well-formatted JSON as specific in the testing guidelines. Turns the given JSON object's
+   * Assumes well-formatted JSON as specified in the testing guidelines. Turns the given JSON object's
    *  "board" field into a 2D array of ints to be used for board creation
    *
    * @param jsonObject (JsonObject) The properly formatted JSON object
    * @return (int[][]) 2D array of ints representing tile values
    */
-  public static int[][] getTileValues(JsonObject jsonObject) {
+  static int[][] getTileValues(JsonObject jsonObject) {
 
     JsonArray array = jsonObject.getAsJsonArray("board");
 
@@ -74,7 +74,13 @@ public class XBoard {
     return values;
   }
 
-  public static int findMaxLengthInArray(JsonArray array) {
+  /**
+   * Handles the possibility that the board's JSON representation does not have even dimensions.
+   * Finds the maximum length of any row in the full board representation.
+   * @param array
+   * @return
+   */
+  static int findMaxLengthInArray(JsonArray array) {
 
     int max = 0;
     for (int ii = 0; ii < array.size(); ii++) {
@@ -93,7 +99,7 @@ public class XBoard {
    * @param obj (JsonObject) JSON object containing position field to turn into a coordinate
    * @return (Coord) the coordinate found in the json object
    */
-  public static Coord getStartingCoordinate(JsonObject obj) {
+  static Coord getStartingCoordinate(JsonObject obj) {
     JsonArray array = obj.getAsJsonArray("position");
 
     return new Coord(

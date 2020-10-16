@@ -131,6 +131,16 @@ public class HexGameStateTest {
     this.holesState.placePenguin(new Coord(1, 1), PlayerColor.BROWN);
   }
 
+  @Test
+  public void testGetOnePlayersPenguins() {
+    this.noHolesState.placePenguin(new Coord(0, 2), PlayerColor.BROWN);
+    assertEquals(1, this.noHolesState.getOnePlayersPenguins(PlayerColor.BROWN).size());
+    this.noHolesState.placePenguin(new Coord(1,2), PlayerColor.BROWN);
+    assertEquals(2, this.noHolesState.getOnePlayersPenguins(PlayerColor.BROWN).size());
+  }
+
+
+
   //////Player Handling
   @Test
   public void testGetCurrentPlayerAndAdvance() {

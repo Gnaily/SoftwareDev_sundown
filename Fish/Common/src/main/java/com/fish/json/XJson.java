@@ -10,15 +10,11 @@ import com.google.gson.JsonSyntaxException;
 import java.util.Scanner;
 
 /**
- * Class from assignment C-JSON for handling json inputs
+ * Parses/Processes JSON input by translating it into Java objects.
  */
 public class XJson {
 
-  // TODO: edit to work for unit testing
-  // TODO: write unit testing script/main method
-
   private JsonArray jsonArray;
-
   public XJson() {
     this.jsonArray = new JsonArray();
   }
@@ -66,6 +62,10 @@ public class XJson {
     }
   }
 
+  /**
+   * Returns the json Array that stores the input
+   * @return
+   */
   public JsonArray getJsonArray() {
     return this.jsonArray;
   }

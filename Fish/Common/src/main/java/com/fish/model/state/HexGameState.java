@@ -36,12 +36,10 @@ import java.util.Map;
 public class HexGameState implements GameState {
 
   private GameStage gameStage;
-  private GameBoard gameBoard;
   private Map<Coord, PlayerColor> penguinLocs;
-
+  private int currentPlayerIndex; // int index = 0, 1, 2, 3
+  private GameBoard gameBoard;
   private List<Player> players; //needs to be initialized in the order of ascending age
-  // int index = 0, 1, 2, 3
-  private int currentPlayerIndex;
 
 
   /**
@@ -53,6 +51,7 @@ public class HexGameState implements GameState {
   public HexGameState() {
     this.gameStage = GameStage.NOT_STARTED;
     this.penguinLocs = new HashMap<>();
+    this.currentPlayerIndex = 0;
   }
 
   /////////////////////////////////ADVANCE TO PLACING_PENGUINS

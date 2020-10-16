@@ -42,9 +42,9 @@ public interface GameState {
   void movePenguin(Coord from, Coord to);
 
   /**
-   *
+   * Advance the game to be the next player's turn
    */
-  public void advanceToNextPlayer();
+  void advanceToNextPlayer();
 
   /**
    * Removes a player from the game by removing all of its penguins off the board and deleting
@@ -66,10 +66,11 @@ public interface GameState {
   GameStage getGameStage();
 
   /**
+   * Return the current Player's color
    *
-   * @return
+   * @return (PlayerColor) the current player's color
    */
-  public PlayerColor getCurrentPlayer();
+  PlayerColor getCurrentPlayer();
 
   /**
    * Retrieves the Tile located at the coordinate in the GameBoard.
