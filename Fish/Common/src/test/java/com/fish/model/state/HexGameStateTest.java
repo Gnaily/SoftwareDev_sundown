@@ -57,66 +57,35 @@ public class HexGameStateTest {
     assertEquals(3, gs.getTileAt(new Coord(0,0)).getNumFish());
   }
 
-  /////Tests for Tile Handling
-  @Test
-  public void testGetTileAtValid() {
-    assertEquals(3, this.holesState.getTileAt(new Coord(0, 1)).getNumFish());
-    assertEquals(1, this.holesState.getTileAt(new Coord(1, 0)).getNumFish());
-    assertEquals(5, this.noHolesState.getTileAt(new Coord(1, 2)).getNumFish());
-    assertEquals(1, this.noHolesState.getTileAt(new Coord(0, 5)).getNumFish());
-  }
-
-  @Test
-  public void testAllTilesSameValue() {
-    for (int ii = 0; ii < this.constantFishNumState.getWidth(); ii++) {
-      for (int jj = 0; jj < this.constantFishNumState.getHeight(); jj++) {
-        assertEquals(2, this.constantFishNumState.getTileAt(new Coord(ii, jj)).getNumFish());
-      }
-    }
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void testGetTileOutOfRange() {
-    this.noHolesState.getTileAt(new Coord(10, 10));
-  }
-
-  @Test
-  public void testGetTileRemoved() {
-    assertFalse(this.holesState.getTileAt(new Coord(1, 4)).isPresent());
-  }
-
   /////Penguin Handling
-  @Test
-  public void testPlaceThenGetPenguin() {
-    assertEquals(0, this.holesState.getPenguinLocations().size());
+  @Test(expected = IllegalArgumentException.class)
+  public void testPlaceInvalidNotTurn() {
+    this.holesState.placePenguin(new Coord(0, 2), PlayerColor.BROWN);//advances to the next player automatically
+    holesState.advanceToNextPlayer();//advance again to be out of place and trigger exception
+    this.holesState.placePenguin(new Coord(1, 3), PlayerColor.BLACK);
+  }
 
+
+  @Test
+  public void testPlacePenguin() {
+    assertEquals(0, this.holesState.getPenguinLocations().size());
     this.holesState.placePenguin(new Coord(0, 2), PlayerColor.BROWN);
     this.holesState.placePenguin(new Coord(1, 3), PlayerColor.BLACK);
-
     Map<Coord, PlayerColor> pengs = this.holesState.getPenguinLocations();
     assertEquals(2, pengs.size());
     assertEquals(PlayerColor.BROWN, pengs.get(new Coord(0, 2)));
     assertEquals(PlayerColor.BLACK, pengs.get(new Coord(1, 3)));
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  public void testPlaceInvalidNotTurn() {
-    this.holesState.placePenguin(new Coord(0, 2), PlayerColor.BROWN);
-    holesState.advanceToNextPlayer();
-    this.holesState.placePenguin(new Coord(1, 3), PlayerColor.BLACK);
-  }
-
   @Test
-  public void testPlaceThenGetNullPenguin() {
+  public void testGetNullPenguin() {
     assertEquals(0, this.holesState.getPenguinLocations().size());
-
     this.holesState.placePenguin(new Coord(0, 2), PlayerColor.BROWN);
     this.holesState.placePenguin(new Coord(1, 3), PlayerColor.BLACK);
-
     Map<Coord, PlayerColor> pengs = this.holesState.getPenguinLocations();
-    //A tile that doesnt exist on the board:
+    //A tile that is a hole:
     assertNull(pengs.get(new Coord(0, 0)));
-    //A tile that does:
+    //A tile on the board but where there is not a penguin:
     assertNull(pengs.get(new Coord(0, 1)));
   }
 
@@ -144,7 +113,6 @@ public class HexGameStateTest {
     assertEquals(2, gs.getPenguinLocations().size());
     assertNull(gs.getPenguinLocations().get(new Coord(1, 1)));
     assertEquals(PlayerColor.WHITE, gs.getPenguinLocations().get(new Coord(0, 2)));
-
   }
 
 
@@ -158,7 +126,7 @@ public class HexGameStateTest {
   @Test(expected = IllegalArgumentException.class)
   public void testPutPenguinsOverOtherPenguin() {
     this.holesState.placePenguin(new Coord(1, 0), PlayerColor.BROWN);
-    this.holesState.placePenguin(new Coord(1, 0), PlayerColor.RED);
+    this.holesState.placePenguin(new Coord(1, 0), PlayerColor.BLACK);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -176,7 +144,6 @@ public class HexGameStateTest {
     this.noHolesState.placePenguin(new Coord(1,2), PlayerColor.BROWN);
     assertEquals(2, this.noHolesState.getOnePlayersPenguins(PlayerColor.BROWN).size());
   }
-
 
 
   //////Player Handling
@@ -198,7 +165,6 @@ public class HexGameStateTest {
 
   @Test
   public void testGetPlayerScore() {
-
     assertEquals(PlayerColor.BROWN, this.constantFishNumState.getCurrentPlayer());
 
     this.constantFishNumState.placePenguin(new Coord(0,0), PlayerColor.BROWN);
@@ -208,13 +174,14 @@ public class HexGameStateTest {
 
     assertEquals(2, this.constantFishNumState.getPlayerScore(PlayerColor.BROWN));
     //Now move across multiple tiles but make sure only the tile of origin is counted in score
-    constantFishNumState.advanceToNextPlayer();
+    constantFishNumState.advanceToNextPlayer();//this is to skip the black penguin's move since we
+    //are testing specifically the brown penguin's score.
     this.constantFishNumState.movePenguin(new Coord(0,1), new Coord(1,3));
     assertEquals(4, this.constantFishNumState.getPlayerScore(PlayerColor.BROWN));
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testPlayerIsGoneAtferRemove() {
+  public void testPlayerIsGoneAfterRemove() {
     this.holesState.removeCurrentPlayer();
     this.holesState.getPlayerScore(PlayerColor.BROWN);
   }
@@ -230,10 +197,13 @@ public class HexGameStateTest {
     this.holesState.advanceToNextPlayer();
     this.holesState.advanceToNextPlayer();
     this.holesState.advanceToNextPlayer();
-    this.holesState.removeCurrentPlayer();
+    assertEquals(PlayerColor.RED, holesState.getCurrentPlayer());
+    this.holesState.removeCurrentPlayer();//remove red and ensure the current player index
+    //restarts to zero, which would mean it is brown's turn
     assertEquals(PlayerColor.BROWN, this.holesState.getCurrentPlayer());
   }
 
+  //////////////Testing Game Ending
 
   @Test
   public void testIsGameOver() {
@@ -310,6 +280,35 @@ public class HexGameStateTest {
     assertEquals(1, gs.getWinners().size());
     assertEquals(PlayerColor.WHITE, gs.getWinners().get(0));
 
+  }
+
+
+  /////Tests for Tile Handling
+  @Test
+  public void testGetTileAtValid() {
+    assertEquals(3, this.holesState.getTileAt(new Coord(0, 1)).getNumFish());
+    assertEquals(1, this.holesState.getTileAt(new Coord(1, 0)).getNumFish());
+    assertEquals(5, this.noHolesState.getTileAt(new Coord(1, 2)).getNumFish());
+    assertEquals(1, this.noHolesState.getTileAt(new Coord(0, 5)).getNumFish());
+  }
+
+  @Test
+  public void testAllTilesSameValue() {
+    for (int ii = 0; ii < this.constantFishNumState.getWidth(); ii++) {
+      for (int jj = 0; jj < this.constantFishNumState.getHeight(); jj++) {
+        assertEquals(2, this.constantFishNumState.getTileAt(new Coord(ii, jj)).getNumFish());
+      }
+    }
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testGetTileOutOfRange() {
+    this.noHolesState.getTileAt(new Coord(10, 10));
+  }
+
+  @Test
+  public void testGetTileRemoved() {
+    assertFalse(this.holesState.getTileAt(new Coord(1, 4)).isPresent());
   }
 
   @Test

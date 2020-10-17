@@ -330,6 +330,27 @@ public class HexGameBoard implements GameBoard {
   /////////////////////////////////Getters and Helpers
 
   /**
+   * Returns a copy of the gameboard by constructing a new version
+   * @return a GameBoard with all of the relevant information copied over
+   */
+  @Override
+  public GameBoard getCopyGameBoard() {
+    int[][] boardRep = new int[this.getWidth()][this.getHeight()];
+    //Gets a 2d array of int representing the number of fish on each tile at index/Coord ii, jj
+    for (int ii = 0; ii < this.getWidth(); ii++) {
+      for (int jj = 0; jj < this.getHeight(); jj++) {
+        if (this.getTileAt(new Coord(ii,jj)).isPresent()) {
+          boardRep[ii][jj] = this.getTileAt(new Coord(ii,jj)).getNumFish();
+        }
+        else {
+          boardRep[ii][jj] = 0;
+        }
+      }
+    }
+    return new HexGameBoard(boardRep);
+  }
+
+  /**
    * Returns the width of the game board, defined by the number of columns on the visual board
    * @return an int with the width
    */

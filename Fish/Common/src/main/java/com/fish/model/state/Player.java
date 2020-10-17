@@ -63,4 +63,15 @@ public class Player {
   public PlayerColor getColor() {
     return this.color;
   }
+
+  /**
+   * Returns a copy of this Player
+   * @return the Player
+   */
+  public Player getCopyPlayer() {
+    Player p = new Player(this.age);
+    p.addToScore(this.score);
+    p.setPlayerColor(this.color);
+    return p;
+  }
 }

@@ -73,6 +73,13 @@ public interface GameState {
   List<PlayerColor> getWinners();
 
   /**
+   * Returns a deep copy of the GameState.
+   * Every mutable field is copied so that the original is not modified.
+   * @return a deep copy of the gamestate
+   */
+  GameState getCopyGameState();
+
+  /**
    * Return the GameStage emuneration that represents the current stage of the game, either
    * NOT_STARTED, PLACING_PENGUINS, IN_PLAY, or GAMEOVER.
    */
@@ -91,6 +98,14 @@ public interface GameState {
    * @return the Tile object located there
    */
   Tile getTileAt(Coord loc);
+
+  /**
+   * Return a list of Coordinates of all the tiles reachable from a starting
+   * Coord given the location of all the other penguins on the board
+   * @param start the starting coordinate location
+   * @return the list of possible tiles to move to
+   */
+  List<Coord> getTilesReachableFrom(Coord start);
 
   /**
    * Returns a HashMap of penguin locations, formatted such that the Coord is the unique

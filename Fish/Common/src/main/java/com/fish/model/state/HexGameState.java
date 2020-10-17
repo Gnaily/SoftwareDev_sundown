@@ -6,6 +6,7 @@ import com.fish.model.board.GameBoard;
 import com.fish.model.tile.Tile;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +54,24 @@ public class HexGameState implements GameState {
     this.penguinLocs = new HashMap<>();
     this.currentPlayerIndex = 0;
   }
+
+  /**
+   * A private constructor called by the getStateCopy method that constructs a copy of the state
+   * @param gs the gamestate
+   * @param penguinLocs the penguin locations
+   * @param currentPlayerIndex the current player index
+   * @param players the list of players
+   * @param gameBoard the gameboard the game is played on
+   */
+  private HexGameState(GameStage gs, Map<Coord, PlayerColor> penguinLocs, int currentPlayerIndex,
+      List<Player> players, GameBoard gameBoard){
+    this.gameStage = gs;
+    this.penguinLocs = penguinLocs;
+    this.currentPlayerIndex = currentPlayerIndex;
+    this.players = players;
+    this.gameBoard = gameBoard;
+  }
+
 
   /////////////////////////////////ADVANCE TO PLACING_PENGUINS
 
@@ -230,6 +249,21 @@ public class HexGameState implements GameState {
   /////////////////////////////////Info Retrieval & Helpers
 
   /**
+   * Returns a deep copy of the GameState.
+   * Every mutable field is copied so that the original is not modified.
+   * @return a deep copy of the gamestate
+   */
+  @Override
+  public GameState getCopyGameState() {
+    List<Player> playersCopy = new ArrayList<>();
+    for (Player p: this.players){
+      playersCopy.add(p.getCopyPlayer());
+    }
+    return new HexGameState(this.gameStage, this.getPenguinLocations(), this.currentPlayerIndex,
+        playersCopy, this.gameBoard.getCopyGameBoard());
+  }
+
+  /**
    * Return the current gameStage of this game of HTMF
    *
    * @return (GameStage) the current gameStage
@@ -293,6 +327,18 @@ public class HexGameState implements GameState {
   }
 
   /**
+   * Return a list of Coordinates of all the tiles reachable from a starting
+   * Coord given the location of all the other penguins on the board
+   * @param start the starting coordinate location
+   * @return the list of possible tiles to move to
+   */
+  @Override
+  public List<Coord> getTilesReachableFrom(Coord start) {
+    return this.gameBoard.getTilesReachableFrom(start,
+        new ArrayList<>(this.penguinLocs.keySet()));
+  }
+
+  /**
    * Get the current locations of penguins on the board
    *
    * @return (Map<Coord, PlayerColor>) the current penguin locations on the board
@@ -341,7 +387,6 @@ public class HexGameState implements GameState {
       throw new IllegalArgumentException("There is already a penguin here!");
     }
   }
-
 
   /**
    * Get the current width of the board

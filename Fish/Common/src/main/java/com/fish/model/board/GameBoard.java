@@ -51,6 +51,11 @@ public interface GameBoard {
    */
   Tile removeTileAt(Coord loc) throws IllegalArgumentException;
 
+  /**
+   * Returns a copy of the gameboard by constructing a new version
+   * @return a GameBoard with all of the relevant information copied over
+   */
+  GameBoard getCopyGameBoard();
 
   /**
    * Returns the width of the game board, defined by the number of columns on the visual board.
