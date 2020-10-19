@@ -60,7 +60,7 @@ public class HexGameTree implements GameTree {
    * @param start the starting coord
    * @param dest the destination coord
    * @return the resulting GameState
-   * @throws IllegalArgumentException
+   * @throws IllegalArgumentException if the move is illegal
    */
   @Override
   public GameState getResultState(GameState gs, Coord start, Coord dest) throws IllegalArgumentException{
@@ -74,10 +74,10 @@ public class HexGameTree implements GameTree {
   /**
    * Returns the child node stemming from this current node after making the given action,
    * which is a move from the start coord to the destination coord by the current player.
-   * @param start
-   * @param dest
-   * @return
-   * @throws IllegalArgumentException
+   * @param start starting coordinate of the penguin to move
+   * @param dest ending coordinate of the penguin to move
+   * @return new GameTree after making the given move
+   * @throws IllegalArgumentException if the move is illegal
    */
   @Override
   public GameTree getNextGameTree (Coord start, Coord dest) throws IllegalArgumentException {
@@ -86,24 +86,24 @@ public class HexGameTree implements GameTree {
   }
 
 
-  @Override
-  public void applyFunctionToThisNode(Funtion f) {
-
-  }
-
-
-
-
-
-  /**
-   * Returns the parent node of this GameTree, which represents all moves taken in the game up to
-   * now. Altering the parent node does not actually alter the state.
-   * @return the parent node
-   */
-  @Override
-  public GameTree getParent() {
-    return this.parent;
-  }
+//  @Override
+//  public void applyFunctionToThisNode(Funtion f) {
+//
+//  }
+//
+//
+//
+//
+//
+//  /**
+//   * Returns the parent node of this GameTree, which represents all moves taken in the game up to
+//   * now. Altering the parent node does not actually alter the state.
+//   * @return the parent node
+//   */
+//  @Override
+//  public GameTree getParent() {
+//    return this.parent;
+//  }
 
 
 

@@ -3,6 +3,8 @@ package com.fish.model.state;
 import com.fish.model.Coord;
 import com.fish.model.board.GameBoard;
 import com.fish.model.board.HexGameBoard;
+import com.fish.model.tile.Tile;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -221,7 +223,7 @@ public class HexGameStateTest {
         players);
     gO.placePenguin(new Coord(0,0), PlayerColor.BROWN);
     //Then call gameover
-    assertEquals(true, gO.isGameOver());
+    assertTrue(gO.isGameOver());
     assertEquals(GameStage.GAMEOVER, gO.getGameStage());
   }
 
@@ -276,7 +278,7 @@ public class HexGameStateTest {
 
     gb.removeTileAt(new Coord(1,0));
 
-    assertEquals(true, gs.isGameOver());
+    assertTrue(gs.isGameOver());
     assertEquals(1, gs.getWinners().size());
     assertEquals(PlayerColor.WHITE, gs.getWinners().get(0));
 
@@ -322,4 +324,109 @@ public class HexGameStateTest {
     assertEquals(6, this.noHolesState.getHeight());
     assertEquals(4, this.constantFishNumState.getHeight());
   }
+
+
+  ///// Tests for copying the state
+  @Test
+  public void testCopyStateTilesConsistent() {
+    GameState copy = this.noHolesState.getCopyGameState();
+
+    for (int ii = 0; ii < copy.getWidth(); ii++) {
+      for (int jj = 0; jj < copy.getHeight(); jj++) {
+        Tile tile = copy.getTileAt(new Coord(ii, jj));
+        if (tile.isPresent()) {
+          assertEquals(tile.getNumFish(), this.noHolesState.getTileAt(new Coord(ii, jj)).getNumFish());
+        }
+        else {
+          assertFalse(this.noHolesState.getTileAt(new Coord(ii, jj)).isPresent());
+        }
+      }
+    }
+
+  }
+
+  @Test
+  public void testCopyStatePenguins() {
+    GameState gs = this.createSmallStateWithPenguins();
+
+    GameState copy = gs.getCopyGameState();
+
+    Map<Coord, PlayerColor> original = gs.getPenguinLocations();
+    Map<Coord, PlayerColor> penguinCopy = copy.getPenguinLocations();
+
+    for (Coord c : original.keySet()) {
+      assertEquals(original.get(c), penguinCopy.get(c));
+    }
+
+    gs.movePenguin(new Coord(1,2), new Coord(0,0));
+    copy.movePenguin(new Coord(1, 2), new Coord(0, 1));
+
+    // check penguins only move in one State at a time, not both
+    assertNull(gs.getPenguinLocations().get(new Coord(0, 1)));
+    assertNull(copy.getPenguinLocations().get(new Coord(0, 0)));
+
+    assertNotNull(gs.getPenguinLocations().get(new Coord(0, 0)));
+    assertNotNull(copy.getPenguinLocations().get(new Coord(0, 1)));
+  }
+
+  @Test
+  public void testCopyStateBoardIsCopy() {
+    GameState gs = this.createSmallStateWithPenguins();
+    GameState copy = gs.getCopyGameState();
+
+    Coord oneTwo = new Coord(1, 2);
+
+    assertEquals(copy.getTileAt(oneTwo).getNumFish(),
+            gs.getTileAt(oneTwo).getNumFish());
+    assertTrue(copy.getTileAt(oneTwo).isPresent());
+    assertTrue(gs.getTileAt(oneTwo).isPresent());
+
+    gs.movePenguin(oneTwo, new Coord(0,0));
+
+    assertTrue(copy.getTileAt(oneTwo).isPresent());
+    assertFalse(gs.getTileAt(oneTwo).isPresent());
+
+  }
+
+  @Test
+  public void testCopyPlayersList() {
+    GameState gs = this.createSmallStateWithPenguins();
+    GameState copy = gs.getCopyGameState();
+
+    gs.advanceToNextPlayer();
+
+    assertEquals(PlayerColor.RED, gs.getCurrentPlayer());
+    assertEquals(PlayerColor.WHITE, copy.getCurrentPlayer());
+
+    gs.removeCurrentPlayer();
+
+    assertEquals(PlayerColor.WHITE, gs.getCurrentPlayer());
+    assertEquals(PlayerColor.WHITE, copy.getCurrentPlayer());
+
+    gs.advanceToNextPlayer();
+    copy.advanceToNextPlayer();
+
+    assertEquals(PlayerColor.WHITE, gs.getCurrentPlayer());
+    assertEquals(PlayerColor.RED, copy.getCurrentPlayer());
+
+  }
+
+  private GameState createSmallStateWithPenguins() {
+    GameBoard gb = new HexGameBoard(3, 3, 2);
+    GameState gs = new HexGameState();
+
+    List<Player> players = new ArrayList<>(Arrays.asList(new Player(10), new Player(12)));
+    players.get(0).setPlayerColor(PlayerColor.WHITE);
+    players.get(1).setPlayerColor(PlayerColor.RED);
+
+    gs.initGame(gb, players);
+
+    gs.placePenguin(new Coord(1,2), PlayerColor.WHITE);
+    gs.placePenguin(new Coord(1,1), PlayerColor.RED);
+
+    gs.startPlay();
+
+    return gs;
+  }
+
 }

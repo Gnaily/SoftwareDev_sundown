@@ -6,13 +6,15 @@ import com.fish.model.state.HexGameState;
 import com.fish.model.board.GameBoard;
 
 import com.fish.model.board.HexGameBoard;
+import com.fish.model.state.Player;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 
 public class HexBoardViewTest {
@@ -27,7 +29,8 @@ public class HexBoardViewTest {
         4, 1);
 
     GameState state = new HexGameState();
-    state.initGame(this.board, new ArrayList<>());
+    List<Player> players = Arrays.asList(new Player(10), new Player(15));
+    state.initGame(this.board, players);
     this.hbv = new HexBoardView(state);
   }
 

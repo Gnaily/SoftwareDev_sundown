@@ -1,6 +1,7 @@
 package com.fish.model.board;
 
 import com.fish.model.Coord;
+import com.fish.model.tile.Tile;
 
 import java.util.*;
 
@@ -242,5 +243,44 @@ public class HexGameBoardTest {
     assertEquals(6, this.noHolesBoard.getHeight());
     assertEquals(4, this.constantFishNumBoard.getHeight());
   }
+
+
+  //// Tests for copying a board
+  @Test
+  public void testGetCopyBoardTilesConsistent() {
+    GameBoard copy = this.noHolesBoard.getCopyGameBoard();
+
+    for (int ii = 0; ii < copy.getWidth(); ii++) {
+      for (int jj = 0; jj < copy.getHeight(); jj++) {
+        Tile tile = copy.getTileAt(new Coord(ii, jj));
+        if (tile.isPresent()) {
+          assertEquals(tile.getNumFish(), this.noHolesBoard.getTileAt(new Coord(ii, jj)).getNumFish());
+        }
+        else {
+          assertFalse(this.noHolesBoard.getTileAt(new Coord(ii, jj)).isPresent());
+        }
+      }
+
+    }
+
+  }
+
+  @Test
+  public void testGetCopyAlterBoard() {
+    GameBoard copy = this.holesBoard.getCopyGameBoard();
+    Coord cc = new Coord(0, 4);
+    assertTrue(this.holesBoard.getTileAt(cc).isPresent());
+    assertTrue(copy.getTileAt(cc).isPresent());
+
+    this.holesBoard.removeTileAt(cc);
+    assertTrue(copy.getTileAt(cc).isPresent());
+    assertFalse(this.holesBoard.getTileAt(cc).isPresent());
+
+    cc = new Coord(0, 2);
+    copy.removeTileAt(cc);
+    assertFalse(copy.getTileAt(cc).isPresent());
+    assertTrue(this.holesBoard.getTileAt(cc).isPresent());
+  }
+
 
 }

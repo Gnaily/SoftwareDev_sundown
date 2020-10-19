@@ -6,10 +6,10 @@ import com.fish.model.board.GameBoard;
 import com.fish.model.tile.Tile;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Implementation for a GameState object in a game of Hey, That's my Fish! (HTMF)
@@ -73,7 +73,7 @@ public class HexGameState implements GameState {
   }
 
 
-  /////////////////////////////////ADVANCE TO PLACING_PENGUINS
+  ///////////////////////////////// ADVANCE TO PLACING_PENGUINS
 
   /**
    * Moves the gameStage to the next stage, PLACING_PENGUINS, during which the players and gameboard
@@ -178,12 +178,19 @@ public class HexGameState implements GameState {
    */
   @Override
   public void removeCurrentPlayer() {
-    PlayerColor toRemove = this.getCurrentPlayer();
+    PlayerColor playerToRemove = this.getCurrentPlayer();
 
-    for (Coord cc : this.penguinLocs.keySet()) {
-      if (this.penguinLocs.get(cc) == toRemove) {
-        this.penguinLocs.remove(cc);
+    // Doing this is one foreach causes a ConcurrentModificationException
+    Set<Coord> coords = this.penguinLocs.keySet();
+    List<Coord> penguinsToRemove = new ArrayList<>();
+    for (Coord cc : coords) {
+      if (this.penguinLocs.get(cc) == playerToRemove) {
+        penguinsToRemove.add(cc);
       }
+    }
+
+    for (Coord c : penguinsToRemove) {
+      this.penguinLocs.remove(c);
     }
 
     //The mod ensures that the next currentPlayerIndex is a valid index that reflects the changes
