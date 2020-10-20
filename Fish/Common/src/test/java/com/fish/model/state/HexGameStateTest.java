@@ -468,5 +468,15 @@ public class HexGameStateTest {
     assertEquals(4, this.constantFishNumGame.getHeight());
   }
 
+  @Test
+  public void testGetPlayers() {
+    assertEquals(4, this.fourPlayerGame.getPlayers().size());
+    assertEquals(PlayerColor.BROWN, this.fourPlayerGame.getPlayers().get(0).getColor());
+    assertEquals(PlayerColor.BLACK, this.fourPlayerGame.getPlayers().get(1).getColor());
+    assertEquals(PlayerColor.WHITE, this.fourPlayerGame.getPlayers().get(2).getColor());
+    assertEquals(PlayerColor.RED, this.fourPlayerGame.getPlayers().get(3).getColor());
+
+  }
+
 
 }

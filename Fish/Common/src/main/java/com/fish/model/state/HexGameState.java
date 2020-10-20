@@ -440,6 +440,16 @@ public class HexGameState implements GameState {
     return this.gameBoard.getHeight();
   }
 
+  /**
+   * Return the array of players in this game of fish
+   *
+   * @return the array of players
+   */
+  @Override
+  public List<Player> getPlayers() {
+    return new ArrayList<>(this.players);
+  }
+
   //Private Helpers
 
   //Checks if a player making a change to the state is the current player

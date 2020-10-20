@@ -161,6 +161,13 @@ public interface GameState {
    */
   int getHeight();
 
+  /**
+   * Return the players (in order) of this game
+   *
+   * @return the list of players
+   */
+  List<Player> getPlayers();
+
 
 
 }

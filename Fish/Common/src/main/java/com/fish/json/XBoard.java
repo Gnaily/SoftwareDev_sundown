@@ -8,6 +8,7 @@ import com.fish.model.board.GameBoard;
 import com.fish.model.board.HexGameBoard;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class XBoard {
