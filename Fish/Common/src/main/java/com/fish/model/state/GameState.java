@@ -18,18 +18,26 @@ import java.util.List;
 public interface GameState {
 
   /**
-   * Advances the gameStage to PLACING_PENGUINS, during which the players and GameBoard
-   * are constructed.
-   * @param board the board to construct for the game
-   * @param players the list of players involved in the game
+   * Constructs the GameBoard and ordered Players list to carry out a game of HTMF and
+   * moves the gameStage to the next stage, PLACING_PENGUINS, which allows players to start
+   * placing their penguins in order of player turn.
+   * @param board (GameBoard) the board to construct for the game
+   * @param players (List of Players) the list of players involved in the game
    */
   void initGame(GameBoard board, List<Player> players);
 
   /**
-   * Places a penguin on a GameBoard in the PLACING_PENGUINS stage of a game by adding the
-   * unique Coord and PlayerColor to the penguinLocs hashmap.
-   * @param loc the coordinate location on the GameBoard
-   * @param playerColor the color assigned to the Player
+   * Places a single penguin on the board at the given location on behalf of the Player with the
+   * given PlayerColor. Checks:
+   *  - That the given PlayerColor is the player whose turn it is
+   *  - That the tile to place the penguin on is not currently occupied and
+   *  - That the given Coord location is not a hole.
+   *  Then:
+   *  - Adds an element to the penguinLocs map and advances the CurrentPlayerIndex by one.
+   * @param loc (Coord) the coordinate location on the GameBoard
+   * @param playerColor (PlayerColor) the color assigned to the Player
+   * @throws IllegalArgumentException if there is no tile there to place the penguin on or if it is
+   * already occupied by another penguin
    */
   void placePenguin(Coord loc, PlayerColor playerColor);
 
@@ -40,10 +48,18 @@ public interface GameState {
   void startPlay();
 
   /**
-   * Updates the penguinLocs Hashmap to reflect the movement of penguins on the board.
-   * Interpretation: Moves a penguin from one location of the visual playing board to another.
-   * @param from the tile of origin
-   * @param to the tile to move the penguin to
+   * Moves a penguin from one location of the visual playing board to another.
+   * Checks:
+   *  - That there is a penguin to move on the from Tile
+   *  - That the penguin on the from Tile is a penguin of the current player
+   *  - That the Tile to place the penguin on is not currently occupied nor a hole
+   * Then:
+   *  - Adjusts the penguinLocs to reflect the changes made
+   * @param from (Coord) the tile of origin
+   * @param to (Coord) the tile to move the penguin to
+   * @throws IllegalArgumentException if the from or to Coord is not present, if there is no penguin
+   * to move on the from coord, or if the to Coord is already occupied by another penguin.
+   * @throws IllegalStateException if the method is called before or after a game has been in play.
    */
   void movePenguin(Coord from, Coord to);
 

@@ -33,77 +33,83 @@ import java.util.Set;
  * GameStage.GAMEOVER:
  *   Once no player can make a valid move, the game is over.
  *
+ * The Players list must be passed into initGame in the order of player turns. This means the referee
+ * gets to choose if the players play in order of ascending age, or if it choses a different order
+ * it may.
+ *
+ * The GameBoard must also be passed into initGame in order to create the collection of Tiles the
+ * game is played on.
+ *
  */
 public class HexGameState implements GameState {
 
   private GameStage gameStage;
-  private Map<Coord, PlayerColor> penguinLocs;
-  private int currentPlayerIndex; // int index = 0, 1, 2, 3
-  private List<Player> players; //can be initialized in the order of ascending age
   private GameBoard gameBoard;
+  private List<Player> players; //can be initialized in the order of ascending age, or another order
+  private int currentPlayerIndex; // int index = 0, 1, 2, 3
+  private Map<Coord, PlayerColor> penguinLocs;
 
 
   /**
-   * Initiates a game of HTMF that has not been started. The first stage of the game represents the
-   * time that Players are gathering in for a game and therefore everything is set to be empty at
-   * first and there are methods for the referee to pick the settings of the game once all players
-   * are ready.
+   * Initiates a game of HTMF that has not been started.
+   * The player index starts at zero and the penguin location hashmap is initialized as empty.
+   * The next step must be to called initGame() to initialize the board and players.
    */
   public HexGameState() {
     this.gameStage = GameStage.NOT_STARTED;
+    this.currentPlayerIndex = 0;
     this.penguinLocs = new HashMap<>();
-    this.currentPlayerIndex = 0;
   }
 
   /**
-   * A private constructor called by the getStateCopy method that constructs a copy of the state
-   * @param gs the gamestate
-   * @param penguinLocs the penguin locations
-   * @param currentPlayerIndex the current player index
-   * @param players the list of players
-   * @param gameBoard the gameboard the game is played on
+   * Convenience constructor for generating a completely controlled GameState that represents the
+   * middle of an ongoing game.
+   *
+   * The constructor allows for the initialization of a controlled GameBoard, penguins already
+   * on the board, players in the order of player-turn, and the player index of which player's
+   * turn it is in this precise snapshot of a GameState.
+   *
+   * This allows one to construct a GameState that represents a snapshot of the middle of a game.
+   * This is also used by the copyGameState method to make copies of each of the fields and generate
+   * the copied GameState as it is in the middle of the ongoing game.
+   * @param penguinLocs the location of penguins
+   * @param players the players in order of player-turn
+   * @param currentPlayerIndex the index in the player list to find the current player
+   * @param board the GameBoard on which the game is playing
    */
-  private HexGameState(GameStage gs, Map<Coord, PlayerColor> penguinLocs, int currentPlayerIndex,
-      List<Player> players, GameBoard gameBoard){
+  public HexGameState(GameStage gs, GameBoard board, List<Player> players,
+      int currentPlayerIndex, Map<Coord, PlayerColor> penguinLocs) {
     this.gameStage = gs;
-    this.penguinLocs = penguinLocs;
-    this.currentPlayerIndex = currentPlayerIndex;
+    this.gameBoard = board;
     this.players = players;
-    this.gameBoard = gameBoard;
-  }
-
-  /**
-   * Convenience constructor for generating a game state with penguins already on the board
-   * @param penguinLocs the locations of the penguins stored in a hashmap
-   */
-  public HexGameState(Map<Coord, PlayerColor> penguinLocs){
-    this.gameStage = GameStage.NOT_STARTED;
+    this.currentPlayerIndex = currentPlayerIndex;
     this.penguinLocs = new HashMap<>(penguinLocs);
-    this.currentPlayerIndex = 0;
   }
 
   ///////////////////////////////// ADVANCE TO PLACING_PENGUINS
 
   /**
-   * Moves the gameStage to the next stage, PLACING_PENGUINS, during which the players and gameboard
-   * are constructed.
-   *
+   * Constructs the GameBoard and ordered Players list to carry out a game of HTMF and
+   * moves the gameStage to the next stage, PLACING_PENGUINS, which allows players to start
+   * placing their penguins in order of player turn.
    * @param board (GameBoard) the board to construct for the game
    * @param players (List of Players) the list of players involved in the game
    */
   @Override
   public void initGame(GameBoard board, List<Player> players) {
-//    if (players.size() < 2) {
-//      throw new IllegalArgumentException("Needs at least 2 players");
-//    }
-    this.gameStage = GameStage.PLACING_PENGUINS;
     this.gameBoard = board;
     this.players = new ArrayList<>(players);
+    this.gameStage = GameStage.PLACING_PENGUINS;
   }
 
   /**
-   * Places a penguin on the board at the given location on behalf of the Player with the given
-   * PlayerColor.
+   * Places a single penguin on the board at the given location on behalf of the Player with the
+   * given PlayerColor. Checks:
+   *  - That the given PlayerColor is the player whose turn it is
+   *  - That the tile to place the penguin on is not currently occupied and
+   *  - That the given Coord location is not a hole.
+   *  Then:
+   *  - Adds an element to the penguinLocs map and advances the CurrentPlayerIndex by one.
    *
    * @param loc (Coord) the coordinate location on the GameBoard
    * @param playerColor (PlayerColor) the color assigned to the Player
@@ -139,7 +145,12 @@ public class HexGameState implements GameState {
   /**
    * Updates the penguinLocs Hashmap to reflect the movement of penguins on the board.
    * Interpretation: Moves a penguin from one location of the visual playing board to another.
-   * Updates the Player's score with however many fish were on the source Tile.
+   * Checks:
+   *  - That there is a penguin to move on the from Tile
+   *  - That the penguin on the from Tile is a penguin of the current player
+   *  - That the Tile to place the penguin on is not currently occupied nor a hole
+   * Then:
+   *  - Adjusts the penguinLocs map to reflect the changes made
    *
    * @param from (Coord) the tile of origin
    * @param to (Coord) the tile to move the penguin to
@@ -177,7 +188,9 @@ public class HexGameState implements GameState {
   }
 
   /**
-   * Advance the game to be the next player's turn
+   * Advance the currentPlayerIndex by one or cycle it back to zero once the next cycle of turns
+   * begins. This enforces the player turn flow and ensures that only the proper player whose
+   * turn it is can make moves.
    */
   @Override
   public void advanceToNextPlayer() {
@@ -187,8 +200,11 @@ public class HexGameState implements GameState {
   }
 
   /**
-   * Removes a player from the game by removing all of its penguins off the board and deleting its
-   * score from the scoreKeeper field.
+   * Removes a player from the game by:
+   *  - remove the player from the player list
+   *  - remove all the player's penguins from the board
+   *    (without removing the tiles they were removed from)
+   *  - resetting the currentPlayerIndex to account for one less player
    */
   @Override
   public void removeCurrentPlayer() {
@@ -216,10 +232,14 @@ public class HexGameState implements GameState {
   /////////////////////////////////Game Closing
 
   /**
-   * Checks whether the game is over by checking if there are any remaining valid moves stemming
-   * from any of the penguins currently located on the board, meaning in the penguinLoc hashmap. If
-   * the length of the list returned by 'getTilesReachableFrom' is > 0 that implies that there are
-   * tiles reachable from where a penguin currently stands and therefore the game is not yet over.
+   * Checks whether the game is over by:
+   *  - Checking if there are any valid moves stemming from any penguin's location left on the board
+   *  - Checking if there is only one player left, meaning the rest got kicked out
+   *
+   * If there are no more valid moves OR if there is only one player left, the game immediately ends.
+   * Meaning:
+   *  - the method returns false and
+   *  - the GameStage is set to GAME_OVER
    *
    * @return (boolean) a boolean that determines whether the game is over
    */
@@ -240,9 +260,13 @@ public class HexGameState implements GameState {
   }
 
   /**
-   * If the game has ended, returns the list of winners.
-   * The list may have one playerColor on it, or if there is a tie then the list includes all
-   * tied winners.
+   * If the GameStage is set to GAME_OVER, then this method may be called to generate a
+   * List of Player(s) that are the winner(s) of the game, defined by the player(s) with the highest
+   * int in their score field, which was calculated by the number of fish collected during a game.
+   *
+   * If there is only one winner, the resulting list will have one element.
+   * If there is a tie, the resulting list will contain all the tied players.
+   *
    * @return a list of playerColor of winners
    * @throws IllegalStateException if the game is not over
    */
@@ -282,8 +306,8 @@ public class HexGameState implements GameState {
     for (Player p: this.players){
       playersCopy.add(p.getCopyPlayer());
     }
-    return new HexGameState(this.gameStage, this.getPenguinLocations(), this.currentPlayerIndex,
-        playersCopy, this.gameBoard.getCopyGameBoard());
+    return new HexGameState(this.gameStage, this.gameBoard.getCopyGameBoard(),
+        playersCopy, this.currentPlayerIndex, this.getPenguinLocations());
   }
 
   /**
@@ -310,7 +334,7 @@ public class HexGameState implements GameState {
   }
 
   /**
-   * Get all of the given player's penguin locations
+   * Get the Coord locations of all the penguins of the given PlayerColor
    *
    * @param playerColor (PlayerColor) the color assigned to the player
    * @return (List<Coord>) the player's penguin locations
@@ -331,8 +355,8 @@ public class HexGameState implements GameState {
 
   /**
    * Return the current Player's color, not the Player object.
-   * This stops users of this gamestate from mutating the Player object, since the PlayerColor
-   * is unique anyway.
+   * This stops users of this GameState from mutating the Player object.
+   * The PlayerColor is unique, so it suffices to return this.
    *
    * @return (PlayerColor) the current player's color
    */
@@ -355,7 +379,7 @@ public class HexGameState implements GameState {
   }
 
 
-  //Returns the player indicated by the given PlayerColor
+  //Returns the Player object indicated by the given PlayerColor
   //This method is private because it returns the player object, not a copy
   //If this method is to be made public, change the return line to return a copy.
   private Player findPlayer(PlayerColor color) {
