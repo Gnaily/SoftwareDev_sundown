@@ -8,6 +8,7 @@ import com.fish.model.board.GameBoard;
 import com.fish.model.board.HexGameBoard;
 import com.fish.model.state.Player;
 
+import com.fish.model.state.PlayerColor;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,7 +30,7 @@ public class HexBoardViewTest {
         4, 1);
 
     GameState state = new HexGameState();
-    List<Player> players = Arrays.asList(new Player(10), new Player(15));
+    List<Player> players = Arrays.asList(new Player(10, PlayerColor.BROWN), new Player(15, PlayerColor.BLACK));
     state.initGame(this.board, players);
     this.hbv = new HexBoardView(state);
   }

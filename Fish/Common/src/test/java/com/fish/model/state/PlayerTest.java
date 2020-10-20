@@ -7,49 +7,57 @@ import static org.junit.Assert.*;
 
 public class PlayerTest {
 
-  Player player1;
-  Player player2;
+  private Player redPlayer;
+  private Player whitePlayer;
 
   @Before
   public void setUp() {
-    this.player1 = new Player(10);
-    this.player2 = new Player(12);
-
+    this.redPlayer = new Player(10, PlayerColor.RED);
+    this.whitePlayer = new Player(12, PlayerColor.WHITE);
   }
 
   @Test
-  public void setColorColor() {
-    assertNull(this.player1.getColor());
-    this.player1.setPlayerColor(PlayerColor.BLACK);
-    assertEquals(PlayerColor.BLACK, this.player1.getColor());
+  public void testGetAge() {
+    assertEquals(10, this.redPlayer.getAge());
+    assertEquals(12, this.whitePlayer.getAge());
   }
 
   @Test
-  public void getAge() {
-    assertEquals(10, this.player1.getAge());
-    assertEquals(12, this.player2.getAge());
+  public void testGetColor() {
+    assertEquals(PlayerColor.RED, this.redPlayer.getColor());
+    assertEquals(PlayerColor.WHITE, this.whitePlayer.getColor());
   }
 
   @Test
-  public void getScore() {
-    assertEquals(0, this.player1.getScore());
-    this.player1.addToScore(10);
-    assertEquals(10, this.player1.getScore());
+  public void testGetScore() {
+    assertEquals(0, this.redPlayer.getScore());
+    assertEquals(0, this.whitePlayer.getScore());
+    this.redPlayer.addToScore(100);
+    assertEquals(100, this.redPlayer.getScore());
+    assertEquals(0, this.whitePlayer.getScore());
+  }
+
+  @Test
+  public void testAddToScore() {
+    assertEquals(0, this.redPlayer.getScore());
+    this.redPlayer.addToScore(10);
+    assertEquals(10, this.redPlayer.getScore());
+    this.redPlayer.addToScore(2);
+    assertEquals(12, this.redPlayer.getScore());
   }
 
 
   @Test
   public void testPlayerCopy() {
-    this.player1.setPlayerColor(PlayerColor.BROWN);
-    Player player1Copy = this.player1.getCopyPlayer();
+    Player redCopy = this.redPlayer.getCopyPlayer();
 
-    assertEquals(player1Copy.getAge(), player1.getAge());
-    assertEquals(player1Copy.getScore(), player1.getScore());
-    assertEquals(player1Copy.getColor(), player1.getColor());
+    //Check that the dimensions of the player got copied over properly
+    assertEquals(redPlayer.getAge(), redCopy.getAge());
+    assertEquals(redPlayer.getScore(), redCopy.getScore());
+    assertEquals(redPlayer.getColor(), redCopy.getColor());
 
-    this.player1.addToScore(100);
-    assertNotEquals(player1Copy.getScore(), player1.getScore());
-    player1Copy.setPlayerColor(PlayerColor.RED);
-    assertNotEquals(player1Copy.getColor(), this.player1.getColor());
+    //Check that modifying the copy does not modify the original
+    redCopy.addToScore(100);
+    assertNotEquals(redPlayer.getScore(), redCopy.getScore());
   }
 }

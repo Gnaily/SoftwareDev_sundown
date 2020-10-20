@@ -72,6 +72,15 @@ public class HexGameState implements GameState {
     this.gameBoard = gameBoard;
   }
 
+  /**
+   * Convenience constructor for generating a game state with penguins already on the board
+   * @param penguinLocs the locations of the penguins stored in a hashmap
+   */
+  public HexGameState(Map<Coord, PlayerColor> penguinLocs){
+    this.gameStage = GameStage.NOT_STARTED;
+    this.penguinLocs = new HashMap<>(penguinLocs);
+    this.currentPlayerIndex = 0;
+  }
 
   ///////////////////////////////// ADVANCE TO PLACING_PENGUINS
 
@@ -84,9 +93,9 @@ public class HexGameState implements GameState {
    */
   @Override
   public void initGame(GameBoard board, List<Player> players) {
-    if (players.size() < 2) {
-      throw new IllegalArgumentException("Needs at least 2 players");
-    }
+//    if (players.size() < 2) {
+//      throw new IllegalArgumentException("Needs at least 2 players");
+//    }
     this.gameStage = GameStage.PLACING_PENGUINS;
     this.gameBoard = board;
     this.players = new ArrayList<>(players);
@@ -103,12 +112,17 @@ public class HexGameState implements GameState {
    */
   @Override
   public void placePenguin(Coord loc, PlayerColor playerColor) throws IllegalArgumentException {
-    this.checkCurrentPlayer(playerColor);
-    this.checkIfPengAlreadyOnTile(loc);
-    this.checkIfTilePresent(loc);
+    if (this.gameStage == GameStage.PLACING_PENGUINS) {
+      this.checkCurrentPlayer(playerColor);
+      this.checkIfPengAlreadyOnTile(loc);
+      this.checkIfTilePresent(loc);
 
-    this.penguinLocs.put(loc, playerColor);
-    this.advanceToNextPlayer();
+      this.penguinLocs.put(loc, playerColor);
+      this.advanceToNextPlayer();
+    }
+    else {
+      throw new IllegalStateException("You cannot place a new penguin during this stage of the game.");
+    }
   }
 
   /////////////////////////////////ADVANCE TO IN_PLAY
@@ -149,7 +163,7 @@ public class HexGameState implements GameState {
   private Player checkValidMove(Coord from, Coord to) throws IllegalArgumentException, IllegalStateException {
     if (this.gameStage != GameStage.IN_PLAY) {
       throw new IllegalStateException(
-          "You cannot move penguins before or after a game is in in play.");
+          "You cannot move penguins before or after a game is in play.");
     }
     if (this.penguinLocs.get(from) == null) {
       throw new IllegalArgumentException("There is no Penguin here to move.");
@@ -255,6 +269,8 @@ public class HexGameState implements GameState {
 
   /////////////////////////////////Info Retrieval & Helpers
 
+  //Info about the Sate
+
   /**
    * Returns a deep copy of the GameState.
    * Every mutable field is copied so that the original is not modified.
@@ -280,6 +296,38 @@ public class HexGameState implements GameState {
     return this.gameStage;
   }
 
+
+  //Info about penguins
+
+  /**
+   * Get the current locations of penguins on the board
+   *
+   * @return (Map<Coord, PlayerColor>) the current penguin locations on the board
+   */
+  @Override
+  public HashMap<Coord, PlayerColor> getPenguinLocations() {
+    return new HashMap<>(this.penguinLocs);
+  }
+
+  /**
+   * Get all of the given player's penguin locations
+   *
+   * @param playerColor (PlayerColor) the color assigned to the player
+   * @return (List<Coord>) the player's penguin locations
+   */
+  @Override
+  public List<Coord> getOnePlayersPenguins(PlayerColor playerColor) {
+    List<Coord> pengs = new ArrayList<>();
+    for (Coord cc : this.penguinLocs.keySet()) {
+      if (this.penguinLocs.get(cc) == playerColor) {
+        pengs.add(cc);
+      }
+    }
+    return pengs;
+  }
+
+
+  //Info about Players
 
   /**
    * Return the current Player's color, not the Player object.
@@ -320,6 +368,9 @@ public class HexGameState implements GameState {
     throw new IllegalArgumentException("Player not found");
   }
 
+
+  //Info about Board
+
   /**
    * Get the tile at the given location on the board.
    * The getTileAt method in the board handles errors when the given Coord has negative or
@@ -346,31 +397,26 @@ public class HexGameState implements GameState {
   }
 
   /**
-   * Get the current locations of penguins on the board
+   * Get the current width of the board
    *
-   * @return (Map<Coord, PlayerColor>) the current penguin locations on the board
+   * @return (int) this board's width
    */
   @Override
-  public HashMap<Coord, PlayerColor> getPenguinLocations() {
-    return new HashMap<>(this.penguinLocs);
+  public int getWidth() {
+    return this.gameBoard.getWidth();
   }
 
   /**
-   * Get all of the given player's penguin locations
+   * Get the height of this game's board
    *
-   * @param playerColor (PlayerColor) the color assigned to the player
-   * @return (List<Coord>) the player's penguin locations
+   * @return (int) the height of the board
    */
   @Override
-  public List<Coord> getOnePlayersPenguins(PlayerColor playerColor) {
-    List<Coord> pengs = new ArrayList<>();
-    for (Coord cc : this.penguinLocs.keySet()) {
-      if (this.penguinLocs.get(cc) == playerColor) {
-        pengs.add(cc);
-      }
-    }
-    return pengs;
+  public int getHeight() {
+    return this.gameBoard.getHeight();
   }
+
+  //Private Helpers
 
   //Checks if a player making a change to the state is the current player
   private void checkCurrentPlayer(PlayerColor pc) throws IllegalArgumentException {
@@ -393,26 +439,6 @@ public class HexGameState implements GameState {
     if (this.penguinLocs.get(loc) != null) {
       throw new IllegalArgumentException("There is already a penguin here!");
     }
-  }
-
-  /**
-   * Get the current width of the board
-   *
-   * @return (int) this board's width
-   */
-  @Override
-  public int getWidth() {
-    return this.gameBoard.getWidth();
-  }
-
-  /**
-   * Get the height of this game's board
-   *
-   * @return (int) the height of the board
-   */
-  @Override
-  public int getHeight() {
-    return this.gameBoard.getHeight();
   }
 
 }

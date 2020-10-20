@@ -13,7 +13,7 @@ import java.util.Scanner;
 public class XBoard {
 
   /**
-   * Main function for running the XBoard integration tests. Consumes valid JSON from Standard,
+   * Main method for running the XBoard integration tests. Consumes valid JSON from Standard,
    *   parses that into a HexGameBoard, and then prints how many tiles are reachable from the
    *   given position.
    *
@@ -21,21 +21,25 @@ public class XBoard {
    */
   public static void main(String[] args) {
 
+    //grab the input from STD in
     Scanner scan = new Scanner(System.in);
+    //create a JasonArray Java object whose elements are each JSON object from STD in
+    JsonArray xJson = XJson.processInput(scan);
+    //Grab the first JSON object, which is the board represented in JSON
+    JsonObject obj = xJson.get(0).getAsJsonObject();
 
-    XJson xJson = new XJson();
-    xJson.processInput(scan);
-
-    JsonObject obj = xJson.getJsonArray().get(0).getAsJsonObject();
-
-    int[][] values = getTileValues(obj);
-
+    //////HANDLE "board" INPUT
+    //turn that into an actual 2D array board representation in Java
+    int[][] values = getTileValues(obj, "board");
+    //Create the GameBoard object with the values from the JSON input
     GameBoard gb = new HexGameBoard(values);
 
-    Coord start = getStartingCoordinate(obj);
-    int size = gb.getTilesReachableFrom(start, new ArrayList<>()).size();
+    //////HANDLE "position" INPUT
+    Coord start = getStartingCoordinate(obj, "position");
+    int numTilesReachableFromPosn = gb.getTilesReachableFrom(start, new ArrayList<>()).size();
 
-    System.out.println(size);
+    //Print the number of tiles reachable from
+    System.out.println(numTilesReachableFromPosn);
   }
 
 
@@ -46,9 +50,9 @@ public class XBoard {
    * @param jsonObject (JsonObject) The properly formatted JSON object
    * @return (int[][]) 2D array of ints representing tile values
    */
-  static int[][] getTileValues(JsonObject jsonObject) {
+  static int[][] getTileValues(JsonObject jsonObject, String key) {
 
-    JsonArray array = jsonObject.getAsJsonArray("board");
+    JsonArray array = jsonObject.getAsJsonArray(key);
 
     if (array.size() == 0) {
       return new int[0][0];
@@ -80,7 +84,7 @@ public class XBoard {
    * @param array
    * @return
    */
-  static int findMaxLengthInArray(JsonArray array) {
+  private static int findMaxLengthInArray(JsonArray array) {
 
     int max = 0;
     for (int ii = 0; ii < array.size(); ii++) {
@@ -99,8 +103,8 @@ public class XBoard {
    * @param obj (JsonObject) JSON object containing position field to turn into a coordinate
    * @return (Coord) the coordinate found in the json object
    */
-  static Coord getStartingCoordinate(JsonObject obj) {
-    JsonArray array = obj.getAsJsonArray("position");
+  static Coord getStartingCoordinate(JsonObject obj, String key) {
+    JsonArray array = obj.getAsJsonArray(key);
 
     return new Coord(
             array.get(0).getAsInt(),

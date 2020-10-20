@@ -86,28 +86,6 @@ public interface GameState {
   GameStage getGameStage();
 
   /**
-   * Return the current Player's color
-   *
-   * @return (PlayerColor) the current player's color
-   */
-  PlayerColor getCurrentPlayer();
-
-  /**
-   * Retrieves the Tile located at the coordinate in the GameBoard.
-   * @param loc the coordinate location of the desired Tile
-   * @return the Tile object located there
-   */
-  Tile getTileAt(Coord loc);
-
-  /**
-   * Return a list of Coordinates of all the tiles reachable from a starting
-   * Coord given the location of all the other penguins on the board
-   * @param start the starting coordinate location
-   * @return the list of possible tiles to move to
-   */
-  List<Coord> getTilesReachableFrom(Coord start);
-
-  /**
    * Returns a HashMap of penguin locations, formatted such that the Coord is the unique
    * identifier of the location (since only one penguin can be on a tile at a time) and
    * the PlayerColor is the value, to identify which player's penguin is on that location.
@@ -124,11 +102,34 @@ public interface GameState {
   List<Coord> getOnePlayersPenguins(PlayerColor playerColor);
 
   /**
+   * Return the current Player's color
+   *
+   * @return (PlayerColor) the current player's color
+   */
+  PlayerColor getCurrentPlayer();
+
+  /**
    * Given a specific playerColor, returns the score of that player.
    * @param playerColor the player's color
    * @return the player's score
    */
   int getPlayerScore(PlayerColor playerColor);
+
+
+  /**
+   * Retrieves the Tile located at the coordinate in the GameBoard.
+   * @param loc the coordinate location of the desired Tile
+   * @return the Tile object located there
+   */
+  Tile getTileAt(Coord loc);
+
+  /**
+   * Return a list of Coordinates of all the tiles reachable from a starting
+   * Coord given the location of all the other penguins on the board
+   * @param start the starting coordinate location
+   * @return the list of possible tiles to move to
+   */
+  List<Coord> getTilesReachableFrom(Coord start);
 
   /**
    * Returns the width of the game board, defined by the number of columns on the board data

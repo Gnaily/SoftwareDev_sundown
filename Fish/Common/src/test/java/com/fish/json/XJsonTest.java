@@ -17,9 +17,7 @@ public class XJsonTest {
         "{ \"a\" :  1, \"b\" : 2}\n" +
         "[1, \"hello\", true]";
 
-    XJson xjson = new XJson();
-    xjson.processInput(new Scanner(input));
-    String out = xjson.formatJson();
+    String out = XJson.formatJson(XJson.processInput(new Scanner(input)));
 
     assertEquals("{\"count\":8,\"seq\":[1,2,3,4,\"hello world\"," +
             "false,{\"a\":1,\"b\":2},[1,\"hello\",true]]}\n" +
@@ -31,9 +29,7 @@ public class XJsonTest {
   public void testJsonMt() {
     String input = "";
 
-    XJson xJson = new XJson();
-    xJson.processInput(new Scanner(input));
-    String out = xJson.formatJson();
+    String out = XJson.formatJson(XJson.processInput(new Scanner(input)));
 
     assertEquals("{\"count\":0,\"seq\":[]}\n" +
         "[0]\n", out);

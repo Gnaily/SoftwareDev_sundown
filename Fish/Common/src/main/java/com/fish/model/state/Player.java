@@ -12,20 +12,10 @@ public class Player {
   private PlayerColor color;
   private int score;
 
-  public Player(int age) {
+  public Player(int age, PlayerColor pc) {
     this.age = age;
+    this.color = pc;
     this.score = 0;
-  }
-
-
-  /**
-   * Sets the player's color for a game of HTMF. This method will be used by the referee to assign
-   * colors to players
-   *
-   * @param color (PlayerColor) Color to set this player to
-   */
-  public void setPlayerColor(PlayerColor color) {
-    this.color = color;
   }
 
   /**
@@ -35,6 +25,15 @@ public class Player {
    */
   public int getAge() {
     return this.age;
+  }
+
+  /**
+   * Get this player's assigned color
+   *
+   * @return (PlayerColor) the player's color
+   */
+  public PlayerColor getColor() {
+    return this.color;
   }
 
   /**
@@ -56,22 +55,12 @@ public class Player {
   }
 
   /**
-   * Get this player's assigned color
-   *
-   * @return (PlayerColor) the player's color
-   */
-  public PlayerColor getColor() {
-    return this.color;
-  }
-
-  /**
    * Returns a copy of this Player
    * @return the Player
    */
   public Player getCopyPlayer() {
-    Player p = new Player(this.age);
+    Player p = new Player(this.age, this.color);
     p.addToScore(this.score);
-    p.setPlayerColor(this.color);
     return p;
   }
 }

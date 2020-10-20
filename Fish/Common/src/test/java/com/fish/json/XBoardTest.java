@@ -17,8 +17,9 @@ public class XBoardTest {
 
   @Before
   public void setUp() {
-    String input = "{\n" + "        \"position\": [1,2],\n"
+    String in1 = "{\n" + "        \"position\": [1,2],\n"
         + "        \"board\" : [[1,0],[0,0],[2,3],[0,0],[4,0]]\n" + "}\n";
+
     String in2 = "{\n" + "        \"position\": [1,3],\n"
         + "        \"board\" : [[2,3,4],[1,1,1],[5,5,5],[4,4,4],[3,3,3],[2,2,2],[1,1,1],[4,4,4],[3,4,2]]\n"
         + "}\n";
@@ -27,22 +28,17 @@ public class XBoardTest {
             + "        \"board\" : [[2,3],[1,1,1],[5,5,5],[4,4],[3,3,3],[2,2,2],[1],[4,4,4],[3,4,2,1]]\n"
             + "}\n";
 
-    XJson xjson = new XJson();
-    xjson.processInput(new Scanner(input));
-    obj1 = xjson.getJsonArray().get(0).getAsJsonObject();
-    xjson = new XJson();
-    xjson.processInput(new Scanner(in2));
-    obj2 = xjson.getJsonArray().get(0).getAsJsonObject();
+    obj1 = XJson.processInput(new Scanner(in1)).get(0).getAsJsonObject();
 
-    xjson = new XJson();
-    xjson.processInput(new Scanner(in3));
-    obj3 = xjson.getJsonArray().get(0).getAsJsonObject();
+    obj2 = XJson.processInput(new Scanner(in2)).get(0).getAsJsonObject();
+
+    obj3 = XJson.processInput(new Scanner(in3)).get(0).getAsJsonObject();
 
   }
 
   @Test public void getTileValues() {
 
-    int[][] nums = XBoard.getTileValues(obj1);
+    int[][] nums = XBoard.getTileValues(obj1, "board");
 
     assertEquals(2, nums.length);
     assertEquals(5, nums[0].length);
@@ -55,7 +51,7 @@ public class XBoardTest {
   @Test
   public void testGetTileValuesUnequalLength() {
 
-    int[][] nums = XBoard.getTileValues(obj3);
+    int[][] nums = XBoard.getTileValues(obj3, "board");
 
     assertEquals(4, nums.length);
     assertEquals(9, nums[0].length);
@@ -69,7 +65,7 @@ public class XBoardTest {
 
   @Test public void getStartingCoordinate() {
 
-    assertEquals(new Coord(1, 3), XBoard.getStartingCoordinate(obj2));
-    assertEquals(new Coord(1, 2), XBoard.getStartingCoordinate(obj1));
+    assertEquals(new Coord(1, 3), XBoard.getStartingCoordinate(obj2, "position"));
+    assertEquals(new Coord(1, 2), XBoard.getStartingCoordinate(obj1, "position"));
   }
 }
