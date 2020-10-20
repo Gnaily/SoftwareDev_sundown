@@ -228,6 +228,9 @@ public class XState {
     firstPlayer.add("places", originalLocs);
   }
 
+  // Turns a given GameState into a JsonObject
+  // Not used, but could be useful for future testing
+  // Does not preserve the order of penguins that was passe in
   static JsonObject reconstructStateToJson(GameState gs) {
     JsonObject state = new JsonObject();
 
@@ -243,6 +246,7 @@ public class XState {
     return state;
   }
 
+  // Turns a Player into a JsonObject representing that player
   static JsonObject createPlayerObject(Player p, GameState gs) {
     JsonObject jo = new JsonObject();
     jo.addProperty("score", gs.getPlayerScore(p.getColor()));
@@ -274,6 +278,7 @@ public class XState {
     return jo;
   }
 
+  // turn a given GameState's board into a JsonArray representing tile values
   static JsonArray createBoard(GameState gs) {
     JsonArray board = new JsonArray();
     for (int ii = 0; ii < gs.getHeight(); ii++) {

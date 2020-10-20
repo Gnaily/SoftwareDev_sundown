@@ -1,10 +1,20 @@
 package com.fish.game;
 
-import com.fish.model.Coord;
 import com.fish.model.state.GameState;
 import java.util.List;
+import java.util.Map;
 
 /**
+ * Data representation for an entire game of Fish, starting from the point where all penguins have
+ *  been placed.
+ *
+ * An implementation of this interface must contain the following functionality:
+ *  - Get all possible GameStates from the current GameState
+ *  - Make a move and advance to the next GameState
+ *  - Undo the previous move and return to the previous GameState
+ *  - Get all previous moves to reach the current GameState
+ *  - Get the current GameState
+ *  - Apply a given function to all reachable GameStates from a given GameState
  *
  */
 public interface GameTree {
@@ -14,25 +24,37 @@ public interface GameTree {
    * The copy only contains states reachable at the current player's turn.
    * @return a list of possible states
    */
-  List<GameState> getPossibleGameStates();
+  Map<Move, GameState> getPossibleGameStates();
 
-  /**
-   * Returns one GameState that is the retult of applying a move from start to dest on
-   * the given gamestate.
-   * @param gs the given gamestate
-   * @param start the starting coord
-   * @param dest the destination coord
-   * @return the resulting GameState
-   */
-  GameState getResultState(GameState gs, Coord start, Coord dest) throws IllegalArgumentException;
 
   /**
    * Returns the child node stemming from this current node after making the given action,
    * which is a move from the start coord to the destination coord by the current player.
-   * @param start starting coordinate of the penguin to move
-   * @param dest ending coordinate of the penguin to move
+   * @param move the move to make on the current game tree
    * @return new GameTree after making the given move
    * @throws IllegalArgumentException if the move is illegal
    */
-  GameTree getNextGameTree (Coord start, Coord dest);
+  GameTree getNextGameTree (Move move);
+
+  /**
+   * Undo the previous move of this gametree.
+   *
+   * @return the previous gametree.
+   */
+  GameTree undoPreviousMove();
+
+  /**
+   * Get all previous moves to reach the current state
+   *
+   * @return the list of all moves taken
+   */
+  List<MoveState> getPreviousMoves();
+
+  /**
+   * Get the current state
+   *
+   * @return the current state of this GameTree
+   */
+  GameState getState();
+
 }
