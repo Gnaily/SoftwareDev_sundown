@@ -128,7 +128,7 @@ public class HexGameTreeTest {
   }
 
   @Test
-  public void getNextGameTreeEnd() {
+  public void getNextGameTreePossibleStatesEnd() {
     this.twoPlayerTree = this.twoPlayerTree.getNextGameTree(new Move(new Coord(0, 0), new Coord(1, 2)));
     this.twoPlayerTree = this.twoPlayerTree.getNextGameTree(new Move(new Coord(0, 2), new Coord(1, 0)));
     this.twoPlayerTree = this.twoPlayerTree.getNextGameTree(new Move(new Coord(0, 4), new Coord(0, 3)));
@@ -160,7 +160,7 @@ public class HexGameTreeTest {
   }
 
   @Test
-  public void undoPreviousMoveThreePlayer() {
+  public void testPreviousMoveThreePlayer() {
     this.threePlayerTree = this.threePlayerTree.getNextGameTree(new Move(new Coord(0, 1), new Coord(0, 0)));
     assertEquals(1, this.threePlayerTree.getPreviousMoves().size());
 
