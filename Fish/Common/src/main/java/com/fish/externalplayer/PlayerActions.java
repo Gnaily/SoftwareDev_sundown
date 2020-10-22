@@ -1,5 +1,7 @@
 package com.fish.externalplayer;
 
+import com.google.gson.JsonObject;
+
 import com.fish.model.Coord;
 import com.fish.model.state.GameStage;
 import com.fish.model.state.Player;
@@ -146,8 +148,63 @@ public interface PlayerActions {
    */
   boolean movePenguin(Coord start, Coord end);
 
-  /// --- PLANNING --- ///
+  /// --- COMMUNICATION --- ///
 
+  /**
+   * This a call that will wait for the Referee to indicate that the game has started. Once the
+   *  player receives a message, the game will be in the PLACING_PENGUINS phase. The message
+   *  they receive will include their assigned color and the order in which they will play.
+   *
+   * @return A JsonObject represnting the order of Players and the assigned color. The object will be
+   * formatted as follows:
+   * {
+   *   "players" : [Json array of colors indicating the order],
+   *   "color" : String representing this player's assigned color
+   * }
+   */
+  JsonObject waitForGameStart();
 
+  /**
+   * This is a call that will wait for the Referee to indicate that a penguin has been placed. Once
+   *  the player recieves a message, they will know where the most recent penguin has been placed on
+   *  the board.
+   *
+   * @return A JsonObject representing where the most recent penguin has been placed. It will be
+   * formatted as follows:
+   * {
+   *   "position" : [X, Y],
+   *   "color" : String representing the color of penguin that was placed.
+   * }
+   *
+   * Where X and Y indicate a coordinate on the board
+   */
+  JsonObject waitForPenguinPlacement();
+
+  /**
+   * This is a call that will wait for the Referee to indicate that a penguin has moved. Once
+   *  the player receives a message, they will know where the most recent penguin movement occurred.
+   *
+   * @return A JsonObject indicating the most recent penguin movement. It will be formatted as follows:
+   * {
+   *   "start" : [X, Y],
+   *   "end" : [X, Y]
+   * }
+   *
+   * Where X and Y indicate a coordinate on the board
+   */
+  JsonObject waitForPenguinMovement();
+
+  /**
+   * This is a method that will wait for the referee to indicate what the final scores of the game
+   *  are. Once this player receives this message, they will know where they placed in this game of
+   *  Fish.
+   *
+   * @return A JsonObject indicating the rankings of the players. It will be formatted as follows:
+   * {
+   *   "winners" : [Strings representing the winning player colors]
+   * }
+   */
+  JsonObject waitForGameResults();
 
 }
+

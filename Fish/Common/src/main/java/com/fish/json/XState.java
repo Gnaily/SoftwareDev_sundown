@@ -120,8 +120,8 @@ public class XState {
 
       // our other method flips the array - this flips it back
       for (int ii = 0; ii < penguinLocsAsArray[0].length; ++ii) {
-        penguinLocs.put(new Coord(penguinLocsAsArray[0][ii],
-            penguinLocsAsArray[1][ii]), pc);
+        penguinLocs.put(new Coord(penguinLocsAsArray[1][ii],
+            penguinLocsAsArray[0][ii]), pc);
 
       }
     }
@@ -133,7 +133,7 @@ public class XState {
     JsonObject firstPlayerObj = playerArray.get(0).getAsJsonObject();
     JsonArray firstPlayersPenguinsLocs = firstPlayerObj.getAsJsonArray("places");
     JsonArray firstPenguinLoc = firstPlayersPenguinsLocs.get(0).getAsJsonArray();
-    return new Coord(firstPenguinLoc.get(0).getAsInt(), firstPenguinLoc.get(1).getAsInt());
+    return new Coord(firstPenguinLoc.get(1).getAsInt(), firstPenguinLoc.get(0).getAsInt());
   }
 
   //----Calculating the move----//
@@ -218,8 +218,8 @@ public class XState {
   static void updatePlayerPenguinPositions(JsonObject firstPlayer, Coord moveMade) {
     JsonArray originalLocs = firstPlayer.remove("places").getAsJsonArray();
     JsonArray newLoc = new JsonArray();
-    newLoc.add(moveMade.getX());
     newLoc.add(moveMade.getY());
+    newLoc.add(moveMade.getX());
     originalLocs.set(0, newLoc);
     firstPlayer.add("places", originalLocs);
   }
@@ -265,8 +265,8 @@ public class XState {
     JsonArray pengs = new JsonArray();
     for (Coord c : gs.getOnePlayersPenguins(p.getColor())) {
       JsonArray singlePenguin = new JsonArray();
-      singlePenguin.add(c.getX());
       singlePenguin.add(c.getY());
+      singlePenguin.add(c.getX());
       pengs.add(singlePenguin);
     }
 
