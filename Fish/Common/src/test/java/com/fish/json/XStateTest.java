@@ -19,6 +19,8 @@ public class XStateTest {
 
   JsonObject stateAsJson;
   GameState gs;
+  JsonObject smallJsonState;
+  GameState smallGameState;
 
   @Before public void setUp() throws Exception {
     String jsonAsString = "{\n" + "  \"players\" : [\n" + "    {\n" + "      \"color\" : \"red\",\n"
@@ -31,6 +33,16 @@ public class XStateTest {
     this.stateAsJson = xJsonArray.get(0).getAsJsonObject();
     this.gs = setupGameState();
 
+    jsonAsString = "{\n" + "  \"players\" : [\n" + "    {\n" + "      \"color\" : \"red\",\n"
+        + "      \"score\" : 10,\n" + "      \"places\" : [[0,0],[0,1]]\n" + "    },\n" + "    {\n"
+        + "      \"color\" : \"white\",\n" + "      \"score\" : 0,\n"
+        + "      \"places\" : [[1,0],[1,1]]\n" + "    }],\n"
+        + "    \"board\" : [[2,3,4],[1,1,1],[5]]\n" + "}\n";
+
+    xJsonArray = XJson.processInput(new Scanner(jsonAsString));
+    this.smallJsonState = xJsonArray.get(0).getAsJsonObject();
+    this.smallGameState = setupSmallGameState();
+
   }
 
   private GameState setupGameState() {
@@ -38,6 +50,17 @@ public class XStateTest {
     GameBoard boardFromInput = new HexGameBoard(valuesFromInput);
 
     JsonArray playerArray = stateAsJson.getAsJsonArray("players");
+    List<Player> players = XState.getPlayersList(playerArray);
+
+    return new HexGameState(GameStage.IN_PLAY, boardFromInput, players, 0,
+        XState.placePenguins(playerArray));
+  }
+
+  private GameState setupSmallGameState() {
+    int[][] valuesFromInput = XBoard.getTileValues(smallJsonState, "board");
+    GameBoard boardFromInput = new HexGameBoard(valuesFromInput);
+
+    JsonArray playerArray = smallJsonState.getAsJsonArray("players");
     List<Player> players = XState.getPlayersList(playerArray);
 
     return new HexGameState(GameStage.IN_PLAY, boardFromInput, players, 0,
@@ -222,5 +245,16 @@ public class XStateTest {
 
     assertEquals(5, board.get(2).getAsJsonArray().get(2).getAsInt());
     assertEquals(3, board.get(4).getAsJsonArray().get(1).getAsInt());
+  }
+
+  @Test
+  public void testPadOutBoard() {
+    JsonArray board = XState.createBoardJson(this.smallGameState);
+
+    assertEquals(3, board.size());
+    assertEquals(3, board.get(2).getAsJsonArray().size());
+
+    assertEquals(0, board.get(2).getAsJsonArray().get(1).getAsInt());
+
   }
 }

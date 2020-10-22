@@ -89,6 +89,9 @@ public class HexGameTree implements GameTree {
   public GameTree undoPreviousMove() {
     List<MoveState> newMoves = new ArrayList<>(this.history);
 
+    if (newMoves.size() <= 0) {
+      throw new IllegalArgumentException("No moves to go back from!");
+    }
     MoveState ms = newMoves.remove(newMoves.size() - 1);
 
     return new HexGameTree(ms.getGameState(), newMoves);
