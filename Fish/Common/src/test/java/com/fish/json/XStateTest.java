@@ -121,14 +121,14 @@ public class XStateTest {
         new Coord(0, 0), new Coord(0, 2));
 
     assertEquals(12, this.stateAsJson.getAsJsonArray("players")
-      .get(0).getAsJsonObject().getAsJsonPrimitive("score").getAsInt());
+      .get(1).getAsJsonObject().getAsJsonPrimitive("score").getAsInt());
     assertEquals(0, this.stateAsJson.getAsJsonArray("board")
         .get(0).getAsJsonArray().get(0).getAsInt());
     JsonArray out = new JsonArray();
     out.add(0);
     out.add(2);
     assertEquals(out, this.stateAsJson.getAsJsonArray("players")
-        .get(0).getAsJsonObject().getAsJsonArray("places").get(0).getAsJsonArray());
+        .get(1).getAsJsonObject().getAsJsonArray("places").get(0).getAsJsonArray());
 
   }
 
@@ -138,7 +138,7 @@ public class XStateTest {
         new Coord(0, 1), new Coord(0, 2));
 
     assertEquals(11, this.stateAsJson.getAsJsonArray("players")
-        .get(0).getAsJsonObject().getAsJsonPrimitive("score").getAsInt());
+        .get(1).getAsJsonObject().getAsJsonPrimitive("score").getAsInt());
     assertEquals(0, this.stateAsJson.getAsJsonArray("board")
         .get(1).getAsJsonArray().get(0).getAsInt());
 
@@ -146,16 +146,17 @@ public class XStateTest {
     out.add(0);
     out.add(2);
     assertEquals(out, this.stateAsJson.getAsJsonArray("players")
-        .get(0).getAsJsonObject().getAsJsonArray("places").get(0).getAsJsonArray());
-
+        .get(1).getAsJsonObject().getAsJsonArray("places").get(0).getAsJsonArray());
   }
 
   @Test public void updateBoardPosition() {
-    XState.updateBoardPosition(this.stateAsJson, new Coord(2, 1));
+    this.gs.movePenguin(new Coord(0,0), new Coord(0,2));
+    this.gs.movePenguin(new Coord(1, 0), new Coord(1,2));
+    XState.updateBoardPosition(this.stateAsJson, this.gs);
     assertEquals(0, this.stateAsJson.getAsJsonArray("board")
-        .get(1).getAsJsonArray().get(2).getAsInt());
+        .get(0).getAsJsonArray().get(0).getAsInt());
 
-    XState.updateBoardPosition(this.stateAsJson, new Coord(1, 0));
+    XState.updateBoardPosition(this.stateAsJson, this.gs);
     assertEquals(0, this.stateAsJson.getAsJsonArray("board")
         .get(0).getAsJsonArray().get(1).getAsInt());
   }
@@ -214,7 +215,7 @@ public class XStateTest {
 
   @Test
   public void testCreateBoard() {
-    JsonArray board = XState.createBoard(this.gs);
+    JsonArray board = XState.createBoardJson(this.gs);
 
     assertEquals(6, board.size());
     assertEquals(3, board.get(0).getAsJsonArray().size());

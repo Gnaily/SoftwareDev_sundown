@@ -12,7 +12,6 @@ import com.fish.model.tile.Tile;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -58,13 +57,13 @@ public class XState {
     Coord penguinStart = getFirstPlayersFirstPenguin(playerArray);
 
     Coord moveMade = findLegalMove(gsFromInput, penguinStart);
-    gsFromInput.movePenguin(penguinStart, moveMade);
 
     //IF no move has been made, return FALSE. Else, return the new State as represented in JSON
     if (moveMade == null) {
       System.out.println("False");
     }
     else{
+      gsFromInput.movePenguin(penguinStart, moveMade);
       adjustStateAfterMove(stateAsJson, gsFromInput, penguinStart, moveMade);
       System.out.println(stateAsJson);
     }
@@ -181,13 +180,13 @@ public class XState {
   static void adjustStateAfterMove(JsonObject stateAsJson, GameState startState,
       Coord penguinStart, Coord moveMade) {
 
-    //Adjust board represented in stateAsJson -- change tile to hole
-    updateBoardPosition(stateAsJson, penguinStart);
-
+    //Replace board represented in stateAsJson by converting the updated state back to JSON
+    updateBoardPosition(stateAsJson, startState);
 
     //Adjust player score as represented in stateAsJson -- pull updated score from GameState
     JsonArray firstPlayerArray = stateAsJson.getAsJsonArray("players");
-    JsonObject firstPlayer = firstPlayerArray.get(0).getAsJsonObject();
+    JsonObject firstPlayer = firstPlayerArray.remove(0).getAsJsonObject();
+    firstPlayerArray.add(firstPlayer); //cycles through the players to advance player turn
 
     updatePlayerScore(firstPlayer, startState, moveMade);
 
@@ -196,12 +195,9 @@ public class XState {
   }
 
   // Update the board to have a new hole in the correct place
-  static void updateBoardPosition(JsonObject stateAsJson, Coord penguinStart) {
-    JsonArray boardArray = stateAsJson.getAsJsonArray("board");
-    JsonArray row = boardArray.get(penguinStart.getY()).getAsJsonArray();
-    //Set the location of the board in the Json representation to zero to represent a hole
-    row.set(penguinStart.getX(), new JsonPrimitive(0));
-
+  static void updateBoardPosition(JsonObject stateAsJson, GameState gs) {
+    stateAsJson.remove("board");
+    stateAsJson.add("board", createBoardJson(gs));
   }
 
   // update the player score with the number of fish on the removed tile
@@ -240,7 +236,7 @@ public class XState {
       playersArray.add(createPlayerObject(p, gs));
     }
 
-    JsonArray board = createBoard(gs);
+    JsonArray board = createBoardJson(gs);
     state.add("players", playersArray);
     state.add("board", board);
     return state;
@@ -279,7 +275,7 @@ public class XState {
   }
 
   // turn a given GameState's board into a JsonArray representing tile values
-  static JsonArray createBoard(GameState gs) {
+  static JsonArray createBoardJson(GameState gs) {
     JsonArray board = new JsonArray();
     for (int ii = 0; ii < gs.getHeight(); ii++) {
       JsonArray row = new JsonArray();
