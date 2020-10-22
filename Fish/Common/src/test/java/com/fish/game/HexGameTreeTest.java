@@ -36,7 +36,7 @@ public class HexGameTreeTest {
     gs1.placePenguin(new Coord(2, 1), PlayerColor.RED);
     gs1.placePenguin(new Coord(0, 6), PlayerColor.BLACK);
     gs1.placePenguin(new Coord(3, 3), PlayerColor.BROWN);
-    gs1.placePenguin(new Coord(2, 1), PlayerColor.RED);
+    gs1.placePenguin(new Coord(2, 4), PlayerColor.RED);
     gs1.placePenguin(new Coord(1, 5), PlayerColor.BLACK);
     gs1.placePenguin(new Coord(3, 7), PlayerColor.BROWN);
     gs1.placePenguin(new Coord(3, 6), PlayerColor.RED);
@@ -56,9 +56,9 @@ public class HexGameTreeTest {
     gs1.placePenguin(new Coord(0, 2), PlayerColor.RED);
     gs1.placePenguin(new Coord(0, 4), PlayerColor.BROWN);
     gs1.placePenguin(new Coord(1, 1), PlayerColor.RED);
-    gs1.placePenguin(new Coord(1, 3), PlayerColor.BLACK);
+    gs1.placePenguin(new Coord(1, 3), PlayerColor.BROWN);
     gs1.placePenguin(new Coord(2, 0), PlayerColor.RED);
-    gs1.placePenguin(new Coord(2, 2), PlayerColor.BLACK);
+    gs1.placePenguin(new Coord(2, 2), PlayerColor.BROWN);
     gs1.placePenguin(new Coord(2, 4), PlayerColor.RED);
 
     gs1.startPlay();
