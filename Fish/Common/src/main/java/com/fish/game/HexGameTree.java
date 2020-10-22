@@ -73,7 +73,7 @@ public class HexGameTree implements GameTree {
    */
   @Override
   public GameTree getNextGameTree(Move move) {
-    GameState copy = getResultState(this.currentState, move);
+    GameState copy = getResultState(this, move);
     List<MoveState> newMoves = new ArrayList<>(this.history);
 
     newMoves.add(new MoveState(move, this.currentState.getCopyGameState()));
@@ -121,122 +121,36 @@ public class HexGameTree implements GameTree {
 
   /**
    * A query facility that returns one GameState that is the result of applying a move from
-   * start to dest on the given gamestate.
+   * start to dest on the given GameTree.
    *
-   * @param gs   the given gamestate
+   * @param gameTree   the given GameTree
    * @param move The move to make on the input game state
    * @return the resulting GameState
    */
-  public static GameState getResultState(GameState gs, Move move) throws IllegalArgumentException {
-    GameState copy = gs.getCopyGameState();
+  public static GameState getResultState(GameTree gameTree, Move move) throws IllegalArgumentException {
+    GameState copy = gameTree.getState();
     copy.movePenguin(move.getStart(), move.getEnd());
     return copy;
   }
 
   /**
-   * Apply the given function to all reachable states from the given gameState. Requires an initial
+   * Apply the given function to all reachable states from the given gameTree. Requires an initial
    * value.
    *
-   * @param gameState What state to investigate
+   * @param gameTree  What state to investigate
    * @param function  the function to apply
    * @param value     The base case
    * @return Whatever the function is written to return
    */
-  public static <T> T applyToAllReachableStates(GameState gameState, IFunc<T> function, T value) {
+  public static <T> T applyToAllReachableStates(GameTree gameTree, IFunc<T> function, T value) {
 
     T returnVal = value;
-    GameTree gt = new HexGameTree(gameState);
-    Map<Move, GameState> moveGameStateMap = gt.getPossibleGameStates();
+    Map<Move, GameState> moveGameStateMap = gameTree.getPossibleGameStates();
     for (Move move : moveGameStateMap.keySet()) {
       returnVal = function.apply(moveGameStateMap.get(move), returnVal);
     }
 
     return returnVal;
   }
-
-
-
-//  //private GameTree parent;
-//
-//  private GameState currentGameState;
-//  private List<GameState> possibleGameStates;
-//
-//  public HexGameTree(GameTree parent, GameState currentGameState) {
-//    this.parent = parent;
-//    this.currentGameState = currentGameState;
-//    this.possibleGameStates = generatePossibleGameStates();
-//  }
-//
-//  //Generates all possible game states that stem from this current state
-//  //and stores them in the possibleGameStates field.
-
-//
-//  /**
-//   * Returns a copy of all possible gamestates reachable from the current state.
-//   * The copy only contains states reachable at the current player's turn.
-//   * @return a list of possible states
-//   */
-//  @Override
-//  public List<GameState> getPossibleGameStates() {
-//    return new ArrayList<>(this.possibleGameStates);
-//  }
-//
-//  /**
-//   * Returns one GameState that is the retult of applying a move from start to dest on
-//   * the given gamestate.
-//   * @param gs the given gamestate
-//   * @param start the starting coord
-//   * @param dest the destination coord
-//   * @return the resulting GameState
-//   * @throws IllegalArgumentException if the move is illegal
-//   */
-//  @Override
-//  public GameState getResultState(GameState gs, Coord start, Coord dest) throws IllegalArgumentException{
-//    GameState copy = gs.getCopyGameState();
-//    //May throw illegal arg exceptions if the move is invalid
-//    copy.movePenguin(start, dest);
-//
-//    return copy;
-//  }
-//
-//  /**
-//   * Returns the child node stemming from this current node after making the given action,
-//   * which is a move from the start coord to the destination coord by the current player.
-//   * @param start starting coordinate of the penguin to move
-//   * @param dest ending coordinate of the penguin to move
-//   * @return new GameTree after making the given move
-//   * @throws IllegalArgumentException if the move is illegal
-//   */
-//  @Override
-//  public GameTree getNextGameTree (Coord start, Coord dest) throws IllegalArgumentException {
-//    GameState resultState = getResultState(this.currentGameState, start, dest);
-//    return new HexGameTree(this, resultState);
-//  }
-
-
-//  @Override
-//  public void applyFunctionToThisNode(Funtion f) {
-//
-//  }
-//
-//
-//
-//
-//
-//  /**
-//   * Returns the parent node of this GameTree, which represents all moves taken in the game up to
-//   * now. Altering the parent node does not actually alter the state.
-//   * @return the parent node
-//   */
-//  @Override
-//  public GameTree getParent() {
-//    return this.parent;
-//  }
-
-
-
-
-
-
 }
 
