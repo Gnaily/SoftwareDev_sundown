@@ -38,6 +38,7 @@ public class HexGameStateTest {
     this.twoPlayerGame.initGame(new HexGameBoard(6, 2, new ArrayList<>(),
         5, 1), twoPlayers);
 
+
     //Place Penguins
     this.twoPlayerGame.placePenguin(new Coord(1, 2), PlayerColor.WHITE);
     this.twoPlayerGame.placePenguin(new Coord(0, 1), PlayerColor.RED);
@@ -247,6 +248,20 @@ public class HexGameStateTest {
     assertEquals(whitePengLocs, this.twoPlayerGame.getOnePlayersPenguins(PlayerColor.WHITE));
   }
 
+  @Test
+  public void testMovePenguinNoMoves() {
+    this.twoPlayerGame.startPlay();
+    this.twoPlayerGame.movePenguin(new Coord(1, 2), new Coord(1, 0));
+    this.twoPlayerGame.movePenguin(new Coord(0, 1), new Coord(0, 2));
+    this.twoPlayerGame.movePenguin(new Coord(1, 0), new Coord(1, 1));
+    this.twoPlayerGame.movePenguin(new Coord(0, 2), new Coord(0, 0));
+
+    this.twoPlayerGame.movePenguin(new Coord(1, 1), new Coord(1, 3));
+    assertEquals(PlayerColor.WHITE, this.twoPlayerGame.getCurrentPlayer());
+    this.twoPlayerGame.movePenguin(new Coord(1, 3), new Coord(1, 5));
+    assertEquals(PlayerColor.WHITE, this.twoPlayerGame.getCurrentPlayer());
+  }
+
   ////////////PLAYER HANDLING
 
   @Test
@@ -335,7 +350,7 @@ public class HexGameStateTest {
     gs.movePenguin(new Coord(0,0), new Coord(0,2));
     gs.movePenguin(new Coord(1,0), new Coord(0,1));
 
-    assertEquals(true, gs.isGameOver());
+    assertTrue(gs.isGameOver());
     assertEquals(2, gs.getWinners().size());
   }
 

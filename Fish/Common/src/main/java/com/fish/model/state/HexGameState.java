@@ -100,6 +100,7 @@ public class HexGameState implements GameState {
     this.gameBoard = board;
     this.players = new ArrayList<>(players);
     this.gameStage = GameStage.PLACING_PENGUINS;
+
   }
 
   /**
@@ -140,6 +141,9 @@ public class HexGameState implements GameState {
   @Override
   public void startPlay() {
     this.gameStage = GameStage.IN_PLAY;
+    if (this.currentPlayerNoMoves()) {
+      this.advanceToNextPlayer();
+    }
   }
 
   /**
@@ -197,6 +201,10 @@ public class HexGameState implements GameState {
     //Adding 1 brings us to the next player. By modding by the size of the list means that if
     //we reach the end we will loop back around to zero.
     this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.size();
+    if (this.currentPlayerNoMoves() && !this.isGameOver()) {
+
+      this.advanceToNextPlayer();
+    }
   }
 
   /**
@@ -227,6 +235,9 @@ public class HexGameState implements GameState {
     //made to the players list.
     this.players.remove(this.currentPlayerIndex);
     this.currentPlayerIndex %= this.players.size();
+    if (this.currentPlayerNoMoves()) {
+      this.advanceToNextPlayer();
+    }
   }
 
   /////////////////////////////////Game Closing
@@ -473,6 +484,22 @@ public class HexGameState implements GameState {
     if (this.penguinLocs.get(loc) != null) {
       throw new IllegalArgumentException("There is already a penguin here!");
     }
+  }
+
+  // returns a boolean representing if the current player does not have any moves
+  private boolean currentPlayerNoMoves() {
+    if (this.gameStage != GameStage.IN_PLAY) {
+      return false;
+    }
+    List<Coord> pengs = this.getOnePlayersPenguins(this.getCurrentPlayer());
+
+    for (Coord cc : pengs) {
+      if (this.getTilesReachableFrom(cc).size() > 0) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
 }
