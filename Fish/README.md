@@ -136,16 +136,16 @@ XJson contains two static methods that aid in the processing of JSON input, XBoa
 
 
 ### iii. Maintaining Repository <a name="maintain"></a>
-The following UML diagrams support the maintaining of this repository. Pictured first is the model logic components. Second, visual components. Coord and PlayerColor are not pointing to any other class because they are additional tools that are used to facilitate the transfer of information between all other classes. 
-*Needs Updating*
+The main functionality of the overall game system lies in four primary interfaces: Tile, GameBoard, GameState, and GameTree. The individual functionality of each can be understood by examining method signatures. Use the following interface summaries to pinpoint functionatliy you wish to examine:
+
 <div align="center">
-  <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/images/ModelUML.png"
-       width="450"/>
-
-
-  <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/images/ViewUML.png"
-       width="350"/>
+  <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/images/InterfaceTile.png"/>
+  <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/images/InterfaceGameBoard.png"/>
+  <https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/images/InterfaceGameStage.png"/>
+  <https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/images/InterfaceGameTree.png"/>
 </div>
+
+**Note** There is a typo in the GameState diagram - its title says GameStage but it should be GameState. 
 
 
 ### iv. Unit Testing <a name="testing"></a>
@@ -169,7 +169,7 @@ For all of our tests the seed is set to 1. The first three examples below are us
 <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/images/constantBoard.png" alt="constantFishNumBoard" width="540"/>
 </div>
 
-While progressing to the GameState, the visual component was approved upon, and all of our GameState test cases are based off the following three boards:
+While progressing to the GameState, the visual component was approved upon, and all of our GameState test cases are based off the following three boards, named in our tests as 'twoPlayerGame,' 'fourPlayerGame,' and 'constantFishNumGame':
 
 <div align="center">
 <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/images/twoPlayerGame.png" alt="twoPlayerGame" width="420"/>
@@ -177,9 +177,9 @@ While progressing to the GameState, the visual component was approved upon, and 
 <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/images/constantFishNumGame.png" alt="constantFishNumGame" width="540"/>
 </div>
 
-Finally, presented here is a generalized example of our GameTree structure (this does not correspond to our test examples due to the complexity of the test cases):
+Finally, presented here is a generalized example of our GameTree structure (this does not correspond to our test examples due to the complexity of the test cases). Emphasized in the diagram is the functionality of traversing the GameTree backwards while a Player is strategizing. In order to avoid storing large tree data, every time a player traverses nodes on the Tree a new one is made while the previous one is not stored, but in the new one is enough information to reconstruct the previous node:
 <div align="center">
-<img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/images/twoPlayerGame.png" alt="GameTree Example" width="420"/>
+<https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/images/GameTree%20Example.pdf" alt="GameTree Example" width="420"/>
 </div>
 
 
