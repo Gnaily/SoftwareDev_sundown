@@ -150,7 +150,9 @@ public class HexGameTree implements GameTree {
     T returnVal = value;
     Map<Move, GameState> moveGameStateMap = gameTree.getPossibleGameStates();
     for (Move move : moveGameStateMap.keySet()) {
-      returnVal = function.apply(moveGameStateMap.get(move), returnVal);
+      // applying to the gameTree allows for applying to the state but also keeps track of
+      //  the move that was made to achieve this state
+      returnVal = function.apply(gameTree.getNextGameTree(move), returnVal);
     }
 
     return returnVal;

@@ -1,21 +1,19 @@
 package com.fish.game;
 
-import com.fish.model.state.GameState;
-
 /**
- * Function interface for interacting with GameStates. Has a single method that takes in a GameState
+ * Function interface for interacting with GameTrees. Has a single method that takes in a GameTree
  *  and a value and applies its function to those inputs.
  * @param <T> What type of data this function object should return
  */
 public interface IFunc<T> {
 
   /**
-   * Apply a function to the given GameState and value
-   * @param gameState the given GameState to apply a function to
+   * Apply a function to the given GameTree and value
+   * @param gameTree the given GameTree to apply a function to
    * @param value the previous value
    * @return The calculated value
    */
-  T apply(GameState gameState, T value);
+  T apply(GameTree gameTree, T value);
 
   /*
 
