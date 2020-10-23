@@ -3,7 +3,7 @@ package com.fish.game;
 import com.fish.model.state.GameState;
 
 /**
- * Class for representing a Move and the resulting gamestate from making that move. This class
+ * Class for representing a Move and the GameState that move was made from. This class
  *  is used to represent the history of a GameTree without storing the entire tree itself.
  *
  * This class contains the following information:
