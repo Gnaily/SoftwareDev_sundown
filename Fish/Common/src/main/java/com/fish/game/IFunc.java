@@ -14,14 +14,4 @@ public interface IFunc<T> {
    * @return The calculated value
    */
   T apply(GameTree gameTree, T value);
-
-  /*
-
-  Map: [LoX] [X -> Y]
-  (map lox func)
-
-  Foldr: [LoX] Y [X Y -> Y]
-  (foldr lox '() (lambda (x y) (cons (func x) y))
-  (foldr LoN 0 +)
-   */
 }
