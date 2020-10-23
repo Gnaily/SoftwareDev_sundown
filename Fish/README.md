@@ -75,15 +75,12 @@ Common/src/main/java/com.fish/
 
 * `Coord` : A coordinate point with an X value and a Y value. Use `getX()` and `getY()` to retrieve values. *Interpretation:* The precise location of a Tile in the game board data representation where X is the corresponding COLUMN on a visual plane and Y is the corresponding ROW on a visual plane. See image below of the Coord layout in a hexagon board.
 
-tile/
 * `Tile` : An interface implemented by `HexTile` that has an int of the number of fish on that Tile and a boolean isPresent that represents whether or not there is a hole in that Tile place on a GameBoard. 
 
-board/
 * `TwoNumberOperation` : An interface for a function object that takes in two integers and performs an operation on them that results in a int. This is used in the getTilesReachableFrom(Coord start) method in the HexGameBoard class to take in the x and y values of the Coord and perform a multitude of operations on them to obtain all of the tiles reachable from that location. 
 
 * `GameBoard` : An interface implemented by `HexGameBoard` that represents the collection of tiles a game of HTMF is played on. The `HexGameBoard` contains a 2-d Array of `Tile`, and each individual `Tile` holds informaiton about whether or not it should be present on the visible playing plane. A GameBoard's only functionality is to maintain the layout and visibility of `Tile` objects. 
 
-state/
 * `GameStage` : One of NOT_STARTED, PLACING_PENGUINS, IN_PLAY, or GAME_OVER. *Interpretation:* An enumeration representing one of four stages a game of HTMF progresses through. Please see instructions below for details of each stage.
 
 * `PlayerColor` : One of BLACK, BROWN, WHITE, or RED. *Interpretation:* An enumeration representing one of the four possible colors of avatars (penguins) in a game of HTMF.
@@ -126,7 +123,7 @@ Common/src/main/java/com.fish/
 `GameView` is an interface implemented by `HexBoardView` with one single method: drawGame(), which launches the image of the HTMF gameboard. 
 
 
-**json**  
+**JSON**  
 All of the functionality for our test harnesses is in the json/ directory.  
 ```
 Common/src/main/java/com.fish/
@@ -164,13 +161,27 @@ For individual test classes, in order to test a random generated board, there ex
         this.fillBoardWithTiles(holes, minOneFishTiles);
     }
 
-For all of our tests the seed is set to 1. Our three examples used throughout the test classes, and referenced above in [Running](#running), looked like the following during our prototype stage (we have since improved the visual component but the placement of holes and number of fish are the same). Please click each photo for a closer look. The constructor for the board object used to generate each board is captured in the screenshot above the board.
+For all of our tests the seed is set to 1. The first three examples below are used in the GameBoard test classes, and referenced above in [Running](#running), looked like the following during our prototype stage. Please click each photo for a closer look. The constructor for the board object used to generate each board is captured in the screenshot above the board.
 
 <div align="center">
 <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/images/holesBoard.png" alt="holesBoard" width="420"/>
 <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/images/noHolesBoard.png" alt="noHolesBoard" width="355"/>
 <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/images/constantBoard.png" alt="constantFishNumBoard" width="540"/>
 </div>
+
+While progressing to the GameState, the visual component was approved upon, and all of our GameState test cases are based off the following three boards:
+
+<div align="center">
+<img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/images/twoPlayerGame.png" alt="twoPlayerGame" width="420"/>
+<img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/images/fourPlayerGame.png" alt="fourPlayerGame" width="355"/>
+<img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/images/constantFishNumGame.png" alt="constantFishNumGame" width="540"/>
+</div>
+
+Finally, presented here is a generalized example of our GameTree structure (this does not correspond to our test examples due to the complexity of the test cases):
+<div align="center">
+<img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/images/twoPlayerGame.png" alt="GameTree Example" width="420"/>
+</div>
+
 
 ### v. Test Harness
 
