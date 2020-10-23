@@ -276,6 +276,24 @@ public class HexGameTreeTest {
   }
 
   @Test
+  public void getResultStateMultipleMoves() {
+    assertEquals(2, this.twoPlayerTree.getState().getTilesReachableFrom(new Coord(0, 0)).size());
+    this.twoPlayerTree = this.twoPlayerTree.getNextGameTree(new Move(new Coord(0, 0), new Coord(1, 2)));
+    this.twoPlayerTree = this.twoPlayerTree.getNextGameTree(new Move(new Coord(0, 2), new Coord(0, 1)));
+
+    this.twoPlayerTree = this.twoPlayerTree.getNextGameTree(new Move(new Coord(2, 2), new Coord(2, 3)));
+
+    GameState gs = HexGameTree.getResultState(this.twoPlayerTree, new Move(new Coord(2, 0), new Coord(2, 1)));
+
+    assertEquals(2, gs.getPlayerScore(PlayerColor.BROWN));
+    assertTrue(gs.getOnePlayersPenguins(PlayerColor.BROWN).contains(new Coord(1, 2)));
+
+    assertEquals(2, gs.getTilesReachableFrom(new Coord(0, 1)).size());
+    assertFalse(gs.getTilesReachableFrom(new Coord(0, 1)).contains(new Coord(0, 0)));
+
+  }
+
+  @Test
   public void getResultState() {
 
     GameState gs = HexGameTree.getResultState(this.twoPlayerTree, new Move(new Coord(0, 0), new Coord(1, 2)));

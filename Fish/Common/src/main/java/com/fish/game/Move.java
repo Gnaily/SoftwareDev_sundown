@@ -4,6 +4,13 @@ import com.fish.model.Coord;
 
 /**
  * Class representing a single move in a game of Fish
+ *
+ * A Move contains the following information:
+ *  - The starting Coord of this move
+ *  - The ending Coord of this move
+ *
+ * This class does not validate that this move can be made. It only stores data about
+ *  possible moves.
  */
 public class Move {
 
@@ -16,10 +23,20 @@ public class Move {
   }
 
 
+  /**
+   * Get the starting Coord of this move
+   *
+   * @return the starting move
+   */
   public Coord getStart() {
     return this.start;
   }
 
+  /**
+   * Get the ending Coord of this move
+   *
+   * @return the ending move
+   */
   public Coord getEnd() {
     return this.end;
   }
