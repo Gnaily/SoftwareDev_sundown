@@ -23,7 +23,7 @@ public class HexGameTree implements GameTree {
   private Map<Move, GameState> possibleMoves;
 
 
-  // private Constructor for creating a new GameTree given a list of previous MoveStates and the
+  // private Constructor for creating a new GameTree given a list of pr+evious MoveStates and the
   // current state. This is used when moving up and down a tree.
   private HexGameTree(GameState gs, List<MoveState> moves) {
     this.currentState = gs;
@@ -97,14 +97,14 @@ public class HexGameTree implements GameTree {
    */
   @Override
   public GameTree undoPreviousMove() {
-    List<MoveState> newMoves = new ArrayList<>(this.history);
+    List<MoveState> historyCopy = new ArrayList<>(this.history);
 
-    if (newMoves.size() <= 0) {
+    if (historyCopy.size() <= 0) {
       throw new IllegalArgumentException("No moves to go back from!");
     }
-    MoveState ms = newMoves.remove(newMoves.size() - 1);
+    MoveState lastMove = historyCopy.remove(historyCopy.size() - 1);
 
-    return new HexGameTree(ms.getGameState(), newMoves);
+    return new HexGameTree(lastMove.getGameState(), historyCopy);
   }
 
   /**
