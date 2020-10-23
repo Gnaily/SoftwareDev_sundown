@@ -141,7 +141,7 @@ The main functionality of the overall game system lies in four primary interface
 <div align="center">
   <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/images/InterfaceTile.png"/>
   <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/images/InterfaceGameBoard.png"/>
-  <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/images/InterfaceGameStage.png/>
+  <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/images/InterfaceGameStage.png"/>
   <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/images/InterfaceGameTree.png"/>
 </div>
 **Note** There is a typo in the GameState diagram - its title says GameStage but it should be GameState. 
@@ -167,8 +167,7 @@ For all of our tests the seed is set to 1. The first three examples below are us
 <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/images/noHolesBoard.png" alt="noHolesBoard" width="355"/>
 <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/images/constantBoard.png" alt="constantFishNumBoard" width="540"/>
 </div>
-
-
+<br>
 
 While progressing to the GameState, the visual component was approved upon, and all of our GameState test cases are based off the following three boards, named in our tests as 'twoPlayerGame,' 'fourPlayerGame,' and 'constantFishNumGame':
 
@@ -177,9 +176,8 @@ While progressing to the GameState, the visual component was approved upon, and 
 <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/images/fourPlayerGame.png" alt="fourPlayerGame" width="375"/>
 <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/images/constantFishNumGame.png" alt="constantFishNumGame" width="540"/>
 </div>
-
-
-
+<br>
+ 
 Finally, presented here is a generalized example of our GameTree structure (this does not correspond to our test examples due to the complexity of the test cases). Emphasized in the diagram is the functionality of traversing the GameTree backwards while a Player is strategizing. In order to avoid storing large tree data, every time a player traverses nodes on the Tree a new one is made while the previous one is not stored, but in the new one is enough information to reconstruct the previous node:
 
 <div align="center">
