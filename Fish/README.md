@@ -50,10 +50,10 @@ Pick your favorite GameBoard and use it as an argument to instantiate the GameSt
 
 Run the main method to view the board in a new window.
 
+
 ### ii. Navigating Directories <a name="navDir"></a>
 **Model**  
 Foundations for the model have been built in the Other/src/main/java/com/fish/model directory, in compliance with Maven file structure requirements.  
-
 ```
 Common/src/main/java/com.fish/
     model/
@@ -73,25 +73,70 @@ Common/src/main/java/com.fish/
      |  Coord.java
 ```
 
-`GameBoard` is an interface implemented by `HexGameBoard` that represents the collection of tiles a game of HTMF is played on. The `HexGameBoard` contains a 2-d Array of `Tile`, and each individual `Tile` holds informaiton about whether or not it should be present on the visible playing plane. A GameBoard's only functionality is to maintain the layout and visibility of `Tile` objects.
+* `Coord` : A coordinate point with an X value and a Y value. Use `getX()` and `getY()` to retrieve values. *Interpretation:* The precise location of a Tile in the game board data representation where X is the corresponding COLUMN on a visual plane and Y is the corresponding ROW on a visual plane. See image below of the Coord layout in a hexagon board.
 
-`GameState` is an interface implemented by `HexGameState` that manages the HTMF gaeme logic. A HexGameState has a `GameStage`, which is an enumeration that represents the different stages of a game: NOT_STARTED, PLACING_PENGUINS, IN_PLAY, and GAMEOVER. A `Player` represents an internal player and holds information about the player's age, score, and `PlayerColor`, which is an enumeration representing one of the four colors a player's avatars can be assigned.
+tile/
+* `Tile` : An interface implemented by `HexTile` that has an int of the number of fish on that Tile and a boolean isPresent that represents whether or not there is a hole in that Tile place on a GameBoard. 
 
-`Tile` is an interface implemented by `HexTile` and has two purposes: to hold and return the number of fish on a tile, and to hold information about whether or not the tile has 'melted' eg disappears after a penguin departs from it.
+board/
+* `TwoNumberOperation` : An interface for a function object that takes in two integers and performs an operation on them that results in a int. This is used in the getTilesReachableFrom(Coord start) method in the HexGameBoard class to take in the x and y values of the Coord and perform a multitude of operations on them to obtain all of the tiles reachable from that location. 
 
-`Coord` is a class that represents a coordinate point on a cartesian plane. Its xx and yy values correspond to the ii and jj indices of the 2-d Array of Tiles in the GameBoard object. This class fascilitates the transfer of information between components.
+* `GameBoard` : An interface implemented by `HexGameBoard` that represents the collection of tiles a game of HTMF is played on. The `HexGameBoard` contains a 2-d Array of `Tile`, and each individual `Tile` holds informaiton about whether or not it should be present on the visible playing plane. A GameBoard's only functionality is to maintain the layout and visibility of `Tile` objects. 
+
+state/
+* `GameStage` : One of NOT_STARTED, PLACING_PENGUINS, IN_PLAY, or GAME_OVER. *Interpretation:* An enumeration representing one of four stages a game of HTMF progresses through. Please see instructions below for details of each stage.
+
+* `PlayerColor` : One of BLACK, BROWN, WHITE, or RED. *Interpretation:* An enumeration representing one of the four possible colors of avatars (penguins) in a game of HTMF.
+
+* `Player` : An internal player representation that has a score (int), age (int) and color (PlayerColor). *Interpretation:* An internal participant of a game of HTMF.
+
+* `GameState` : An interface implemented by `HexGameState` that manages the HTMF game logic. A HexGameState has a `GameStage`, a `GameBoard`, a List of Player in the order of player turns, an int of the current player index, and a Map of Coord to PlayerColor of penguin locations, expanded below..
+
+* `Map<Coord, PlayerColor>` : A map with Coord keys and PlayerColor values. *Interpretation:* A collection penguin avatar locations on the board. The coordinate locations are unique in that no two penguins may land on the same tile at once. The PlayerColor is the player's assigned avatar color whose penguin is at the coordinate location.
+
+**Game Tree**  
+For representing a full game of HTMF, all files of the Game Tree are gathered in the game/directory. 
+
+```
+Common/src/main/java/com.fish/
+    game/
+     |  GameTree.java
+     |  HexGameTree
+     |  IFunc
+     |  Move
+     |  MoveState
+     |  NodeCounter
+```
+* `Move` : A complete move from a starting Coord to an ending Coord in a game of HTMF. Note: This does **not** represent a valid move as there are absolutely no restrictions to how the start and end Coord are instantiated. *Interpretation:* A possible action that a player can make during their turn of the game. 
+
+* `MoveState` : An abstract pairing of a Move and a GameState, used by a GameTree to represent the history of the tree without storing the Tree itself. *Interpretation*: A sequence of all moves that were made from the starting node of a game as represented in a GameTree. Note that the Move is the Move made FROM the State it is paired with, not TO the state it is paired with. Please see diagram below in testing section on the structure of a GameTree. 
+
+* `GameTree` : An interface implemented by `HexGameTree` that represents entire games of HTMf. A HexGameTree has a GameState, and List of MoveState representing the tree history, and a Map of Move to Gamestate representing the possible moves stemming from the current gamestate at the current player's turn. 
+
+* `IFunc` is a function interface for applying actions to state in GameTrees. `NodeCounter` is one example of the actions made possible by the IFunc. 
 
 **View**  
 Foundations for the view can be found in the Other/src/main/java/com/fish/view directory.
-
 ```
 Common/src/main/java/com.fish/
     view/
      |  GameView.java
      |  HexBoardView.java
 ```
+`GameView` is an interface implemented by `HexBoardView` with one single method: drawGame(), which launches the image of the HTMF gameboard. 
 
-`GameView` is an interface implemented by `HexBoardView` with one single method: drawGame(), which launches the image of the HTMF gameboard.
+
+**json**  
+All of the functionality for our test harnesses is in the json/ directory.  
+```
+Common/src/main/java/com.fish/
+    json/
+     |  XBoard
+     |  XJson
+     |  XState
+```
+XJson contains two static methods that aid in the processing of JSON input, XBoard processes JSON input that represents game boards, and likewise XState processes a JSON representations of a State, performs one action (moves the first player's first penguin) and either returns false or converts the resulting state back into JSON and returns that. 
+
 
 ### iii. Maintaining Repository <a name="maintain"></a>
 The following UML diagrams support the maintaining of this repository. Pictured first is the model logic components. Second, visual components. Coord and PlayerColor are not pointing to any other class because they are additional tools that are used to facilitate the transfer of information between all other classes. 
