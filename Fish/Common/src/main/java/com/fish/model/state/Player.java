@@ -63,4 +63,17 @@ public class Player {
     p.addToScore(this.score);
     return p;
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (o instanceof Player) {
+      Player other = (Player) o;
+
+      return this.score == other.getScore() && this.age == other.getAge() && this.color == other.getColor();
+
+
+    }
+
+    return false;
+  }
 }

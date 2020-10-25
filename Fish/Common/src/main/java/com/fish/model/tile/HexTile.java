@@ -68,5 +68,14 @@ public class HexTile implements Tile {
     this.isPresent = false;
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (o instanceof HexTile) {
+      HexTile other = (HexTile) o;
+      return this.numFish == other.getNumFish() && this.isPresent == other.isPresent();
+    }
+
+    return false;
+  }
 
 }

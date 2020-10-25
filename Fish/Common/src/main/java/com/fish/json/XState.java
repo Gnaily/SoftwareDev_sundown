@@ -3,11 +3,7 @@ package com.fish.json;
 import com.fish.model.Coord;
 import com.fish.model.board.GameBoard;
 import com.fish.model.board.HexGameBoard;
-import com.fish.model.state.GameStage;
-import com.fish.model.state.GameState;
-import com.fish.model.state.HexGameState;
-import com.fish.model.state.Player;
-import com.fish.model.state.PlayerColor;
+import com.fish.model.state.*;
 import com.fish.model.tile.Tile;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -50,7 +46,7 @@ public class XState {
     List<Player> players = getPlayersList(playerArray);
 
     //Generate the gameState during the precise snapshot given in the JSON input
-    GameState gsFromInput = new HexGameState(GameStage.IN_PLAY, boardFromInput, players, 0,
+    GameState gsFromInput = new HexGameState(GameStage.IN_PLAY, boardFromInput, players,
         placePenguins(playerArray));
 
     //Make the move, OR determine that NO move can be made:

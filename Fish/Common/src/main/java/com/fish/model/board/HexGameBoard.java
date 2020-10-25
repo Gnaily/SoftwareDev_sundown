@@ -371,6 +371,40 @@ public class HexGameBoard implements GameBoard {
     return this.height;
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (o instanceof HexGameBoard) {
+      HexGameBoard other = (HexGameBoard) o;
+
+      // BOARD EQUALITY:
+      // SAME NUMBER OF TILES, HOLES in the same places.
+      if (this.width == other.getWidth() && this.height == other.getHeight()) {
+        for (int ii = 0; ii < this.width; ii++) {
+          for (int jj = 0; jj < this.height; jj++) {
+            Coord loc = new Coord(ii, jj);
+            Tile myTile = this.getTileAt(loc);
+            Tile otherTile = other.getTileAt(loc);
+            if (myTile.isPresent() &&  otherTile.isPresent() && myTile.getNumFish() == otherTile.getNumFish()) {
+              // tiles are equal
+            }
+            else if (!myTile.isPresent() && !otherTile.isPresent()) {
+              // considered equals
+            }
+            else {
+              return false;
+            }
+          }
+        }
+
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+
+
   //Purpose: To reduce the amount of times we need to write out checks that a Coord is within
   //the dimensions of the board (which is in almost every method)
   private void checkTileInBounds(Coord loc, String specificMsg) throws IllegalArgumentException {

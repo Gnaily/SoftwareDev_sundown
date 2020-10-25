@@ -167,14 +167,14 @@ public class HexGameBoardTest {
   @Test
   public void getTileAtValid() {
     assertEquals(3, this.holesBoard.getTileAt(new Coord(0, 1)).getNumFish());
-    assertEquals(true, this.holesBoard.getTileAt(new Coord(0, 1)).isPresent());
+    assertTrue(this.holesBoard.getTileAt(new Coord(0, 1)).isPresent());
     assertEquals(1, this.holesBoard.getTileAt(new Coord(1, 0)).getNumFish());
-    assertEquals(true, this.holesBoard.getTileAt(new Coord(1, 0)).isPresent());
+    assertTrue(this.holesBoard.getTileAt(new Coord(1, 0)).isPresent());
 
     assertEquals(1, this.noHolesBoard.getTileAt(new Coord(0, 5)).getNumFish());
     noHolesBoard.removeTileAt(new Coord(0,5));
     assertEquals(1, this.noHolesBoard.getTileAt(new Coord(0, 5)).getNumFish());
-    assertEquals(false, this.noHolesBoard.getTileAt(new Coord(0, 5)).isPresent());
+    assertFalse(this.noHolesBoard.getTileAt(new Coord(0, 5)).isPresent());
   }
 
   @Test
@@ -193,7 +193,7 @@ public class HexGameBoardTest {
 
   @Test
   public void testGetTileRemoved() {
-    assertEquals(false, this.holesBoard.getTileAt(new Coord(1, 4)).isPresent());
+    assertFalse(this.holesBoard.getTileAt(new Coord(1, 4)).isPresent());
   }
 
   @Test
@@ -280,6 +280,26 @@ public class HexGameBoardTest {
     copy.removeTileAt(cc);
     assertFalse(copy.getTileAt(cc).isPresent());
     assertTrue(this.holesBoard.getTileAt(cc).isPresent());
+  }
+
+  @Test
+  public void testEqualsCopy() {
+    GameBoard copy = this.holesBoard.getCopyGameBoard();
+    assertEquals(this.holesBoard, copy);
+  }
+
+  @Test
+  public void testEqualsNotCopy() {
+    List<Coord> holes = Arrays.asList(new Coord(0, 0), new Coord(1, 1),
+        new Coord(2, 2), new Coord(1, 4));
+    GameBoard gb = new HexGameBoard(8, 3, holes,
+        8, 1);
+    assertEquals(gb, this.holesBoard);
+
+    gb.removeTileAt(new Coord(0, 1));
+    assertNotEquals(gb, this.holesBoard);
+    this.holesBoard.removeTileAt(new Coord(0, 1));
+    assertEquals(gb, this.holesBoard);
   }
 
 

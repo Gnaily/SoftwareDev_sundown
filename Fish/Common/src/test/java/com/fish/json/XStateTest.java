@@ -52,7 +52,7 @@ public class XStateTest {
     JsonArray playerArray = stateAsJson.getAsJsonArray("players");
     List<Player> players = XState.getPlayersList(playerArray);
 
-    return new HexGameState(GameStage.IN_PLAY, boardFromInput, players, 0,
+    return new HexGameState(GameStage.IN_PLAY, boardFromInput, players,
         XState.placePenguins(playerArray));
   }
 
@@ -63,7 +63,7 @@ public class XStateTest {
     JsonArray playerArray = smallJsonState.getAsJsonArray("players");
     List<Player> players = XState.getPlayersList(playerArray);
 
-    return new HexGameState(GameStage.IN_PLAY, boardFromInput, players, 0,
+    return new HexGameState(GameStage.IN_PLAY, boardFromInput, players,
         XState.placePenguins(playerArray));
   }
 

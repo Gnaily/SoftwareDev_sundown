@@ -493,5 +493,33 @@ public class HexGameStateTest {
 
   }
 
+  @Test
+  public void testEqualsCopy() {
+    GameState gs = this.twoPlayerGame.getCopyGameState();
+    assertEquals(gs, this.twoPlayerGame);
+  }
 
+  @Test
+  public void testEqualsNotCopy() {
+    GameState gs = new HexGameState();
+    List<Player> twoConstPlayers = new ArrayList<>(Arrays.asList(
+        new Player(5, PlayerColor.BROWN), new Player(50, PlayerColor.BLACK)));
+
+    //Board: 4 rows x 4 columns; no holes and 2 fish on each tile
+    gs.initGame(new HexGameBoard(4, 4, 2), twoConstPlayers);
+
+    //Place Penguins
+    gs.placePenguin(new Coord(0, 0), PlayerColor.BROWN);
+    gs.placePenguin(new Coord(1, 0), PlayerColor.BLACK);
+
+    gs.startPlay();
+    this.constantFishNumGame.startPlay();
+    
+    assertEquals(gs, this.constantFishNumGame);
+    gs.movePenguin(new Coord(0, 0), new Coord(0, 2));
+    assertNotEquals(gs, this.constantFishNumGame);
+
+    this.constantFishNumGame.movePenguin(new Coord(0, 0), new Coord(0, 2));
+    assertEquals(gs, this.constantFishNumGame);
+  }
 }

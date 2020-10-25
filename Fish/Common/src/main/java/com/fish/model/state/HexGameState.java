@@ -455,6 +455,39 @@ public class HexGameState implements GameState {
     return new ArrayList<>(this.players);
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (o instanceof HexGameState) {
+      HexGameState other = (HexGameState) o;
+      return this.compareGameState(other);
+
+    }
+    return false;
+  }
+
+  private boolean compareGameState(HexGameState other) {
+    if (this.gameStage != other.getGameStage()) {
+      return false;
+    }
+    Map<Coord, PlayerColor> otherPengs = other.getPenguinLocations();
+    for (Coord c : this.penguinLocs.keySet()) {
+      if (otherPengs.get(c) != this.penguinLocs.get(c)) {
+        return false;
+      }
+    }
+    List<Player> otherPlayers = other.getPlayers();
+    if (this.players.size() != otherPlayers.size() || this.penguinLocs.size() != otherPengs.size()) {
+      return false;
+    }
+    for (int ii = 0; ii < this.players.size(); ii++) {
+      if (!this.players.get(ii).equals(otherPlayers.get(ii))) {
+        return false;
+      }
+    }
+
+    return other.gameBoard.equals(this.gameBoard);
+  }
+
   //Private Helpers
 
   //Checks if a player making a change to the state is the current player
