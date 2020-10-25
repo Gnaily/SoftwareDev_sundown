@@ -35,19 +35,9 @@ public class XState {
     //Grab the first (and only) JSON object, which is the State represented in JSON
     JsonObject stateAsJson = xJsonInput.get(0).getAsJsonObject();
 
-    //////HANDLE "board" INPUT
-    //turn that into an actual 2D array board representation in Java
-    int[][] valuesFromInput = XBoard.getTileValues(stateAsJson, "board");
-    //Create the GameBoard object with the values from the JSON input
-    GameBoard boardFromInput = new HexGameBoard(valuesFromInput);
-
+    GameState gsFromInput = jsonToGameState(stateAsJson);
     //////HANDLE "players" INPUT
     JsonArray playerArray = stateAsJson.getAsJsonArray("players");
-    List<Player> players = getPlayersList(playerArray);
-
-    //Generate the gameState during the precise snapshot given in the JSON input
-    GameState gsFromInput = new HexGameState(GameStage.IN_PLAY, boardFromInput, players,
-        placePenguins(playerArray));
 
     //Make the move, OR determine that NO move can be made:
     Coord penguinStart = getFirstPlayersFirstPenguin(playerArray);
@@ -66,6 +56,26 @@ public class XState {
   }
 
   //////////////////////HELPERS
+
+  static GameState jsonToGameState(JsonObject stateAsJson) {
+    //////HANDLE "board" INPUT
+    //turn that into an actual 2D array board representation in Java
+    int[][] valuesFromInput = XBoard.getTileValues(stateAsJson, "board");
+    //Create the GameBoard object with the values from the JSON input
+    GameBoard boardFromInput = new HexGameBoard(valuesFromInput);
+
+    //////HANDLE "players" INPUT
+    JsonArray playerArray = stateAsJson.getAsJsonArray("players");
+    List<Player> players = getPlayersList(playerArray);
+
+    //Generate the gameState during the precise snapshot given in the JSON input
+    return new HexGameState(GameStage.IN_PLAY, boardFromInput, players,
+            placePenguins(playerArray));
+
+
+  }
+
+
   //Useful helper method to generate the data representation of a given color represented as a String
   static PlayerColor getPlayerColor(String color) {
     switch (color) {
