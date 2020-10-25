@@ -9,18 +9,15 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Implementation for a GameBoard object in a game of Hey, That's my Fish! (HTMF)
+ * Implementation of a GameBoard object in a game of Hey, That's my Fish! (HTMF)
  *
- * The GameBoard object is a collection of Tile objects that represent the tiles used to play out
- * a game of HTMF. This implementation handles hexagon-shaped tiles, the layout of which is described
+ * Interpretation: The GameBoard object is a collection of Tile objects that represent the tiles
+ * used to play out a game of HTMF.
+ *
+ * This implementation handles hexagon-shaped tiles, the layout of which is described
  * below. The location of each Tile in the data representation of the board can be found using a
- * Coord object, which has one x and one y value that directly refer to the indices of
- * the 2-d Array where the Tiles are stored. For example, the Tile at the top-left of the board
- * illustrated below can be located using either one of the following methods:
- * tiles[0][0] OR
- * this.getTileAT(new Coord(0,0))
- * But in this implementation the later is used throughout because the method implements checks that
- * enforce the Tile object being retrieved is in fact on this board.
+ * Coord object. For any given Coord (x, y) the x value represents the column number and the y
+ * value represents the row number.
  *
  * <p>
  *  The Coordinate system for a hexagonal game is used as follows:
@@ -37,12 +34,18 @@ import java.util.Random;
  *    `--< 0,5 >--< 1,5|
  *        \___/    \___/
  *
- *   This is an example of a board with 6 rows and 2 columns. For any given coordinate (x, y) the
- *   x value represents the column number and the y value represents the row number.
+ *   This is an example of a board with 6 rows and 2 columns.
  * </p>
  *
- * A Tile that isPresent represents a Tile still visible on the game board, whereas a Tile that
- * returns false for isPresent represents a hole in the visible/playable board.
+ * The Tile at the top-left of the board illustrated below can be located using either one of the
+ * following methods:
+ * tiles[0][0] OR
+ * this.getTileAT(new Coord(0,0))
+ * But in this implementation the later is used throughout because the method implements checks that
+ * enforce the Tile object being retrieved is in fact on this board.
+ *
+ * Finally, the Random object in the rand field is used to generate a constant board for testing
+ * purposes through the use of a random seed of 1 in all our testing.
  */
 public class HexGameBoard implements GameBoard {
 

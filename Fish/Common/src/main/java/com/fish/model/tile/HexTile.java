@@ -3,16 +3,14 @@ package com.fish.model.tile;
 /**
  * Implementation of a Tile in the shape of a hexagon for a game of Hey, That's my Fish! (HTMF)
  *
- * A Tile in the game is a spot on the board that a player may land one of their avatars on.
- * A Tile has a number of fish on it, and players earn the fish from Tiles they land on as
- * an accumulation of their score. Once a player moves its avatar from a Tile, it melts, meaning
- * it disappears/is removed from from the game board, becoming a hole.
+ * Interpretation: A spot on the HTMF board, which is either present (visible) or a hole.
+ * A Tile has:
+ *  - a number indicating how many fish are on it
+ *  - a boolean indicating if it is present on the board or if it is a hole
  *
- * An implementation of the Tile object contains an integer of the number of fish on the Tile, and
- * a boolean determining whether or not the tile isPresent on the board.
- * Its only functionality is to retrieve the number of fish on it, to determine whether it is
- * currently present, and the functionality to 'melt' the Tile, meaning to change its internal
- * state from present to a hole.
+ * Players accumulate their score from collecting the fish of Tiles they land on.
+ * Once a player moves its avatar from a Tile, it melts, meaning it becomes a hole and is removed
+ * from the visible GameBoard.
  */
 public class HexTile implements Tile {
 
@@ -20,7 +18,7 @@ public class HexTile implements Tile {
   private boolean isPresent;
 
   /**
-   * Constructor to instantiate a hexagon-shaped tile in a game. isPresent is set to True because
+   * Constructor to instantiate a hexagon-shaped Tile in a game. isPresent is set to True because
    * if a Tile is instantiated with a numFish then it implies that it will start off as visibly
    * present in a game of HTMF, but that can later be changed.
    * @param numFish the number of fish
@@ -62,7 +60,8 @@ public class HexTile implements Tile {
   }
 
   /**
-   * Melts a tile, meaning changing the tile from visible in a game of HTMF to a hole.
+   * Changes a Tile's isPresent boolean to false, meaning if it is currently present on the game
+   * board, it becomes a hole.
    */
   @Override
   public void meltTile() {

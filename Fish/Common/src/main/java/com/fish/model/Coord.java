@@ -1,8 +1,14 @@
 package com.fish.model;
 
 /**
- * Represents a single point on a Cartesian coordinate plane with an x and y value,
+ * A single point on a Cartesian coordinate plane with an x and y value,
  * denoted xx and yy.
+ *
+ * Interpretation/In relation to HTMF:
+ * The location of a Tile on the visible game board,
+ * where the 0,0 Coord is in the upper left hand corner of the board and
+ * the xx and yy values increment in the same manner that they do on the lower right quartile
+ * of a full cartesian plane.
  */
 public class Coord {
 

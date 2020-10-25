@@ -46,7 +46,6 @@ public class HexGameState implements GameState {
   private GameStage gameStage;
   private GameBoard gameBoard;
   private List<Player> players; //can be initialized in the order of ascending age, or another order
-  private int currentPlayerIndex; // int index = 0, 1, 2, 3
   private Map<Coord, PlayerColor> penguinLocs;
 
 
@@ -57,7 +56,6 @@ public class HexGameState implements GameState {
    */
   public HexGameState() {
     this.gameStage = GameStage.NOT_STARTED;
-    this.currentPlayerIndex = 0;
     this.penguinLocs = new HashMap<>();
   }
 
@@ -74,15 +72,13 @@ public class HexGameState implements GameState {
    * the copied GameState as it is in the middle of the ongoing game.
    * @param penguinLocs the location of penguins
    * @param players the players in order of player-turn
-   * @param currentPlayerIndex the index in the player list to find the current player
    * @param board the GameBoard on which the game is playing
    */
   public HexGameState(GameStage gs, GameBoard board, List<Player> players,
-      int currentPlayerIndex, Map<Coord, PlayerColor> penguinLocs) {
+      Map<Coord, PlayerColor> penguinLocs) {
     this.gameStage = gs;
     this.gameBoard = board;
     this.players = players;
-    this.currentPlayerIndex = currentPlayerIndex;
     this.penguinLocs = new HashMap<>(penguinLocs);
   }
 
@@ -192,17 +188,18 @@ public class HexGameState implements GameState {
   }
 
   /**
-   * Advance the currentPlayerIndex by one or cycle it back to zero once the next cycle of turns
-   * begins. This enforces the player turn flow and ensures that only the proper player whose
-   * turn it is can make moves.
+   * Advances the current player to the next player by rotating the Player list.
+   * The current player is always at index 0, so remove this element and put it to the
+   * back of the list.
+   * Once the turn is advanced
+   * -- check that this new current player has moves.
+   * -- If not, skip them and keep moving on until reaching a player that can make a move.
    */
   @Override
   public void advanceToNextPlayer() {
-    //Adding 1 brings us to the next player. By modding by the size of the list means that if
-    //we reach the end we will loop back around to zero.
-    this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.size();
+    Player toMove = this.players.remove(0);
+    this.players.add(toMove);
     if (this.currentPlayerNoMoves() && !this.isGameOver()) {
-
       this.advanceToNextPlayer();
     }
   }
@@ -219,9 +216,9 @@ public class HexGameState implements GameState {
     PlayerColor playerToRemove = this.getCurrentPlayer();
 
     // Doing this is one foreach causes a ConcurrentModificationException
-    Set<Coord> coords = this.penguinLocs.keySet();
+    Set<Coord> allPenguinLocsOnBoard = this.penguinLocs.keySet();
     List<Coord> penguinsToRemove = new ArrayList<>();
-    for (Coord cc : coords) {
+    for (Coord cc : allPenguinLocsOnBoard) {
       if (this.penguinLocs.get(cc) == playerToRemove) {
         penguinsToRemove.add(cc);
       }
@@ -231,10 +228,7 @@ public class HexGameState implements GameState {
       this.penguinLocs.remove(c);
     }
 
-    //The mod ensures that the next currentPlayerIndex is a valid index that reflects the changes
-    //made to the players list.
-    this.players.remove(this.currentPlayerIndex);
-    this.currentPlayerIndex %= this.players.size();
+    this.players.remove(0);
     if (this.currentPlayerNoMoves()) {
       this.advanceToNextPlayer();
     }
@@ -318,7 +312,7 @@ public class HexGameState implements GameState {
       playersCopy.add(p.getCopyPlayer());
     }
     return new HexGameState(this.gameStage, this.gameBoard.getCopyGameBoard(),
-        playersCopy, this.currentPlayerIndex, this.getPenguinLocations());
+        playersCopy, this.getPenguinLocations());
   }
 
   /**
@@ -373,7 +367,7 @@ public class HexGameState implements GameState {
    */
   @Override
   public PlayerColor getCurrentPlayer() {
-    return this.players.get(this.currentPlayerIndex).getColor();
+    return this.players.get(0).getColor();
   }
 
   /**

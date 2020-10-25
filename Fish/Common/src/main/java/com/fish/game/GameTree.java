@@ -26,7 +26,6 @@ public interface GameTree {
    */
   Map<Move, GameState> getPossibleGameStates();
 
-
   /**
    * Returns the child node stemming from this current node after making the given action,
    * which is a move from the start coord to the destination coord by the current player.
