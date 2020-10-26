@@ -344,7 +344,12 @@ public class HexGameBoard implements GameBoard {
     //Gets a 2d array of int representing the number of fish on each tile at Coord(ii, jj)
     for (int ii = 0; ii < this.getWidth(); ii++) {
       for (int jj = 0; jj < this.getHeight(); jj++) {
-        boardDataRep[ii][jj] = this.tiles[ii][jj].getNumFish();
+        if (this.getTileAt(new Coord(ii,jj)).isPresent()) {
+          boardDataRep[ii][jj] = this.getTileAt(new Coord(ii,jj)).getNumFish();
+        }
+        else {
+          boardDataRep[ii][jj] = 0;
+        }
       }
     }
     return boardDataRep;

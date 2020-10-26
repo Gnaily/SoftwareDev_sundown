@@ -28,7 +28,6 @@ public class HexGameBoardTest {
 
     this.constantFishNumBoard = new HexGameBoard(4, 4, 2);
 
-
   }
 
   /////Tests for Constructors
