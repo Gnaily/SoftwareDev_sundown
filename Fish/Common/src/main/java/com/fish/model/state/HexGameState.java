@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Implementation for a GameState object in a game of Hey, That's my Fish! (HTMF)
@@ -151,37 +150,37 @@ public class HexGameState implements GameState {
    */
   @Override
   public void movePenguin(Coord origin, Coord destination) throws IllegalArgumentException, IllegalStateException {
+    this.checkValidMoveForCurrentPlayer(origin, destination);
 
-    //TODO FINISIH REFACTORING THIS
-//    this.checkValidMoveForCurrentPlayer(origin, destination);
-//
-//
-//
-//    PlayerColor color = this.penguinLocs.remove(origin);
-//    this.penguinLocs.put(destination, color);
-//    Tile tile = this.gameBoard.removeTileAt(origin);
-//    player.addToScore(tile.getNumFish());
-//    this.advanceToNextPlayer();
-//  }
-//
-//
-//  //Checks that the move being made is valid for the current player
-//  private InternalPlayer checkValidMoveForCurrentPlayer(Coord origin, Coord destination)
-//      throws IllegalArgumentException, IllegalStateException {
-//
-//    if (this.gameStage != GameStage.IN_PLAY) {
-//      throw new IllegalStateException(
-//          "You cannot move penguins before or after a game is in play.");
-//    }
-//    if (this.getCurrentPlayer())
-//
-//
-//    HexPlayer player = findPlayer(this.getCurrentPlayer());
-//    this.checkCurrentPlayer(player.getColor());
-//    this.checkIfTilePresent(to); //we do not need to check from because if a penguin is there, the tile is present
-//    this.checkIfPengAlreadyOnTile(to);
-//
-//    return player;
+    this.players.get(0).movePenguin(origin, destination);
+    Tile tileToHole = this.gameBoard.removeTileAt(origin);
+    this.players.get(0).addToScore(tileToHole.getNumFish());
+    this.advanceToNextPlayer();
+  }
+
+
+  //Checks that the move being made is valid for the current player
+  //Either: Throws the exception OR does nothing, allowing the movePenguin method to move on
+  private void checkValidMoveForCurrentPlayer(Coord origin, Coord destination)
+      throws IllegalArgumentException, IllegalStateException {
+
+    if (this.gameStage != GameStage.IN_PLAY) {
+      throw new IllegalStateException(
+          "You cannot move penguins before or after a game is in play.");
+    }
+
+    //TODO : FIX THIS LOGIC !!!
+    //this.checkCurrentPlayer();
+    //QUESTION: What is stronger:
+    // -- The penguin at the origin MUST be the current player's penguin OR
+    // -- The current player.get(0) is the current player??
+    //Consider the cases:
+    // - the player at .get(0) moves a penguin of a different color -- THIS IS HANDLED BY THE PLAYER CLASS MOVE METHOD
+    // - a player NOT at .get(0) tries to call this method on the player at .get(0)'s penguin DURING
+    //        the turn of the player AT .get(0) -- we should plan for a check for this in referee class
+
+    this.checkIfTilePresent(destination); //we do not need to check from because if a penguin is there, the tile is present
+    this.checkIfPengAlreadyOnTile(destination);
   }
 
   /**
