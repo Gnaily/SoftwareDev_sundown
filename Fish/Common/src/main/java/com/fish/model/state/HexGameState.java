@@ -439,7 +439,7 @@ public class HexGameState implements GameState {
   //This is called at every point where player turn is advancing to ensure the game proceeds
   //in a timely manner.
   private void skipPlayerIfNoMoves() {
-    if (!this.currentPlayerHasMoves()) {
+    while (!this.currentPlayerHasMoves() && !this.isGameOver()) {
       this.advanceToNextPlayer();
     }
   }
