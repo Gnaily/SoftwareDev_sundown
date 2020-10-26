@@ -213,6 +213,20 @@ public class HexGameState implements GameState {
     this.skipPlayerIfNoMoves();
   }
 
+  /**
+   * Constructs a hashmap of playerColor to int representing the current score of each player.
+   * @return a hashmap of playerColor to score
+   */
+  @Override
+  public Map<PlayerColor, Integer> getScoreBoard() {
+    Map<PlayerColor, Integer> scoreBoard = new HashMap<>();
+
+    for (InternalPlayer ip : this.players) {
+      scoreBoard.put(ip.getColor(), ip.getScore());
+    }
+    return scoreBoard;
+  }
+
   /////////////////////////////////Game Closing
 
   /**
@@ -243,49 +257,28 @@ public class HexGameState implements GameState {
   }
 
   /**
-   * Generates a list of PlayerColor in order of score in the game.
-   *
-   * If the game is over, the resulting list will contain ONLY the winner(s).
-   * If the game is ongoing, it will be a collection of all scores in order from wining to losing.
-   * If there is only one winner, the resulting list will have one element.
-   * If there is a tie, the resulting list will contain all the tied players.
-   *
+   * If the game has ended, returns the list of winners.
+   * The list may have one playerColor on it, or if there is a tie then the list includes all
+   * tied winners.
    * @return a list of playerColor of winners
-   * @throws IllegalStateException if the game is not over
    */
   @Override
   public List<PlayerColor> getWinners() {
+    List<PlayerColor> winners = new ArrayList<>();
+    int highestScore = 0;
 
-    //TODO: FINISH REFACTORING THIS
-//    if (!this.gameStage.equals(GameStage.GAMEOVER)) {
-//      Map<PlayerColor, Integer> scoreBoard = new HashMap<>();
-//
-//      for (InternalPlayer ip :this.players) {
-//        scoreBoard.put(ip.getColor(), ip.getScore());
-//      }
-//      return scoreBoard;
-//    }
-//
-//    if (this.gameStage == GameStage.GAMEOVER){
-//      List<PlayerColor> winners = new ArrayList<>();
-//      int highestScore = 0;
-//
-//      for (HexPlayer p: players) {
-//        if (p.getScore() > highestScore) {
-//          highestScore = p.getScore();
-//        }
-//      }
-//      for (HexPlayer p: players) {
-//        if (p.getScore() == highestScore) {
-//          winners.add(p.getColor());
-//        }
-//      }
-//      return winners;
-//    }
-//    throw new IllegalStateException("The game is not over yet.");
-    return null;
+    for (InternalPlayer p: players) {
+      if (p.getScore() > highestScore) {
+        highestScore = p.getScore();
+      }
+    }
+    for (InternalPlayer p: players) {
+      if (p.getScore() == highestScore) {
+        winners.add(p.getColor());
+      }
+    }
+    return winners;
   }
-
 
 
   /////////////////////////////////Info Retrieval & Helpers

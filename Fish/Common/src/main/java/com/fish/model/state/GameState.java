@@ -76,6 +76,12 @@ public interface GameState {
   void removeCurrentPlayer();
 
   /**
+   * Constructs a hashmap of playerColor to int representing the current score of each player.
+   * @return a hashmap of playerColor to score
+   */
+  Map<PlayerColor, Integer> getScoreBoard();
+
+  /**
    * Determines whether there remains any valid move for any HexPlayer in the game.
    * @return a boolean which determines if the game is over
    */
