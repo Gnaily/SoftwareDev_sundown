@@ -26,6 +26,12 @@ public class HexPlayer implements InternalPlayer {
     this.penguinLocs = new ArrayList<>();
   }
 
+  private HexPlayer(PlayerColor pc, List<Coord> locs, int score) {
+    this.color = pc;
+    this.penguinLocs = new ArrayList<>(locs);
+    this.score = score;
+  }
+
 
   /**
    * Adds a penguin to the penguinLocs list.
@@ -79,8 +85,7 @@ public class HexPlayer implements InternalPlayer {
    * @return a List of Coord of the player's penguin locations
    */
   public List<Coord> getPenguinLocs() {
-    List<Coord> copyLocs = new ArrayList<>(this.penguinLocs);
-    return copyLocs;
+    return new ArrayList<>(this.penguinLocs);
   }
 
   /**
@@ -107,18 +112,27 @@ public class HexPlayer implements InternalPlayer {
    * @return the HexPlayer
    */
   public InternalPlayer getCopyPlayer() {
-    InternalPlayer copy = new HexPlayer(this.color);
-    copy.addToScore(this.score);
-    return copy;
+    return new HexPlayer(this.color, this.getPenguinLocs(), this.score);
   }
 
   @Override
   public boolean equals(Object o) {
     if (o instanceof HexPlayer) {
       HexPlayer other = (HexPlayer) o;
+      if (this.penguinLocs.size() == other.getPenguinLocs().size()) {
+        for (int ii = 0; ii < this.penguinLocs.size(); ii++) {
+          if (!this.penguinLocs.get(ii).equals(other.penguinLocs.get(ii))) {
+            return false;
+          }
+        }
+      }
+      else {
+        return false;
+      }
+
       return this.score == other.getScore()
           && this.color == other.getColor()
-          && this.penguinLocs == other.getPenguinLocs();
+          && this.penguinLocs.equals(other.getPenguinLocs());
     }
     return false;
   }

@@ -44,7 +44,7 @@ public class HexInternalPlayerTest {
   }
 
   @Test
-  public void testmovePenguinValid() {
+  public void testMovePenguinValid() {
     whitePlayer.placePenguin(new Coord(0,1));
     whitePlayer.movePenguin(new Coord(0, 1), new Coord(2, 4));
     assertEquals(1, whitePlayer.getPenguinLocs().size());

@@ -8,6 +8,7 @@ import com.fish.model.tile.Tile;
 import java.awt.*;
 
 import java.util.HashMap;
+import java.util.Map;
 import javax.swing.*;
 
 /**
@@ -64,7 +65,7 @@ public class HexBoardView extends JPanel implements GameView {
       }
     }
 
-    HashMap<Coord, PlayerColor> penguinLocs = state.getPenguinLocations();
+    Map<Coord, PlayerColor> penguinLocs = state.getPenguinLocations();
     for (Coord c : penguinLocs.keySet()) {
       this.drawPenguin(penguinLocs.get(c), calculateTopLeftXValue(c),
           c.getY() * PIXEL_STEP, g2d);

@@ -484,7 +484,7 @@ public class HexGameState implements GameState {
       }
     }
     List<InternalPlayer> otherPlayers = other.getPlayers();
-    if (this.players.size() != otherPlayers.size() || this.getPenguinLocations().size() != otherPengs.size()) {
+    if (this.players.size() != otherPlayers.size()) {
       return false;
     }
     for (int ii = 0; ii < this.players.size(); ii++) {
