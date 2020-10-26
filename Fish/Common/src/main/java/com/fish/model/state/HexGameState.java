@@ -32,9 +32,8 @@ import java.util.Set;
  * GameStage.GAMEOVER:
  *   Once no player can make a valid move, the game is over.
  *
- * The Players list must be passed into initGame in the order of player turns. This means the referee
- * gets to choose if the players play in order of ascending age, or if it choses a different order
- * it may.
+ * The Players list must be passed into initGame in the order of player turns. As turns advance, the
+ * players list is cycled around so that the current player is always at index zero.
  *
  * The GameBoard must also be passed into initGame in order to create the collection of Tiles the
  * game is played on.
@@ -343,18 +342,6 @@ public class HexGameState implements GameState {
   }
 
   /**
-   * Get the given player's score
-   *
-   * @param playerColor (PlayerColor) the player's color
-   * @return (int) the given player's score
-   */
-  @Override
-  public int getPlayerScore(PlayerColor playerColor) {
-    InternalPlayer player = this.findPlayer(playerColor);
-    return player.getScore();
-  }
-
-  /**
    * Return the array of players in this game of fish
    *
    * @return the array of players
@@ -486,6 +473,7 @@ public class HexGameState implements GameState {
     return false;
   }
 
+  //Helper used in equals override
   private boolean compareGameState(HexGameState other) {
     if (this.gameStage != other.getGameStage()) {
       return false;

@@ -117,18 +117,11 @@ public interface GameState {
   Map<Coord, PlayerColor> getPenguinLocations();
 
   /**
-   * Return the current HexPlayer's color
+   * Return the current Internal Player's color
    *
    * @return (PlayerColor) the current player's color
    */
   PlayerColor getCurrentPlayer();
-
-  /**
-   * Given a specific playerColor, returns the score of that player.
-   * @param playerColor the player's color
-   * @return the player's score
-   */
-  int getPlayerScore(PlayerColor playerColor);
 
   /**
    * Return the players (in order) of this game
@@ -165,7 +158,5 @@ public interface GameState {
    * @return an int with the height
    */
   int getHeight();
-
-
 
 }
