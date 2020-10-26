@@ -4,7 +4,7 @@ import com.google.gson.JsonObject;
 
 import com.fish.model.Coord;
 import com.fish.model.state.GameStage;
-import com.fish.model.state.Player;
+import com.fish.model.state.HexPlayer;
 import com.fish.model.state.PlayerColor;
 
 import java.util.List;
@@ -32,9 +32,9 @@ public interface PlayerActions {
   GameStage getCurrentGameStage();
 
   /**
-   * Return the Player whose turn it is, represented by the color of their avatars.
+   * Return the HexPlayer whose turn it is, represented by the color of their avatars.
    *
-   * @return The PlayerColor of the current Player
+   * @return The PlayerColor of the current HexPlayer
    */
   PlayerColor getCurrentPlayer();
 
@@ -42,16 +42,16 @@ public interface PlayerActions {
    * Get and ordered list of Players in the order that they take turns. The first player in this
    *  list is the first player who took a turn in this game.
    *
-   * Each Player in the list has their age, color, and current score associated with them. This
+   * Each HexPlayer in the list has their age, color, and current score associated with them. This
    *  method can be used to retrieve that information by invoking the following methods on one
    *  of the items in the list:
    *   - getAge() : returns the age of the player
    *   - getColor() : return the PlayerColor of the player
    *   - getScore() : return the score of the player
    *
-   * @return An ordered List of Player objects participating in this game
+   * @return An ordered List of HexPlayer objects participating in this game
    */
-  List<Player> getPlayerList();
+  List<HexPlayer> getPlayerList();
 
   /**
    * Get the current state of the board as a 2D array of integers.

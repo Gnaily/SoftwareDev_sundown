@@ -20,8 +20,8 @@ import java.util.Map;
  *   the gameBoard, Players, and penguinLocs are set to be empty and then the referee can call
  *   initGame(board, list of players) when it is ready.
  * GameStage.PLACING_PENGUINS:
- *   The beginning moments of a game when the Referee assigns each Player a color (by passing in
- *   the list of Player in the initGame(board, list of players) method), and players are placing
+ *   The beginning moments of a game when the Referee assigns each HexPlayer a color (by passing in
+ *   the list of HexPlayer in the initGame(board, list of players) method), and players are placing
  *   their penguins on the board in an order decided by the referee. This order is controlled in
  *   the referee class and this HexGameState class does not enforce any particular order of
  *   player turn. This class only allows the referee to change the state based on its deciding
@@ -71,11 +71,11 @@ public class HexGameState implements GameState {
   }
 
   /**
-   * Places a penguin on the board at the given location on behalf of the Player with the given
+   * Places a penguin on the board at the given location on behalf of the HexPlayer with the given
    * PlayerColor.
    *
    * @param loc (Coord) the coordinate location on the GameBoard
-   * @param playerColor (PlayerColor) the color assigned to the Player
+   * @param playerColor (PlayerColor) the color assigned to the HexPlayer
    * @throws IllegalArgumentException if there is no tile there to place the penguin on or if it is
    * already occupied by another penguin
    */
@@ -203,7 +203,7 @@ public class HexGameState implements GameState {
 
 
   /**
-   * Return the current Player's color
+   * Return the current HexPlayer's color
    *
    * @return (PlayerColor) the current player's color
    */
@@ -220,7 +220,7 @@ public class HexGameState implements GameState {
       }
     }
 
-    throw new IllegalArgumentException("Player not found");
+    throw new IllegalArgumentException("HexPlayer not found");
   }
 
   /**

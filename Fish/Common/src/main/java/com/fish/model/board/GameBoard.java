@@ -8,15 +8,17 @@ import java.util.List;
 /**
  * Interface for a GameBoard object in a game of Hey, That's my Fish! (HTMF)
  *
- * The GameBoard object is a representation of the collection of tiles used to play out a game of
- * HTMF. The user of this interface has control over how to generate the precise design of the
+ * Interpretation: The GameBoard object is a collection of Tile objects that represent the tiles
+ * used to play out a game of HTMF.
+ *
+ * The user of this interface has control over how to generate the precise design of the
  * board, including the shape of the tiles, determining the number of fish on tiles, and where
  * holes are initiated.
  * An implementation of a GameBoard object must handle identifying the location of tiles,
- * removing tiles, placing penguins on the board, moving and removing penguins, and retrieving
- * the dimensions of the board.
+ * removing tiles, calculating valid moves from each Tile location in a game, and
+ * generating defensive copies of the board.
  * The location of tiles on the board layout is specifically identified using Coord objects,
- * which contains one x and one y value that is used to point to the exact index of the board
+ * which contains one x and one y value that is used to point to the exact point of the board
  * data representation where the desired Tile lives.
  */
 public interface GameBoard {
@@ -58,6 +60,13 @@ public interface GameBoard {
   GameBoard getCopyGameBoard();
 
   /**
+   * Constructs a 2dArray of integers that represent the number of fish on the Tile at location
+   * Coord(jj, ii), where ii and jj directly correlate to the indices of a 2dArray[ii][jj]
+   * @return a 2dArray of integers
+   */
+  int[][] getBoardDataRepresentation();
+
+  /**
    * Returns the width of the game board, defined by the number of columns on the visual board.
    * @return an int with the width
    */
@@ -68,11 +77,6 @@ public interface GameBoard {
    * @return an int with the height
    */
   int getHeight();
-
-
-
-
-
 
 
 }

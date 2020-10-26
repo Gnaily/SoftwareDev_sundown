@@ -35,12 +35,15 @@ import java.util.Random;
  *        \___/    \___/
  *
  *   This is an example of a board with 6 rows and 2 columns.
+ *
  * </p>
  *
- * The Tile at the top-left of the board illustrated below can be located using either one of the
- * following methods:
- * tiles[0][0] OR
- * this.getTileAT(new Coord(0,0))
+ * Note that the data structure for the above board looks as follows:
+ * {{0,0  ,  0,1  ,  0,2  ,  0,3  ,  0,4  ,  0,5},
+ *  {1,0  ,  1,1  ,  1,2  ,  1,3  ,  1,4  ,  1,5}};
+ * A Tile of the board illustrated above can be located using either one of the following methods:
+ * tiles[0][1] OR
+ * this.getTileAT(new Coord(1,0))
  * But in this implementation the later is used throughout because the method implements checks that
  * enforce the Tile object being retrieved is in fact on this board.
  *
@@ -57,10 +60,10 @@ public class HexGameBoard implements GameBoard {
   private static final int MAX_FISH = 5;
 
   /**
-   * Constructor to build a general hex game board with randomized fish numbers per tile.
+   * Constructor to build a hex game board with randomized fish numbers per tile.
    * @param rows the number of rows of tiles on the board
    * @param cols the number of columns of tiles on the board
-   * @param holes the specific number of holes to start the game with
+   * @param holes a list of the specific location of holes in the initial board
    * @param minOneFishTiles the minimum number of 1-fish tiles to start the game with
    */
   public HexGameBoard(int rows, int cols, List<Coord> holes, int minOneFishTiles) {
@@ -99,10 +102,10 @@ public class HexGameBoard implements GameBoard {
     this.width = cols;
     this.height = rows;
 
-    for (int iRow = 0; iRow < tiles.length; iRow++) {
-      Tile[] row = tiles[iRow];
-      for (int iCol = 0; iCol < row.length; iCol++) {
-        tiles[iRow][iCol] = new HexTile(numberOfFish);
+    for (int ii = 0; ii < tiles.length; ii++) {
+      Tile[] oneCol = tiles[ii];
+      for (int jj = 0; jj < oneCol.length; jj++) {
+        tiles[ii][jj] = new HexTile(numberOfFish);
       }
     }
   }
@@ -112,7 +115,7 @@ public class HexGameBoard implements GameBoard {
    * Convenience constructor for testing. Includes arg for Rand seed for consistent test outcomes.
    * @param rows the number of rows of tiles on the board
    * @param cols the number of columns of tiles on the board
-   * @param holes the specific number of holes to start the game with
+   * @param holes a list of the specific location of holes in the initial board
    * @param minOneFishTiles the minimum number of 1-fish tiles to start the game with
    * @param randSeed random seed to produce the same outcome multiple times
    */
@@ -126,31 +129,30 @@ public class HexGameBoard implements GameBoard {
 
   /**
    * Convenience constructor for the test harness.
-   * @param values
+   * Takes in a 2d Array of int where each int represents the num fish on a Tile, and
+   * instantiates aboard with those fish values at the corresponding Coord location.
+   * @param values a 2d Array of integers, where each int represents the number of fish on a tile
    */
   public HexGameBoard(int[][] values) {
     if (values.length == 0 || values[0].length == 0) {
-      throw new IllegalArgumentException("Tiles must be at least 1 by 1");
+      throw new IllegalArgumentException("You must add at least one tile to the board.");
     }
 
     this.tiles = new Tile[values.length][values[0].length];
-    this.height = values[0].length;
     this.width = values.length;
+    this.height = values[0].length;
 
-    for (int iRow = 0; iRow < this.width; iRow++) {
-
-      for (int iCol = 0; iCol < this.height; iCol++) {
-        if (values[iRow][iCol] == 0) {
-          tiles[iRow][iCol] = new HexTile();
+    for (int ii = 0; ii < this.width; ii++) {
+      for (int jj = 0; jj < this.height; jj++) {
+        if (values[ii][jj] == 0) {
+          tiles[ii][jj] = new HexTile();
         }
         else {
-          tiles[iRow][iCol] = new HexTile(values[iRow][iCol]);
+          tiles[ii][jj] = new HexTile(values[ii][jj]);
         }
       }
     }
-
   }
-
 
   /////////////////////////////////Initialize board
 
@@ -160,24 +162,22 @@ public class HexGameBoard implements GameBoard {
         this.width * this.height - holes.size(), minOneFishTiles);
 
     //fill in the board taking one number at a time from the tileFishValues array
-    for (int iRow = 0; iRow < this.tiles.length; iRow++) {
-      for (int iCol = 0; iCol < this.tiles[iRow].length; iCol++) {
-        if (holes.contains(new Coord(iRow, iCol))) {
-          this.tiles[iRow][iCol] = new HexTile();
+    for (int ii = 0; ii < this.width; ii++) {
+      for (int jj = 0; jj < this.height; jj++) {
+        if (holes.contains(new Coord(ii, jj))) {
+          this.tiles[ii][jj] = new HexTile();
         }
         else {
-          this.tiles[iRow][iCol] = new HexTile(tileFishValues.remove(
+          this.tiles[ii][jj] = new HexTile(tileFishValues.remove(
               this.rand.nextInt(tileFishValues.size())));
         }
       }
     }
   }
 
-  //Generates random tile fish values
+  //Generates a list of random tile fish values to initialize each Tile
   private List<Integer> generateTileValues(int numValsNeeded, int minOneFishTiles) {
     int ones = 0;
-
-    // generate a list of random tile values
     List<Integer> fishValues = new ArrayList<>();
     for (int ii = 0; ii < numValsNeeded; ii++) {
       int nextVal = this.rand.nextInt(MAX_FISH) + 1;
@@ -186,7 +186,6 @@ public class HexGameBoard implements GameBoard {
       }
       fishValues.add(nextVal);
     }
-
     // enforce there is the minimum number of one-fish tiles requested
     int ii = 0;
     while (ones < minOneFishTiles && ii < numValsNeeded) {
@@ -194,7 +193,6 @@ public class HexGameBoard implements GameBoard {
         fishValues.set(ii, 1);
         ones++;
       }
-
       ii++;
     }
     return fishValues;
@@ -212,19 +210,19 @@ public class HexGameBoard implements GameBoard {
    * The coordinates of each direction are calculated by observing the change in x and y values
    * as the coordinates move away from the Coord of origin.
    * 'Reachable' also means that there is no hole or penguin in the way to get there in a straight line.
-   * @param start the coord of origin
+   * @param origin the coord of origin
    * @param penguinLocs the locations of all penguins on this board
    * @return a list of Coord indicating the possible valid moves
    * @throws IllegalArgumentException if the coord of origin is out of bounds or is a hole
    */
   @Override
-  public List<Coord> getTilesReachableFrom(Coord start, List<Coord> penguinLocs) throws IllegalArgumentException {
+  public List<Coord> getTilesReachableFrom(Coord origin, List<Coord> penguinLocs) throws IllegalArgumentException {
 
-    int x = start.getX();
-    int y = start.getY();
+    int x = origin.getX();
+    int y = origin.getY();
 
-    checkTileInBounds(start, "Cannot move from a tile that is out of bounds");
-    checkTilePresent(start, "Cannot move from a hole");
+    checkTileInBounds(origin, "Cannot move from a tile that is out of bounds");
+    checkTilePresent(origin, "Cannot move from a hole");
     List<Coord> moves = new ArrayList<>();
 
     // These TwoNumberOperations define different rules for incrementing x values while
@@ -259,20 +257,12 @@ public class HexGameBoard implements GameBoard {
     return moves;
   }
 
-  /**
-   * Get tiles reachable from a starting (x, y) location
-   *
-   * <p>
-   *   Holes (isPresent == false for a tile location) and Penguins are considered blockers that stop
-   *   tiles from being reachable.
-   * </p>
-   *
-   * @param xx starting x location
-   * @param yy starting y location
-   * @param op Operation that defines how the x value should be changed
-   * @param yIncrement value to increment/decrement y by for every new tile to search
-   * @return A list of all tiles reachable from the given location following the increment rules
-   */
+
+  //Generates a list of all Coord locations reachable from a starting xx, yy Coord point
+  //in a straight line stemming from the point of origin.
+  //Holes and penguins are considered blockers that stop tiles from being reachable.
+  // param op is an operation that defines how the x value should be changed
+  // param yIncrement is the value to increment/decrement y by in the search for valid Tiles
   private List<Coord> getTilesStraightLine(int xx, int yy,
       TwoNumberOperation op, int yIncrement, List<Coord> penguinLocs) {
 
@@ -312,12 +302,11 @@ public class HexGameBoard implements GameBoard {
 
   /**
    * Given a coordinate location within the dimensions of the game board,
-   * removes the tile from that coordinate location on the board, replacing it with null,
-   * and returns the Tile.
+   * turns that Tile into a hole by altering its isPresent boolean to False.
    * @param loc the coordinate location of the tile to remove on the board
    * @return the Tile object at that location
    * @throws IllegalArgumentException if the requested tile is out of bounds or is already a hole
-   * on the board, represented by a null value
+   * on the board
    */
   @Override
   public Tile removeTileAt(Coord loc) throws IllegalArgumentException {
@@ -333,24 +322,32 @@ public class HexGameBoard implements GameBoard {
   /////////////////////////////////Getters and Helpers
 
   /**
-   * Returns a copy of the gameboard by constructing a new version
+   * Returns a copy of the HexGameBoard by constructing a new object with the exact
+   * same number of fish on each tile and location of holes at the time of invocation.
+   *
    * @return a GameBoard with all of the relevant information copied over
    */
   @Override
   public GameBoard getCopyGameBoard() {
-    int[][] boardRep = new int[this.getWidth()][this.getHeight()];
-    //Gets a 2d array of int representing the number of fish on each tile at index/Coord ii, jj
+    return new HexGameBoard(this.getBoardDataRepresentation());
+  }
+
+
+  /**
+   * Constructs a 2dArray of integers that represent the number of fish on the Tile at location
+   * Coord(jj, ii), where ii and jj directly correlate to the indices of a 2dArray[ii][jj]
+   * (note the ii's and jj's are inverted between the Coord representation and the 2dArray indices)
+   * @return a 2dArray of integers
+   */
+  public int[][] getBoardDataRepresentation() {
+    int[][] boardDataRep = new int[this.getWidth()][this.getHeight()];
+    //Gets a 2d array of int representing the number of fish on each tile at Coord(ii, jj)
     for (int ii = 0; ii < this.getWidth(); ii++) {
       for (int jj = 0; jj < this.getHeight(); jj++) {
-        if (this.getTileAt(new Coord(ii,jj)).isPresent()) {
-          boardRep[ii][jj] = this.getTileAt(new Coord(ii,jj)).getNumFish();
-        }
-        else {
-          boardRep[ii][jj] = 0;
-        }
+        boardDataRep[ii][jj] = this.tiles[ii][jj].getNumFish();
       }
     }
-    return new HexGameBoard(boardRep);
+    return boardDataRep;
   }
 
   /**
@@ -370,6 +367,7 @@ public class HexGameBoard implements GameBoard {
   public int getHeight() {
     return this.height;
   }
+
 
   @Override
   public boolean equals(Object o) {
@@ -404,7 +402,6 @@ public class HexGameBoard implements GameBoard {
   }
 
 
-
   //Purpose: To reduce the amount of times we need to write out checks that a Coord is within
   //the dimensions of the board (which is in almost every method)
   private void checkTileInBounds(Coord loc, String specificMsg) throws IllegalArgumentException {
@@ -422,4 +419,5 @@ public class HexGameBoard implements GameBoard {
       throw new IllegalArgumentException(specificMsg);
     }
   }
+
 }

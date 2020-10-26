@@ -5,6 +5,7 @@ import com.fish.model.board.GameBoard;
 import com.fish.model.tile.Tile;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Interface for a GameState in a game of Hey Thats my Fish (HTMF)
@@ -24,10 +25,10 @@ public interface GameState {
    * @param board (GameBoard) the board to construct for the game
    * @param players (List of Players) the list of players involved in the game
    */
-  void initGame(GameBoard board, List<Player> players);
+  void initGame(GameBoard board, List<InternalPlayer> players);
 
   /**
-   * Places a single penguin on the board at the given location on behalf of the Player with the
+   * Places a single penguin on the board at the given location on behalf of the HexPlayer with the
    * given PlayerColor. Checks:
    *  - That the given PlayerColor is the player whose turn it is
    *  - That the tile to place the penguin on is not currently occupied and
@@ -35,7 +36,7 @@ public interface GameState {
    *  Then:
    *  - Adds an element to the penguinLocs map and advances the CurrentPlayerIndex by one.
    * @param loc (Coord) the coordinate location on the GameBoard
-   * @param playerColor (PlayerColor) the color assigned to the Player
+   * @param playerColor (PlayerColor) the color assigned to the HexPlayer
    * @throws IllegalArgumentException if there is no tile there to place the penguin on or if it is
    * already occupied by another penguin
    */
@@ -75,7 +76,7 @@ public interface GameState {
   void removeCurrentPlayer();
 
   /**
-   * Determines whether there remains any valid move for any Player in the game.
+   * Determines whether there remains any valid move for any HexPlayer in the game.
    * @return a boolean which determines if the game is over
    */
   boolean isGameOver();
@@ -107,18 +108,10 @@ public interface GameState {
    * the PlayerColor is the value, to identify which player's penguin is on that location.
    * @return a HashMap of Coord to PlayerColor values
    */
-  HashMap<Coord, PlayerColor> getPenguinLocations();
+  Map<Coord, PlayerColor> getPenguinLocations();
 
   /**
-   * Returns a List of all the current Coordinate locations of a single player,
-   * indicated by the playerColor.
-   * @param playerColor the color assigned to the player
-   * @return a list of all the coordinate locations of the player's penguins
-   */
-  List<Coord> getOnePlayersPenguins(PlayerColor playerColor);
-
-  /**
-   * Return the current Player's color
+   * Return the current HexPlayer's color
    *
    * @return (PlayerColor) the current player's color
    */
@@ -131,6 +124,12 @@ public interface GameState {
    */
   int getPlayerScore(PlayerColor playerColor);
 
+  /**
+   * Return the players (in order) of this game
+   *
+   * @return the list of players
+   */
+  List<InternalPlayer> getPlayers();
 
   /**
    * Retrieves the Tile located at the coordinate in the GameBoard.
@@ -160,13 +159,6 @@ public interface GameState {
    * @return an int with the height
    */
   int getHeight();
-
-  /**
-   * Return the players (in order) of this game
-   *
-   * @return the list of players
-   */
-  List<Player> getPlayers();
 
 
 

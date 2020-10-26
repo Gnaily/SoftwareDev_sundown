@@ -27,9 +27,22 @@ public class HexGameBoardTest {
         8, 1);
 
     this.constantFishNumBoard = new HexGameBoard(4, 4, 2);
+
+
   }
 
   /////Tests for Constructors
+  @Test
+  public void teastBoardDataStructure() {
+    int[][] output = this.noHolesBoard.getBoardDataRepresentation();
+
+    int[][] valuesOfTiles =
+        {{1, 1, 1, 5, 4, 1},
+            {1, 4, 5, 4, 5, 2}};
+
+    assertEquals(valuesOfTiles, output);
+  }
+
   @Test(expected = IllegalArgumentException.class)
   public void testConstructorNegativeArgument() {
     GameBoard boardr = new HexGameBoard(-3, 2, new ArrayList<>(),
@@ -94,13 +107,20 @@ public class HexGameBoardTest {
   }
 
   @Test
-  public void testXBoardConstructor() {
-    int[][] nums = {{1, 1},{0, 2}};
+  public void testXBoardConvenienceConstructor() {
+    int[][] nums =
+        {{2, 0},
+         {3, 4},
+         {5, 1}};
     GameBoard board = new HexGameBoard(nums);
 
+    //Check dimensions
     assertEquals(2, board.getHeight());
-    assertFalse(board.getTileAt(new Coord(1, 0)).isPresent());
-    assertEquals(1, board.getTileAt(new Coord(0, 0)).getNumFish());
+    assertEquals(3, board.getWidth());
+    //Check a hole
+    assertFalse(board.getTileAt(new Coord(0, 1)).isPresent());
+    //check a Tile
+    assertEquals(2, board.getTileAt(new Coord(0, 0)).getNumFish());
   }
 
 
@@ -123,7 +143,6 @@ public class HexGameBoardTest {
     for (Coord c : expectedMoves) {
       assertTrue(actualMoves.contains(c));
     }
-
 
     // remove a tile and test it still works
     noHolesExpanded.removeTileAt(new Coord(1,2));
