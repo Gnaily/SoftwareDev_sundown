@@ -1,5 +1,7 @@
 package com.fish.json;
 
+import com.fish.model.state.InternalPlayer;
+import com.fish.model.state.PlayerColor;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -53,7 +55,7 @@ public class XTree {
     Coord destination = findDestination(neighbors, moves.keySet());
 
     if (destination == null) {
-      System.out.println("False");
+      System.out.println("false");
     }
 
     //List<Move> movesToDestination = findValidMoves(destination, moves.keySet());
@@ -70,8 +72,10 @@ public class XTree {
 
     List<Move> movesToDestination = HexGameTree.applyToAllReachableStates(tree, moveFinder, new ArrayList<>());
 
-    Move finalMove = findEarliestPenguinMove(movesToDestination, stateAsJson);
+    Move finalMove = findEarliestPenguinMove(movesToDestination, gs);
 
+    JsonArray moveJson = moveToJson(finalMove);
+    System.out.println(moveJson);
   }
 
   /**
@@ -108,23 +112,44 @@ public class XTree {
   }
 
   // assume there are at least two players, because otherwise the game should be over
-  static Move findEarliestPenguinMove(List<Move> movesToDestination, JsonObject stateAsJson) {
+  static Move findEarliestPenguinMove(List<Move> movesToDestination, GameState gs) {
     // in the JsonObject, the current player is still the second player
     if (movesToDestination.size() == 1) {
       return movesToDestination.get(0);
     }
 
-    JsonArray playerArray = stateAsJson.getAsJsonArray("players");
-
-    JsonObject player = playerArray.get(1).getAsJsonObject();
-    JsonArray places = player.getAsJsonArray("places");
-
+    PlayerColor pc = gs.getCurrentPlayer();
     List<Coord> penguinLocations = new ArrayList<>();
+    for (InternalPlayer p : gs.getPlayers()) {
+      if (p.getColor() == pc) {
+        penguinLocations = p.getPenguinLocs();
+      }
+    }
+    for (Coord c : penguinLocations) {
+      for (Move move : movesToDestination) {
+        if (move.getStart().equals(c)) {
+          return move;
+        }
+      }
+    }
 
     // TODO: fix after player refactor
     return null;
+  }
 
+  static JsonArray moveToJson(Move move) {
+    JsonArray ret = new JsonArray();
+    JsonArray start = new JsonArray();
+    JsonArray end = new JsonArray();
 
+    start.add(move.getStart().getY());
+    start.add(move.getStart().getX());
+    end.add(move.getEnd().getY());
+    end.add(move.getEnd().getX());
+
+    ret.add(start);
+    ret.add(end);
+    return ret;
   }
 }
 
