@@ -156,6 +156,7 @@ public class HexGameState implements GameState {
     Tile tileToHole = this.gameBoard.removeTileAt(origin);
     this.players.get(0).addToScore(tileToHole.getNumFish());
     this.advanceToNextPlayer();
+    this.skipPlayerIfNoMoves();
   }
 
 
@@ -195,7 +196,6 @@ public class HexGameState implements GameState {
   public void advanceToNextPlayer() {
     InternalPlayer toMove = this.players.remove(0);
     this.players.add(toMove);
-    this.skipPlayerIfNoMoves(); //ensures that if a player has no more turns their turn it skipped
   }
 
   /**
