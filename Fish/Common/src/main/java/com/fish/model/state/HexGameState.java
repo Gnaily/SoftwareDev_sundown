@@ -175,15 +175,8 @@ public class HexGameState implements GameState {
           "You cannot move penguins before or after a game is in play.");
     }
 
-    //TODO : FIX THIS LOGIC !!!
-    //this.checkCurrentPlayer();
-    //QUESTION: What is stronger:
-    // -- The penguin at the origin MUST be the current player's penguin OR
-    // -- The current player.get(0) is the current player??
-    //Consider the cases:
-    // - the player at .get(0) moves a penguin of a different color -- THIS IS HANDLED BY THE PLAYER CLASS MOVE METHOD
-    // - a player NOT at .get(0) tries to call this method on the player at .get(0)'s penguin DURING
-    //        the turn of the player AT .get(0) -- we should plan for a check for this in referee class
+    // unneeded - this is now handled by the InternalPlayer's move method
+    //this.checkCurrentPlayer(this.getPenguinLocations().get(origin));
 
     this.checkIfTilePresent(destination); //we do not need to check from because if a penguin is there, the tile is present
     this.checkIfPengAlreadyOnTile(destination);

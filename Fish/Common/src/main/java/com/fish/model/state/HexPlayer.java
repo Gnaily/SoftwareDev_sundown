@@ -64,8 +64,9 @@ public class HexPlayer implements InternalPlayer {
       throw new IllegalArgumentException("You do not have a penguin to move on the origin.");
     }
     else {
+      int index = this.penguinLocs.indexOf(origin);
       this.penguinLocs.remove(origin);
-      this.penguinLocs.add(destination);
+      this.penguinLocs.add(index, destination);
     }
   }
 
