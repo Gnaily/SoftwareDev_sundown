@@ -26,6 +26,31 @@ public class MoveState {
   }
 
   public GameState getGameState() {
-    return this.gameState;
+    return this.gameState.getCopyGameState();
+  }
+
+
+  @Override
+  public boolean equals(Object o) {
+    if (o instanceof MoveState) {
+      MoveState other = (MoveState) o;
+
+      return (other.getMove().equals(this.getMove()))
+          && (other.getGameState().equals(this.getGameState()));
+    }
+    return false;
+  }
+
+  /**
+   * Creates a unique identifier for this MoveState object
+   * @return a unique integer
+   */
+  @Override
+  public int hashCode() {
+    int code = 17;
+    code = 31*code + this.getMove().hashCode();
+    code = 31*code + this.getGameState().hashCode();
+
+    return code;
   }
 }

@@ -42,8 +42,7 @@ public class XBoard {
     //Print the number of tiles reachable from
     System.out.println(numTilesReachableFromPosn);
   }
-
-
+  
   /**
    * Assumes well-formatted JSON as specified in the testing guidelines. Turns the given JSON object's
    *  "board" field into a 2D array of ints to be used for board creation
