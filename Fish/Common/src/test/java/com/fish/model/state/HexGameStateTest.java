@@ -38,7 +38,6 @@ public class HexGameStateTest {
     this.twoPlayerGame.initGame(new HexGameBoard(6, 2, new ArrayList<>(),
         5, 1), twoPlayers);
 
-
     //Place Penguins
     this.twoPlayerGame.placePenguin(new Coord(1, 2), PlayerColor.WHITE);
     this.twoPlayerGame.placePenguin(new Coord(0, 1), PlayerColor.RED);
@@ -263,6 +262,45 @@ public class HexGameStateTest {
     //Test that it resets to the first player again
     assertEquals(PlayerColor.BROWN, this.fourPlayerGame.getCurrentPlayer());
     this.fourPlayerGame.advanceToNextPlayer();
+  }
+
+  @Test
+  public void testSkipPlayerFunctionality() {
+    //If a player has no turns left to make in a game, their turn is now skipped as the game
+    //proceeds, meanwhile their Player object is still in the Player list.
+
+    //Step 1: create a board situation that will cause 3 out of 4 players to get stranded:
+    GameState strandedExample = new HexGameState();
+    // Four Players:
+    List<InternalPlayer> fourPlayers = new ArrayList<>(Arrays.asList(
+        new HexPlayer(PlayerColor.BROWN), new HexPlayer(PlayerColor.BLACK),
+        new HexPlayer(PlayerColor.WHITE), new HexPlayer(PlayerColor.RED)));
+
+    //Board: 8 rows x 3 columns; holes from holes list
+    List<Coord> holes = Arrays.asList(new Coord(0, 1), new Coord(0, 2),
+        new Coord(0, 6), new Coord(0, 5), new Coord(1, 6));
+    strandedExample.initGame(new HexGameBoard(8, 3, holes, 8, 1),
+        fourPlayers);
+
+    //Place Penguins
+    strandedExample.placePenguin(new Coord(0, 0), PlayerColor.BROWN); // stranded
+    strandedExample.placePenguin(new Coord(0, 3), PlayerColor.BLACK); // almost stranded
+    strandedExample.placePenguin(new Coord(0, 7), PlayerColor.WHITE); // stranded
+    strandedExample.placePenguin(new Coord(2, 1), PlayerColor.RED);  // not stranded
+
+    strandedExample.startPlay();
+
+    //TEST THAT IT IS THE BLACK/SECOND PLAYER'S TURN -- Because BROWN/FIRST player started out stranded
+    //eg skip brown's turn
+    assertEquals(PlayerColor.BLACK, strandedExample.getCurrentPlayer());
+    //Make a move for BLACK that strands the black penguin
+    strandedExample.movePenguin(new Coord(0,3), new Coord(0,4));
+    //TEST THAT IT IS THE RED/FOURTH PLAYERS TURN -- because WHITE/THIRD player also started out stranded
+    //eg skip white's turn
+    assertEquals(PlayerColor.RED, strandedExample.getCurrentPlayer());
+    //At this point, RED is the only penguin left with any turns, so it should continue being red's turn
+    assertEquals(PlayerColor.RED, strandedExample.getCurrentPlayer());
+
   }
 
   @Test

@@ -14,6 +14,7 @@ import java.util.Map;
  * Implementation for a GameState object in a game of Hey, That's my Fish! (HTMF)
  *
  * GameState Interpretations:
+ *
  * GameStage.NOT_STARTED:
  *   The 'waiting room' stage wherein a GameState (or simply just a game) has been instantiated
  *   but the referee is waiting for players to gather. Therefore, when a HxGameState is instantiated
@@ -31,10 +32,14 @@ import java.util.Map;
  * GameStage.GAMEOVER:
  *   Once no player can make a valid move, the game is over.
  *
+ * Players is a list of InternalPlayers where each element represents one internal players of this
+ * game. Each player has a PlayerColor, an int representing the player's score, and a list of
+ * Coord objects representing the locations of their penguins on the board.
  * The Players list must be passed into initGame in the order of player turns. As turns advance, the
  * players list is cycled around so that the current player is always at index zero.
  *
- * The GameBoard must also be passed into initGame in order to create the collection of Tiles the
+ * Gameboard is a GameBoard object representing the collection of tiles the game is played on.
+ * The gameboard must also be passed into initGame in order to create the collection of Tiles the
  * game is played on.
  *
  */

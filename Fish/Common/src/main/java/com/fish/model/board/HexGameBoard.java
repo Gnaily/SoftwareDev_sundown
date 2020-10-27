@@ -130,7 +130,9 @@ public class HexGameBoard implements GameBoard {
   /**
    * Convenience constructor for the test harness.
    * Takes in a 2d Array of int where each int represents the num fish on a Tile, and
-   * instantiates aboard with those fish values at the corresponding Coord location.
+   * instantiates a board with those fish values at the corresponding Coord location.
+   * Note that the 2d Array needs to be set up such that the x is the column number and
+   * y is the row number.
    * @param values a 2d Array of integers, where each int represents the number of fish on a tile
    */
   public HexGameBoard(int[][] values) {

@@ -32,7 +32,8 @@ public class HexGameBoardTest {
 
   /////Tests for Constructors
   @Test
-  public void teastBoardDataStructure() {
+  public void testBoardDataStructure() {
+    //6 ROWS x 2 COLS board ; but the data is 2 ROWS x 6 COLS
     int[][] output = this.noHolesBoard.getBoardDataRepresentation();
 
     int[][] valuesOfTiles =
