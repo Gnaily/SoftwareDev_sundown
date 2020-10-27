@@ -255,4 +255,9 @@ public class XStateTest {
     assertEquals(0, board.get(2).getAsJsonArray().get(1).getAsInt());
 
   }
+
+  @Test
+  public void testThereAndBackAgain() {
+    assertEquals(this.stateAsJson, XState.reconstructStateToJson(this.gs));
+  }
 }

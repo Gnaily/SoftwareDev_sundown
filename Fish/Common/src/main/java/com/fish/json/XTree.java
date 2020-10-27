@@ -27,6 +27,33 @@ public class XTree {
     JsonArray xJsonInput = XJson.processInput(scan);
 
     JsonObject mrq = xJsonInput.get(0).getAsJsonObject();
+
+    GameState gs = createStateFromJsonWithMove(mrq);
+
+    GameTree tree = new HexGameTree(gs);
+
+    Map<Move, GameState> moves = tree.getPossibleGameStates();
+    Coord to = jsonArrayToCoord(mrq.getAsJsonArray("to"));
+    List<Coord> neighbors = XState.getDirectionalTiles(to);
+
+    Coord destination = findDestination(neighbors, moves.keySet());
+
+    if (destination == null) {
+      System.out.println("false");
+      return;
+    }
+
+    //List<Move> movesToDestination = findValidMoves(destination, moves.keySet());
+    Move finalMove = getMoveToDestination(gs, tree, destination);
+
+
+
+    assert finalMove != null;
+    JsonArray moveJson = moveToJson(finalMove);
+    System.out.println(moveJson);
+  }
+
+  static GameState createStateFromJsonWithMove(JsonObject mrq) {
     JsonObject stateAsJson = mrq.getAsJsonObject("state");
     GameState gs = XState.jsonToGameState(stateAsJson);
 
@@ -35,31 +62,13 @@ public class XTree {
 
     Coord from = jsonArrayToCoord(fromJson);
     Coord to = jsonArrayToCoord(toJson);
-
-    List<Coord> neighbors = XState.getDirectionalTiles(to);
-
     gs.movePenguin(from, to);
 
-    GameTree tree = new HexGameTree(gs);
+    return gs;
 
-    Map<Move, GameState> moves = tree.getPossibleGameStates();
+  }
 
-    /*
-    Each move is (start, end)
-     - make sure end is in neighbors
-       - following the n/ne/... order
-       - List of all Moves that satisfy the condition
-       - go through and find which start is the first penguin in order
-     */
-
-    Coord destination = findDestination(neighbors, moves.keySet());
-
-    if (destination == null) {
-      System.out.println("false");
-    }
-
-    //List<Move> movesToDestination = findValidMoves(destination, moves.keySet());
-
+  static Move getMoveToDestination(GameState gs, GameTree tree, Coord destination) {
     IFunc<List<Move>> moveFinder = (GameTree gt, List<Move> vals) -> {
       List<MoveState> ms = gt.getPreviousMoves();
       Move move = ms.get(ms.size() - 1).getMove();
@@ -72,10 +81,7 @@ public class XTree {
 
     List<Move> movesToDestination = HexGameTree.applyToAllReachableStates(tree, moveFinder, new ArrayList<>());
 
-    Move finalMove = findEarliestPenguinMove(movesToDestination, gs);
-
-    JsonArray moveJson = moveToJson(finalMove);
-    System.out.println(moveJson);
+    return findEarliestPenguinMove(movesToDestination, gs);
   }
 
   /**
@@ -89,6 +95,14 @@ public class XTree {
   }
 
 
+  /**
+   * Compares the input list to the set of moves passed in. If any of the moves reach any of the
+   *  coordinates, return that coordinate.
+   *
+   * @param neighbors ordered list of destinations to search for
+   * @param moves all valid moves for the current player
+   * @return the first coordinate that has a move
+   */
   static Coord findDestination(List<Coord> neighbors, Set<Move> moves) {
     for (Coord cc : neighbors) {
       for (Move move : moves) {
@@ -100,20 +114,8 @@ public class XTree {
     return null;
   }
 
-  static List<Move> findValidMoves(Coord destination, Set<Move> moves) {
-    List<Move> validMoves = new ArrayList<>();
-    for (Move move : moves) {
-      if (destination == move.getEnd()) {
-        validMoves.add(move);
-      }
-    }
-
-    return validMoves;
-  }
-
   // assume there are at least two players, because otherwise the game should be over
   static Move findEarliestPenguinMove(List<Move> movesToDestination, GameState gs) {
-    // in the JsonObject, the current player is still the second player
     if (movesToDestination.size() == 1) {
       return movesToDestination.get(0);
     }
@@ -133,7 +135,6 @@ public class XTree {
       }
     }
 
-    // TODO: fix after player refactor
     return null;
   }
 
