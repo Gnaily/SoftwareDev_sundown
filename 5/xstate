@@ -1,3 +1,0 @@
-#!/bin/bash
-
-java -jar ./Other/XState-1.0.jar $@
