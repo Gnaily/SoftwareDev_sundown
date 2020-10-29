@@ -89,7 +89,6 @@ public class MinMaxAlgorithm implements IFunc<List<MoveValue>> {
             new MinMaxAlgorithm(numberMoves, this.maxMoves, this.startingColor), new ArrayList<>());
 
 
-
     int val;
     if (nextScores.size() == 0) {
       val = gameTree.getState().getScoreBoard().get(this.startingColor);
@@ -98,7 +97,8 @@ public class MinMaxAlgorithm implements IFunc<List<MoveValue>> {
       val = bestValue(nextScores, gameTree.getState().getCurrentPlayer().equals(this.startingColor));
     }
 
-    Move previousMove = gameTree.getPreviousMoves().get(0).getMove();
+    //Move previousMove = gameTree.getPreviousMoves().get(0).getMove();
+    Move previousMove = gameTree.getPreviousMoves().get(gameTree.getPreviousMoves().size() - 1).getMove();
     scores.add(new MoveValue(previousMove, val));
     return scores;
   }
@@ -212,15 +212,15 @@ public class MinMaxAlgorithm implements IFunc<List<MoveValue>> {
     List<Coord> starts = new ArrayList<>();
 
     for (Move m : moves) {
-      starts.add(m.getStart());
+      starts.add(m.getOrigin());
     }
 
     Coord start = findLowestRowCol(starts);
     List<Coord> ends = new ArrayList<>();
 
     for (Move m : moves) {
-      if (m.getStart().equals(start)) {
-        ends.add(m.getEnd());
+      if (m.getOrigin().equals(start)) {
+        ends.add(m.getDestination());
       }
     }
 
