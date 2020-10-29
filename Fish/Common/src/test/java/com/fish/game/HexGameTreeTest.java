@@ -349,7 +349,7 @@ public class HexGameTreeTest {
   public void applyToAllReachableStatesMoveFishList() {
     IFunc<Map<Move, Integer>> moveMap = (GameTree gt, Map<Move, Integer> map) -> {
       Move move = gt.getPreviousMoves().get(gt.getPreviousMoves().size() - 1).getMove();
-      int numFish = gt.getState().getTileAt(move.getEnd()).getNumFish();
+      int numFish = gt.getState().getTileAt(move.getDestination()).getNumFish();
       map.put(move, numFish);
       return map;
     };

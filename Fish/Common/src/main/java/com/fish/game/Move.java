@@ -16,12 +16,12 @@ import java.util.Objects;
  */
 public class Move {
 
-  private Coord start;
-  private Coord end;
+  private Coord origin;
+  private Coord destination;
 
-  public Move(Coord start, Coord end) {
-    this.start = start;
-    this.end = end;
+  public Move(Coord origin, Coord destination) {
+    this.origin = origin;
+    this.destination = destination;
   }
 
 
@@ -30,8 +30,8 @@ public class Move {
    *
    * @return the starting move
    */
-  public Coord getStart() {
-    return this.start;
+  public Coord getOrigin() {
+    return this.origin;
   }
 
   /**
@@ -39,8 +39,8 @@ public class Move {
    *
    * @return the ending move
    */
-  public Coord getEnd() {
-    return this.end;
+  public Coord getDestination() {
+    return this.destination;
   }
 
   @Override
@@ -48,7 +48,7 @@ public class Move {
     if (o instanceof Move) {
       Move other = (Move) o;
 
-      return other.getEnd().equals(this.getEnd()) && other.getStart().equals(this.getStart());
+      return other.getDestination().equals(this.getDestination()) && other.getOrigin().equals(this.getOrigin());
     }
     return false;
   }
@@ -60,16 +60,16 @@ public class Move {
   @Override
   public int hashCode() {
     int code = 19;
-    code = 37*code + this.getStart().hashCode();
-    code = 37*code + this.getEnd().hashCode();
+    code = 37*code + this.getOrigin().hashCode();
+    code = 37*code + this.getDestination().hashCode();
 
-    return Objects.hash(this.getStart(), this.getEnd());
+    return Objects.hash(this.getOrigin(), this.getDestination());
   }
 
   @Override
   public String toString() {
-    Coord s = this.getStart();
-    Coord e = this.getEnd();
+    Coord s = this.getOrigin();
+    Coord e = this.getDestination();
     return s.getX() + ", " + s.getY() + " -> " + e.getX() + ", " + e.getY();
   }
 

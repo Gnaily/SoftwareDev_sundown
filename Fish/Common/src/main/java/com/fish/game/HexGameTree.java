@@ -140,7 +140,12 @@ public class HexGameTree implements GameTree {
    */
   public static GameState getResultState(GameTree gameTree, Move move) throws IllegalArgumentException {
     GameState copy = gameTree.getState();
-    copy.movePenguin(move.getStart(), move.getEnd());
+    List<Coord> validDestinations = copy.getTilesReachableFrom(move.getOrigin());
+    if (!validDestinations.contains(move.getDestination())) {
+      throw new IllegalArgumentException("This is not a legal move.");
+    }
+    //Otherwise, proceed:
+    copy.movePenguin(move.getOrigin(), move.getDestination());
     return copy;
   }
 
