@@ -49,7 +49,7 @@ public class XTree {
     if (validMoves.size() == 0) {
       System.out.println("false");
     }
-    if (validMoves.size() == 1) {
+    else if (validMoves.size() == 1) {
       JsonArray action = moveToJson(validMoves.get(0));
       System.out.println(action);
     } else {
@@ -101,6 +101,7 @@ public class XTree {
     //Grab all of the current player's penguin locs
     List<Coord> possibleOrigins = strategyTree.getState().getPlayers().get(0)
         .getPenguinLocs(); //list of FROM moves
+
     for (Coord destination : possibleDestinations) {
       for (Coord pengToMove : possibleOrigins) {
         try {
