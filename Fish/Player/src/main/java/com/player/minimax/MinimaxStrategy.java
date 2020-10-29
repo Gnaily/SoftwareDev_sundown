@@ -1,18 +1,13 @@
 package com.player.minimax;
 
-
-import com.fish.game.GameTree;
 import com.fish.game.HexGameTree;
 import com.fish.game.Move;
 import com.fish.model.Coord;
-import com.fish.model.board.GameBoard;
 import com.fish.model.state.GameState;
-import com.fish.model.state.InternalPlayer;
 import com.fish.model.state.PlayerColor;
 import com.fish.model.tile.Tile;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +34,21 @@ public class MinimaxStrategy {
 
     // return value is needed for compilation, however this line should never be reached
     return null;
+  }
+
+  public static Move findCurrentPlayersBestMove(GameState gs, int nn) {
+    if (nn <= 1) {
+      return MinMaxAlgorithm.findBestMove(gs);
+    }
+    MinMaxAlgorithm algo = new MinMaxAlgorithm(nn - 1, gs.getCurrentPlayer());
+    List<MoveValue> moveValues = HexGameTree.applyToAllReachableStates(
+        new HexGameTree(gs),
+        algo,
+        new ArrayList<>());
+
+    MoveValue bestMove = MinMaxAlgorithm.calculateBestMove(moveValues).get(0);
+
+    return bestMove.getMove();
   }
 
 

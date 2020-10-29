@@ -2,6 +2,8 @@ package com.fish.game;
 
 import com.fish.model.Coord;
 
+import java.util.Objects;
+
 /**
  * Class representing a single move in a game of Fish
  *
@@ -57,11 +59,18 @@ public class Move {
    */
   @Override
   public int hashCode() {
-    int code = 17;
-    code = 31*code + this.getStart().hashCode();
-    code = 31*code + this.getEnd().hashCode();
+    int code = 19;
+    code = 37*code + this.getStart().hashCode();
+    code = 37*code + this.getEnd().hashCode();
 
-    return code;
+    return Objects.hash(this.getStart(), this.getEnd());
+  }
+
+  @Override
+  public String toString() {
+    Coord s = this.getStart();
+    Coord e = this.getEnd();
+    return s.getX() + ", " + s.getY() + " -> " + e.getX() + ", " + e.getY();
   }
 
 }
