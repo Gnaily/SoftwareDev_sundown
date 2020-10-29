@@ -40,7 +40,22 @@ public class HexGameBoardTest {
         {{1, 1, 1, 5, 4, 1},
             {1, 4, 5, 4, 5, 2}};
 
-    assertEquals(valuesOfTiles, output);
+    assertArrayEquals(valuesOfTiles, output);
+  }
+
+  @Test
+  public void testBoardDataStructureInputMatchesOutput() {
+    //create a 2-d Array in our Coord structure
+    int[][] valuesOfTiles =
+        {{1, 1, 1, 5, 4, 1},
+            {1, 4, 5, 4, 5, 2}};
+
+    //Use the convenience constructor made for the test harness to construct the board
+    GameBoard tHarnessBoard = new HexGameBoard(valuesOfTiles);
+    int[][] output = tHarnessBoard.getBoardDataRepresentation();
+
+    //This confirms that our data structure is as we designed it
+    assertArrayEquals(valuesOfTiles, output);
   }
 
   @Test(expected = IllegalArgumentException.class)

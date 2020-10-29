@@ -1,5 +1,10 @@
 package com.fish.json;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.junit.Test;
 
 import java.util.Scanner;
@@ -10,29 +15,53 @@ public class XJsonTest {
 
   @Test
   public void testJsonNormal() {
-    String input = "1\n" +
-        "2 3 4\n" +
-        "\"hello world\"\n" +
-        "false\n" +
-        "{ \"a\" :  1, \"b\" : 2}\n" +
-        "[1, \"hello\", true]";
+    String input = "{\n" + "        \"position\": [1,2],\n"
+        + "        \"board\" : [[1,0],[0,3]]\n" + "}\n";
 
-    String out = XJson.formatJson(XJson.processInput(new Scanner(input)));
+    JsonArray expectedOutput = new JsonArray();
 
-    assertEquals("{\"count\":8,\"seq\":[1,2,3,4,\"hello world\"," +
-            "false,{\"a\":1,\"b\":2},[1,\"hello\",true]]}\n" +
-            "[8,[1,\"hello\",true],{\"a\":1,\"b\":2},false,\"hello world\",4,3,2,1]\n",
-        out);
+    JsonObject jobj = new JsonObject();
+
+    JsonArray positions = new JsonArray();
+    positions.add(1);
+    positions.add(2);
+    jobj.add("position", positions);
+
+    JsonArray board = new JsonArray();
+    board.add(new JsonArray());
+    board.add(new JsonArray());
+    board.get(0).getAsJsonArray().add(1);
+    board.get(0).getAsJsonArray().add(0);
+    board.get(1).getAsJsonArray().add(0);
+    board.get(1).getAsJsonArray().add(3);
+    jobj.add("board", board);
+
+    expectedOutput.add(jobj);
+
+    JsonArray actualOutput = XJson.processInput(new Scanner(input));
+
+    assertEquals(expectedOutput, actualOutput);
   }
 
   @Test
   public void testJsonMt() {
     String input = "";
 
-    String out = XJson.formatJson(XJson.processInput(new Scanner(input)));
+    JsonArray actualOutput = XJson.processInput(new Scanner(input));
 
-    assertEquals("{\"count\":0,\"seq\":[]}\n" +
-        "[0]\n", out);
+    assertEquals(new JsonArray(), actualOutput);
+
+  }
+
+  @Test
+  public void testInvalidJson() {
+    String input = "hello";
+    JsonArray expectedOutput = new JsonArray();
+    expectedOutput.add(input);
+
+    JsonArray actualOutput = XJson.processInput(new Scanner(input));
+
+    assertEquals(expectedOutput, actualOutput);
 
   }
 

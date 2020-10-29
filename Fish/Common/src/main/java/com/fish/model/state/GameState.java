@@ -109,12 +109,25 @@ public interface GameState {
   GameStage getGameStage();
 
   /**
-   * Returns a HashMap of penguin locations, formatted such that the Coord is the unique
-   * identifier of the location (since only one penguin can be on a tile at a time) and
+   * Returns a HashMap of penguin locations, formatted such that
+   * the Coord is the unique key (since only one penguin can be on a tile at a time) and
    * the PlayerColor is the value, to identify which player's penguin is on that location.
    * @return a HashMap of Coord to PlayerColor values
    */
   Map<Coord, PlayerColor> getPenguinLocations();
+
+  /**
+   * Given a PlayerColor, returns a list of Coord locations of all that player's penguins on the
+   * board.
+   * May return an empty list if:
+   *  -- the player with the given player color has not placed any penguins or
+   *  -- the given player color is not in this game
+   *     (eg it is RED but there are no red avatars in this particular game at this time)
+   *
+   * @param playerColor the PlayerColor to search for penguin locations
+   * @return a list of Coords representing that player's penguin locations
+   */
+  List<Coord> getPenguinLocationsOf(PlayerColor playerColor);
 
   /**
    * Return the current Internal Player's color
@@ -129,6 +142,12 @@ public interface GameState {
    * @return the list of players
    */
   List<InternalPlayer> getPlayers();
+
+  /**
+   * Returns a copy of this GameState's current Gameboard
+   * @return a GameBoard object of the current collection of tiles in the playable game
+   */
+  GameBoard getGameBoard();
 
   /**
    * Retrieves the Tile located at the coordinate in the GameBoard.

@@ -2,17 +2,13 @@ package com.fish.json;
 
 import com.fish.model.Coord;
 import com.fish.model.board.GameBoard;
-import com.fish.model.board.HexGameBoard;
 import com.fish.model.state.*;
-import com.fish.model.tile.Tile;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
 public class XState {
@@ -29,132 +25,150 @@ public class XState {
   public static void main(String[] args) {
     //grab the input from STD in
     Scanner scan = new Scanner(System.in);
-
     //create a JasonArray Java object whose elements are each JSON object from STD in
-    JsonArray xJsonInput = XJson.processInput(scan);
+    JsonArray inputArray = XJson.processInput(scan);
     //Grab the first (and only) JSON object, which is the State represented in JSON
-    JsonObject stateAsJson = xJsonInput.get(0).getAsJsonObject();
+    JsonObject stateAsJson = inputArray.get(0).getAsJsonObject();
 
-    GameState gsFromInput = jsonToGameState(stateAsJson);
-    //////HANDLE "players" INPUT
-    JsonArray playerArray = stateAsJson.getAsJsonArray("players");
+    //Create the GameState from the input
+    GameState gameState = jsonToGameState(stateAsJson);
 
-    //Make the move, OR determine that NO move can be made:
-    Coord penguinStart = getFirstPlayersFirstPenguin(playerArray);
+    //Try to apply the N/NE/SE... etc algorithm on the first player's first penguin:
+    GameState outputGS = attemptDirectionalAlgoOnFirstPlayerFirstPenguin(gameState);
 
-    Coord moveMade = findLegalMove(gsFromInput, penguinStart);
+    //Determine whether the output GameState is the same or different from the original
+    boolean changeMade = !gameState.equals(outputGS);
 
-    //IF no move has been made, return FALSE. Else, return the new State as represented in JSON
-    if (moveMade == null) {
+    if (changeMade) {
+      //Construct JSON data back from the State
+      JsonElement outputJson = reconstructStateToJson(outputGS);
+      System.out.println(outputJson);
+    }
+    else {
       System.out.println("False");
     }
-    else{
-      gsFromInput.movePenguin(penguinStart, moveMade);
-      adjustStateAfterMove(stateAsJson, gsFromInput, penguinStart, moveMade);
-      System.out.println(stateAsJson);
-    }
   }
 
-  //////////////////////HELPERS
-
+  /**
+   * Given a JsonObject of the State, turns that json directly into a gamestate.
+   * Uses tools in the XBoard class to process the board.
+   *
+   * @param stateAsJson the state represented as Json values
+   * @return a GameState of those values
+   */
   static GameState jsonToGameState(JsonObject stateAsJson) {
-    //////HANDLE "board" INPUT
-    //turn that into an actual 2D array board representation in Java
-    int[][] valuesFromInput = XBoard.getTileValues(stateAsJson, "board");
-    //Create the GameBoard object with the values from the JSON input
-    GameBoard boardFromInput = new HexGameBoard(valuesFromInput);
+
+    //////HANDLE "board" INPUT - turn that into an actual board using XBoard class
+    GameBoard boardFromInput = XBoard.jsonToGameBoard(stateAsJson);
 
     //////HANDLE "players" INPUT
-    JsonArray playerArray = stateAsJson.getAsJsonArray("players");
-    List<InternalPlayer> players = getPlayersList(playerArray);
+    List<InternalPlayer> playersFromInput = jsonToPlayer(stateAsJson);
 
     //Generate the gameState during the precise snapshot given in the JSON input
-    return new HexGameState(GameStage.IN_PLAY, boardFromInput, players);
-
+    return new HexGameState(GameStage.IN_PLAY, boardFromInput, playersFromInput);
 
   }
 
-
-  //Useful helper method to generate the data representation of a given color represented as a String
-  static PlayerColor getPlayerColor(String color) {
-    switch (color) {
-      case "black":
-        return PlayerColor.BLACK;
-      case "brown":
-        return PlayerColor.BROWN;
-      case "red":
-        return PlayerColor.RED;
-      case "white":
-        return PlayerColor.WHITE;
-      default:
-        throw new IllegalArgumentException("Not a valid color!");
-    }
-  }
-
-  //Returns the list of HexPlayer JSON representations
-  static List<InternalPlayer> getPlayersList (JsonArray playerArray) {
+  /**
+   * Given a JsonObject of the State, pulls the Player data from that JsonObject and
+   * constructs a list of Players in a game of HTMF.
+   *
+   * Keeps the order of Penguins in the JSON in order in the player object's penguin locs.
+   *
+   * @param stateAsJson the state represented as Json
+   * @return a list of Players in the game
+   */
+  static List<InternalPlayer> jsonToPlayer (JsonObject stateAsJson) {
+    //Grab input array
+    JsonArray inputPlayerArray = stateAsJson.getAsJsonArray("players");
     List<InternalPlayer> resultPlayerList = new ArrayList<>();
+
     //Build the list of players to initiate a gameState with
-    for (JsonElement playerElem : playerArray) {
-      JsonObject playerObj = playerElem.getAsJsonObject();
+    for (JsonElement playerElem : inputPlayerArray) {
+      JsonObject OnePlayerObj = playerElem.getAsJsonObject();
 
-      String color = playerObj.getAsJsonPrimitive("color").getAsString();
-      PlayerColor pc = getPlayerColor(color);
+      //Get their Color
+      String color = OnePlayerObj.getAsJsonPrimitive("color").getAsString();
+      PlayerColor playerColor = getAsPlayerColor(color);
 
-      int score = playerObj.getAsJsonPrimitive("score").getAsInt();
-      HexPlayer p = new HexPlayer(pc);
+      //Create the one player and fill in their color
+      InternalPlayer p = new HexPlayer(playerColor);
+
+      //Fill in their score
+      int score = OnePlayerObj.getAsJsonPrimitive("score").getAsInt();
       p.addToScore(score);
-      int[][] penguinLocsAsArray = XBoard.getTileValues(playerObj, "places");
-      for (int ii = 0; ii < penguinLocsAsArray[0].length; ++ii) {
-        p.placePenguin(new Coord(penguinLocsAsArray[1][ii],
-            penguinLocsAsArray[0][ii]));
 
+      //Fill in their penguin locations in order
+      JsonArray PenguinInputArray = OnePlayerObj.getAsJsonArray("places");
+      for (JsonElement posnElm : PenguinInputArray) {
+        //Gets just the [row,col] pair as JsonArray
+        JsonArray posnArray = posnElm.getAsJsonArray();
+        //Use XBoard functionality to turn it into our interpretation of a location on board
+        Coord penguinLoc = XBoard.jsonToCoord(posnArray);
+        p.placePenguin(penguinLoc); //Keeps the order of penguins in the same order as the JSON
       }
       resultPlayerList.add(p);
     }
     return resultPlayerList;
   }
 
-  //Returns the penguinLocs hashmap of all the players' penguins locs from the input
-  static Map<Coord, PlayerColor> placePenguins(JsonArray playerArray) {
-    Map<Coord, PlayerColor> penguinLocs = new HashMap<>();
+  /**
+   * Attempts the directional algorithm on the first player's first penguin in the gameState.
+   * If a move can be made, apply it to the gameState
+   * If not, then return the original GameState, unaltered
+   * @param gameState the gameState to apply the algorithm
+   * @return either the altered gameState or the original one
+   */
+  static GameState attemptDirectionalAlgoOnFirstPlayerFirstPenguin(GameState gameState) {
+    Coord firstPeng = getFirstPlayersFirstPenguin(gameState);
 
-    for (JsonElement playerElem : playerArray) {
-      JsonObject playerObj = playerElem.getAsJsonObject();
-      //System.out.println(playerObj.get("places"));
-      int[][] penguinLocsAsArray = XBoard.getTileValues(playerObj, "places");
-      //System.out.println(Arrays.deepToString(penguinLocsAsArray));
-
-      String color = playerObj.getAsJsonPrimitive("color").getAsString();
-      PlayerColor pc = getPlayerColor(color);
-
-
-      // our other method flips the array - this flips it back
-      for (int ii = 0; ii < penguinLocsAsArray[0].length; ++ii) {
-        penguinLocs.put(new Coord(penguinLocsAsArray[1][ii],
-            penguinLocsAsArray[0][ii]), pc);
-
+    GameState outputGS = gameState.getCopyGameState();
+    //Now see if any of the tiles reachable from the first penguin's location
+    //align with the directional tiles stemming from the penguin's location
+    List<Coord> tilesReachable = gameState.getTilesReachableFrom(firstPeng);
+    List<Coord> directionalTiles = getDirectionalTiles(firstPeng);
+    for (Coord possibleMove : directionalTiles) {
+      if (tilesReachable.contains(possibleMove)){
+        //As soon as we find the first tile reachable in the directionals, apply the move:
+        outputGS.movePenguin(firstPeng, possibleMove);
+        return outputGS;
       }
     }
-    return penguinLocs;
+    //If none of the directionalTiles are available to make a move, just return the
+    //original gamestate, with no changes made:
+    return gameState;
   }
 
-  //Ensures that we are locating the first player's first penguin from the JSON input
-  static Coord getFirstPlayersFirstPenguin(JsonArray playerArray) {
-    JsonObject firstPlayerObj = playerArray.get(0).getAsJsonObject();
-    JsonArray firstPlayersPenguinsLocs = firstPlayerObj.getAsJsonArray("places");
-    JsonArray firstPenguinLoc = firstPlayersPenguinsLocs.get(0).getAsJsonArray();
-    return new Coord(firstPenguinLoc.get(1).getAsInt(), firstPenguinLoc.get(0).getAsInt());
+
+  /**
+   * Given a gameState, returns the first(current) player's first penguin in their penguing list
+   * @param gameState the GameState to pull the player data from
+   * @return the Coord of the first player's first penguin
+   */
+  static Coord getFirstPlayersFirstPenguin(GameState gameState) {
+    //Get the first player's first penguin location:
+    List<InternalPlayer> players = gameState.getPlayers();
+    InternalPlayer firstPlayer = players.get(0);
+    return firstPlayer.getPenguinLocs().get(0);
   }
+
+
 
   //----Calculating the move----//
-
-  //Get a list of all the potential tiles from the Tile of origin. They could result in negative
-  //or out of bounds Coords. This is good because those results should return invalid exception
-  //messages when sent to the GameState.
-  static List<Coord> getDirectionalTiles(Coord penguinStart) {
-    int xx = penguinStart.getX();
-    int yy = penguinStart.getY();
+  /**
+   * Builds a list of all potential Tiles that surround the Tile of origin in the following order:
+   * North, NorthEast, SouthEast, South, SouthWest, NorthWest
+   *
+   * The resulting Coords MAY BE NEGATIVE / invalid / out of bounds - this is a static method
+   * so it does not check for validity in relation to any specific board.
+   * This is also desired because those invalid Coords should return implemented exceptions if sent
+   * to a GameState.
+   * @param origin the center Tile to calculate the directional tiles from
+   * @return a list of Coords of the surrounding Tiles
+   */
+  static List<Coord> getDirectionalTiles(Coord origin) {
+    int xx = origin.getX();
+    int yy = origin.getY();
 
     Coord north = new Coord(xx, yy - 2);
 
@@ -169,94 +183,35 @@ public class XState {
     return Arrays.asList(north, ne, se, south, sw, nw);
   }
 
-  // Find a legal move for the given penguin as described in the testing doc
-  static Coord findLegalMove(GameState gs, Coord penguinStart) {
 
-    List<Coord> tilesReachable = gs.getTilesReachableFrom(penguinStart);
-    List<Coord> directionalTiles = getDirectionalTiles(penguinStart);
-    for (Coord possibleMove : directionalTiles) {
-      if (tilesReachable.contains(possibleMove)){
-        //gs.movePenguin(penguinStart, possibleMove);
-        return possibleMove;
-      }
-    }
-
-    // no move is possible - return null
-    return null;
-  }
-
-  //----Functions for altering the given State as Json into the resultant state----//
-
-  //Bring together all of the information from the JSON input and APPLY it to the GameState as JSON.
-  static void adjustStateAfterMove(JsonObject stateAsJson, GameState startState,
-      Coord penguinStart, Coord moveMade) {
-
-    //Replace board represented in stateAsJson by converting the updated state back to JSON
-    updateBoardPosition(stateAsJson, startState);
-
-    //Adjust player score as represented in stateAsJson -- pull updated score from GameState
-    JsonArray firstPlayerArray = stateAsJson.getAsJsonArray("players");
-    JsonObject firstPlayer = firstPlayerArray.remove(0).getAsJsonObject();
-    firstPlayerArray.add(firstPlayer); //cycles through the players to advance player turn
-
-    updatePlayerScore(firstPlayer, startState, moveMade);
-
-    //Adjust player places as represented in stateAsJson -- move penguin location
-    updatePlayerPenguinPositions(firstPlayer, moveMade);
-  }
-
-  // Update the board to have a new hole in the correct place
-  static void updateBoardPosition(JsonObject stateAsJson, GameState gs) {
-    stateAsJson.remove("board");
-    stateAsJson.add("board", createBoardJson(gs));
-  }
-
-  // update the player score with the number of fish on the removed tile
-  static void updatePlayerScore(JsonObject firstPlayer,
-      GameState startState, Coord moveMade) {
-
-    firstPlayer.remove("score");
-    //At this point, the move has been made, so the playerColor can be found stored in the penguin
-    //locs at the destination Tile, which is moveMade.
-    PlayerColor firstPlayerColor = startState.getPenguinLocations().get(moveMade);
-    //This pulls the updated score directly from the GameState to ensure our score keeping is accurate
-    int newScore = startState.getScoreBoard().get(firstPlayerColor);
-    firstPlayer.addProperty("score", newScore);
-
-  }
-
-  // Update the player's penguin locations to have the first penguin moved
-  static void updatePlayerPenguinPositions(JsonObject firstPlayer, Coord moveMade) {
-    JsonArray originalLocs = firstPlayer.remove("places").getAsJsonArray();
-    JsonArray newLoc = new JsonArray();
-    newLoc.add(moveMade.getY());
-    newLoc.add(moveMade.getX());
-    originalLocs.set(0, newLoc);
-    firstPlayer.add("places", originalLocs);
-  }
-
-  // Turns a given GameState into a JsonObject
-  // Not used, but could be useful for future testing
-  // Does not preserve the order of penguins that was passe in
+  /**
+   * Transforms the given GameState back into a JSON object for output
+   * @param gs the gameState to translate into JSON
+   * @return the JsonObject
+   */
   static JsonObject reconstructStateToJson(GameState gs) {
-    JsonObject state = new JsonObject();
+    JsonObject outputStateAsJson = new JsonObject();
 
-    // create players:
+    //////HANDLE PLAYERS JSON
     JsonArray playersArray = new JsonArray();
     for (InternalPlayer p : gs.getPlayers()) {
-      playersArray.add(createPlayerObject(p, gs));
+      playersArray.add(reconstructPlayerToJson(p));
     }
 
-    JsonArray board = createBoardJson(gs);
-    state.add("players", playersArray);
-    state.add("board", board);
-    return state;
+    //////HANDLE BOARD JSON
+    JsonArray board = XBoard.boardToJson(gs.getGameBoard());
+
+    outputStateAsJson.add("players", playersArray);
+    outputStateAsJson.add("board", board);
+
+    return outputStateAsJson;
   }
 
   // Turns a HexPlayer into a JsonObject representing that player
-  static JsonObject createPlayerObject(InternalPlayer p, GameState gs) {
-    JsonObject jo = new JsonObject();
-    jo.addProperty("score", gs.getScoreBoard().get(p.getColor()));
+  static JsonObject reconstructPlayerToJson(InternalPlayer p) {
+    JsonObject onePlayerJsonObject = new JsonObject();
+
+    //construct color in json
     String color = "";
     switch(p.getColor()) {
       case RED:
@@ -272,7 +227,12 @@ public class XState {
         color = "brown";
         break;
     }
-    jo.addProperty("color", color);
+    onePlayerJsonObject.addProperty("color", color);
+
+    //construct score in json
+    onePlayerJsonObject.addProperty("score", p.getScore());
+
+    //construct penguin list in json
     JsonArray pengs = new JsonArray();
     for (Coord c : p.getPenguinLocs()) {
       JsonArray singlePenguin = new JsonArray();
@@ -280,29 +240,24 @@ public class XState {
       singlePenguin.add(c.getX());
       pengs.add(singlePenguin);
     }
+    onePlayerJsonObject.add("places", pengs);
 
-    jo.add("places", pengs);
-    return jo;
+    return onePlayerJsonObject;
   }
 
-  // turn a given GameState's board into a JsonArray representing tile values
-  static JsonArray createBoardJson(GameState gs) {
-    JsonArray board = new JsonArray();
-    for (int ii = 0; ii < gs.getHeight(); ii++) {
-      JsonArray row = new JsonArray();
-      for (int jj = 0; jj < gs.getWidth(); jj++) {
-        Tile t = gs.getTileAt(new Coord(jj, ii));
-        if (t.isPresent()) {
-          row.add(t.getNumFish());
-        }
-        else {
-          row.add(0);
-        }
-      }
-      board.add(row);
+  //Useful helper method to generate the data representation of a given color represented as a String
+  static PlayerColor getAsPlayerColor(String color) {
+    switch (color) {
+      case "black":
+        return PlayerColor.BLACK;
+      case "brown":
+        return PlayerColor.BROWN;
+      case "red":
+        return PlayerColor.RED;
+      case "white":
+        return PlayerColor.WHITE;
+      default:
+        throw new IllegalArgumentException("Not a valid color!");
     }
-
-    return board;
   }
-
 }
