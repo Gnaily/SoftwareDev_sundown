@@ -239,11 +239,7 @@ public class XStateTest {
   }
 
 
-
-
-
-
-////Tests for old method of constructing output JSON
+  ///tests for old method of changing gamestate to json
 
 //  @Test public void adjustStateAfterMove() {
 //    gs.movePenguin(new Coord(0, 0), new Coord(0, 2));
