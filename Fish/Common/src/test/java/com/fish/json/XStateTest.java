@@ -42,7 +42,7 @@ public class XStateTest {
         + "    \"board\" : [[2,3,4],[1,1,1],[5,5,5],[4,4,4],[3,3,3],[2,2,2]]\n" + "}\n";
     JsonArray southMoveArray = XJson.processInput(new Scanner(southMoveString));
     this.southMoveJson = southMoveArray.get(0).getAsJsonObject();
-    //Hold off on making the gameState to be able to test this
+    //Hold off on making the regularGameState to be able to test this
 
     //Example of a false outcome
     String falseString = "{\n"
@@ -143,7 +143,7 @@ public class XStateTest {
   @Test public void testAttemptDirectionalAlgo() {
     GameState southGS = XState.jsonToGameState(this.southMoveJson);
 
-    //This method either outputs a new, altered GameState, or the original gameState if no move has been made
+    //This method either outputs a new, altered GameState, or the original regularGameState if no move has been made
     GameState southOutput = XState.attemptDirectionalAlgoOnFirstPlayerFirstPenguin(southGS);
     GameState falseOutput = XState.attemptDirectionalAlgoOnFirstPlayerFirstPenguin(this.falseMoveGameState);
     GameState nwOutput = XState.attemptDirectionalAlgoOnFirstPlayerFirstPenguin(this.northWestMoveGameState);

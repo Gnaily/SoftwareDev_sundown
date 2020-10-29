@@ -30,7 +30,7 @@ public class XState {
     //Grab the first (and only) JSON object, which is the State represented in JSON
     JsonObject stateAsJson = inputArray.get(0).getAsJsonObject();
 
-    //Create the GameState from the input
+    //---Create the GameState from the input---//
     GameState gameState = jsonToGameState(stateAsJson);
 
     //Try to apply the N/NE/SE... etc algorithm on the first player's first penguin:
@@ -49,6 +49,7 @@ public class XState {
     }
   }
 
+  //----Convert JSON to internal data representations----//
   /**
    * Given a JsonObject of the State, turns that json directly into a gamestate.
    * Uses tools in the XBoard class to process the board.
@@ -112,6 +113,8 @@ public class XState {
     return resultPlayerList;
   }
 
+  //----Calculating the move----//
+
   /**
    * Attempts the directional algorithm on the first player's first penguin in the gameState.
    * If a move can be made, apply it to the gameState
@@ -153,8 +156,6 @@ public class XState {
   }
 
 
-
-  //----Calculating the move----//
   /**
    * Builds a list of all potential Tiles that surround the Tile of origin in the following order:
    * North, NorthEast, SouthEast, South, SouthWest, NorthWest
@@ -184,6 +185,7 @@ public class XState {
   }
 
 
+  //----Converting back to JSON----//
   /**
    * Transforms the given GameState back into a JSON object for output
    * @param gs the gameState to translate into JSON
@@ -207,7 +209,11 @@ public class XState {
     return outputStateAsJson;
   }
 
-  // Turns a HexPlayer into a JsonObject representing that player
+  /**
+   * Transform a single internal player data back to Jason for output
+   * @param p the internal player data
+   * @return a JsonObject with the player's information
+   */
   static JsonObject reconstructPlayerToJson(InternalPlayer p) {
     JsonObject onePlayerJsonObject = new JsonObject();
 
@@ -245,7 +251,13 @@ public class XState {
     return onePlayerJsonObject;
   }
 
-  //Useful helper method to generate the data representation of a given color represented as a String
+  //---Helper---//
+  /**
+   * A useful helper for converting a json string representing an avatar's color into
+   * our internal representation of an avatar color, PlayerColor
+   * @param color a string of the color
+   * @return a PlayerColor corresponding with that color
+   */
   static PlayerColor getAsPlayerColor(String color) {
     switch (color) {
       case "black":

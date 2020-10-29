@@ -1,158 +1,182 @@
-//package com.fish.json;
-//
-//import com.fish.model.state.InternalPlayer;
-//import com.fish.model.state.PlayerColor;
-//import com.google.gson.JsonArray;
-//import com.google.gson.JsonObject;
-//
-//import com.fish.game.GameTree;
-//import com.fish.game.HexGameTree;
-//import com.fish.game.IFunc;
-//import com.fish.game.Move;
-//import com.fish.game.MoveState;
-//import com.fish.model.Coord;
-//import com.fish.model.state.GameState;
-//
-//import java.util.ArrayList;
-//import java.util.List;
-//import java.util.Map;
-//import java.util.Scanner;
-//import java.util.Set;
-//
-//public class XTree {
-//
-//  public static void main(String[] args) {
-//    Scanner scan = new Scanner(System.in);
-//
-//    JsonArray xJsonInput = XJson.processInput(scan);
-//
-//    JsonObject mrq = xJsonInput.get(0).getAsJsonObject();
-//
-//    GameState gs = createStateFromJsonWithMove(mrq);
-//
-//    GameTree tree = new HexGameTree(gs);
-//
-//    Map<Move, GameState> moves = tree.getPossibleGameStates();
-//    Coord to = jsonArrayToCoord(mrq.getAsJsonArray("to"));
-//    List<Coord> neighbors = XState.getDirectionalTiles(to);
-//
-//    Coord destination = findDestination(neighbors, moves.keySet());
-//
-//    if (destination == null) {
-//      System.out.println("false");
-//      return;
-//    }
-//
-//    //List<Move> movesToDestination = findValidMoves(destination, moves.keySet());
-//    Move finalMove = getMoveToDestination(gs, tree, destination);
-//
-//
-//
-//    assert finalMove != null;
-//    JsonArray moveJson = moveToJson(finalMove);
-//    System.out.println(moveJson);
-//  }
-//
-//  static GameState createStateFromJsonWithMove(JsonObject mrq) {
-//    JsonObject stateAsJson = mrq.getAsJsonObject("state");
-//    GameState gs = XState.jsonToGameState(stateAsJson);
-//
-//    JsonArray fromJson = mrq.getAsJsonArray("from");
-//    JsonArray toJson = mrq.getAsJsonArray("to");
-//
-//    Coord from = jsonArrayToCoord(fromJson);
-//    Coord to = jsonArrayToCoord(toJson);
-//    gs.movePenguin(from, to);
-//
-//    return gs;
-//
-//  }
-//
-//  static Move getMoveToDestination(GameState gs, GameTree tree, Coord destination) {
-//    IFunc<List<Move>> moveFinder = (GameTree gt, List<Move> vals) -> {
-//      List<MoveState> ms = gt.getPreviousMoves();
-//      Move move = ms.get(ms.size() - 1).getMove();
-//
-//      if (move.getEnd().equals(destination)) {
-//        vals.add(move);
-//      }
-//      return vals;
-//    };
-//
-//    List<Move> movesToDestination = HexGameTree.applyToAllReachableStates(tree, moveFinder, new ArrayList<>());
-//
-//    return findEarliestPenguinMove(movesToDestination, gs);
-//  }
-//
-//  /**
-//   * Turn the given 2-element JsonArray into a coord in our coord representation.
-//   *
-//   * @param loc JsonArray in the following format: [INT, INT]
-//   * @return the coord derived from the input
-//   */
-//  static Coord jsonArrayToCoord(JsonArray loc) {
-//    return new Coord(loc.get(1).getAsInt(), loc.get(0).getAsInt());
-//  }
-//
-//
-//  /**
-//   * Compares the input list to the set of moves passed in. If any of the moves reach any of the
-//   *  coordinates, return that coordinate.
-//   *
-//   * @param neighbors ordered list of destinations to search for
-//   * @param moves all valid moves for the current player
-//   * @return the first coordinate that has a move
-//   */
-//  static Coord findDestination(List<Coord> neighbors, Set<Move> moves) {
-//    for (Coord cc : neighbors) {
-//      for (Move move : moves) {
-//        if (move.getEnd().equals(cc)) {
-//          return cc;
-//        }
-//      }
-//    }
-//    return null;
-//  }
-//
-//  // assume there are at least two players, because otherwise the game should be over
-//  static Move findEarliestPenguinMove(List<Move> movesToDestination, GameState gs) {
-//    if (movesToDestination.size() == 1) {
-//      return movesToDestination.get(0);
-//    }
-//
-//    PlayerColor pc = gs.getCurrentPlayer();
-//    List<Coord> penguinLocations = new ArrayList<>();
-//    for (InternalPlayer p : gs.getPlayers()) {
-//      if (p.getColor() == pc) {
-//        penguinLocations = p.getPenguinLocs();
-//      }
-//    }
-//    //////////////--IMPLEMENT TIE BREAKER HERE --- ////
-//    for (Coord c : penguinLocations) {
-//      for (Move move : movesToDestination) {
-//        if (move.getStart().equals(c)) {
-//          return move;
-//        }
-//      }
-//    }
-//
-//    return null;
-//  }
-//
-//  static JsonArray moveToJson(Move move) {
-//    JsonArray ret = new JsonArray();
-//    JsonArray start = new JsonArray();
-//    JsonArray end = new JsonArray();
-//
-//    start.add(move.getStart().getY());
-//    start.add(move.getStart().getX());
-//    end.add(move.getEnd().getY());
-//    end.add(move.getEnd().getX());
-//
-//    ret.add(start);
-//    ret.add(end);
-//    return ret;
-//  }
-//}
-//
-//
+package com.fish.json;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
+import com.fish.game.GameTree;
+import com.fish.game.HexGameTree;
+import com.fish.game.Move;
+import com.fish.model.Coord;
+import com.fish.model.state.GameState;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+public class XTree {
+
+  /**
+   * Main function for running the XTree integration tests.
+   *    1. Consumes valid JSON from Standard
+   *    2. parses that into a move-response-query (mrq)
+   *    3. applies the move indicated in the mrq to the given state indicated in the mrq
+   *    4. utilizes GameTree query functionality to determine the move for the next player according
+   *        to the algorithm given in the assignment
+   *    5. returns the resulting Move as an Action in JSON
+   *
+   * @param args Command line arguments, not used
+   */
+  public static void main(String[] args) {
+    //grab the input from STD in
+    Scanner scan = new Scanner(System.in);
+    //create a JasonArray Java object whose elements are each JSON object from STD in
+    JsonArray inputArray = XJson.processInput(scan);
+    //Grab the first (and only) JSON object, which is the move-response-query represented in JSON
+    JsonObject mrq = inputArray.get(0).getAsJsonObject();
+
+    //---Process the mrq and apply the move to the given GameState---//
+    GameState gameState = mrqToGameState(mrq);
+
+    //It is now the second player's turn.
+    //---Gather what's needed to calculate the desired outcome and send it to the processing method---//
+    GameTree tree = new HexGameTree(gameState);
+    Coord destOfFirstPlayer = XBoard.jsonToCoord(mrq.getAsJsonArray("to"));
+
+    //---Call the main processing method---//
+    List<Move> validMoves = calculateValidOutcomeMoves(tree, destOfFirstPlayer);
+
+    //If there are no valid moves, return false, otherwise, return the tie breaking move
+    if (validMoves.size() == 0) {
+      System.out.println("false");
+    }
+    if (validMoves.size() == 1) {
+      JsonArray action = moveToJson(validMoves.get(0));
+      System.out.println(action);
+    } else {
+      Move moveMade = determineTieBreaker(validMoves);
+      JsonArray action = moveToJson(moveMade);
+      System.out.println(action);
+    }
+  }
+
+  /**
+   * Converts a mrq to a GameState with the move from the mrq applied to the gamestate
+   * Note that the current player's turn advances automatically when a turn is taken
+   * @param mrq the move-response-query
+   * @return the GameState with the move applied
+   */
+  static GameState mrqToGameState(JsonObject mrq) {
+    JsonObject stateAsJson = mrq.getAsJsonObject("state");
+    GameState returnState = XState.jsonToGameState(stateAsJson);
+
+    JsonArray fromJson = mrq.getAsJsonArray("from");
+    JsonArray toJson = mrq.getAsJsonArray("to");
+    Coord from = XBoard.jsonToCoord(fromJson);
+    Coord to = XBoard.jsonToCoord(toJson);
+
+    returnState.movePenguin(from, to);
+
+    return returnState;
+  }
+
+  /**
+   * Given a GameTree to strategize with, and
+   * the Coordinate of the most recent player's move's destination,
+   * Returns a list of valid moves that the current player may make that place one of their penguins
+   * at a neighboring Tile of their opponent who just took a turn.
+   *
+   * If multiple penguins can reach the same Tile, then the tiebreaker method is called.
+   *
+   * @param strategyTree the GameTree to perform the query function
+   * @param opponentDestination the Tile the player's opponent moved to in the opponent's previous turn
+   * @return
+   */
+  static List<Move> calculateValidOutcomeMoves(GameTree strategyTree, Coord opponentDestination) {
+
+    List<Move> validMoves = new ArrayList<>();
+    //Grab all the neighbors of the first player's penguin in order
+    List<Coord> possibleDestinations = XState
+        .getDirectionalTiles(opponentDestination); //list of TO moves
+
+    //Grab all of the current player's penguin locs
+    List<Coord> possibleOrigins = strategyTree.getState().getPlayers().get(0)
+        .getPenguinLocs(); //list of FROM moves
+    for (Coord destination : possibleDestinations) {
+      for (Coord pengToMove : possibleOrigins) {
+        try {
+          HexGameTree.getResultState(strategyTree, new Move(pengToMove, destination));
+          validMoves.add(new Move(pengToMove, destination));
+        } catch (Exception e) {
+          //do nothing, keep looking for the right move
+        }
+        if (validMoves.size() > 0) {
+          //This will break the loop once we've reached the first reachable neighbor and finished collecting
+          //all the possible moves the current player can make to that neighbor.
+          //but it still may have multiple elements that can reach it from the player's penguins
+          return validMoves;
+        }
+      }
+    }
+    //base case, returns an empty Arraylist if we get here
+    return validMoves;
+  }
+
+  /**
+   * Funnels a list of valid moves into THE final move based on the given tie breaker (in the assignment)
+   * Determines a tie breaker by taking in all valid moves and returning the one that
+   * satisfies the tie breaking rules in the assignment
+   * @param validMoves all valid moves to a neighboring spot of the original penguin
+   * @return the final move made
+   */
+  static Move determineTieBreaker(List<Move> validMoves) {
+    //assign lowest the first element's Y value as the lowest row
+    int lowestRow = validMoves.get(0).getOrigin().getY();
+    for (Move m : validMoves) {
+      if (m.getOrigin().getY() < lowestRow) {
+        lowestRow = m.getOrigin().getY();
+      }
+    }
+    for (Move m : validMoves) {
+      if (m.getOrigin().getY() != lowestRow) {
+        validMoves.remove(m);
+      }
+    }
+
+    //assign the first element's X value as the lowest column
+    int leftMostCol = validMoves.get(0).getOrigin().getX();
+    for (Move m : validMoves) {
+      if (m.getOrigin().getX() < leftMostCol) {
+        leftMostCol = m.getOrigin().getX();
+      }
+    }
+    for (Move m : validMoves) {
+      if (m.getOrigin().getX() != leftMostCol) {
+        validMoves.remove(m);
+      }
+    }
+    return validMoves.get(0);
+  }
+
+  /**
+   * Converts a Move object into its JSON representation called Action
+   * @param move Move object
+   * @return a JsonArray containing the action
+   */
+  static JsonArray moveToJson(Move move) {
+    JsonArray ret = new JsonArray();
+    JsonArray start = new JsonArray();
+    JsonArray end = new JsonArray();
+
+    start.add(move.getOrigin().getY());
+    start.add(move.getOrigin().getX());
+    end.add(move.getDestination().getY());
+    end.add(move.getDestination().getX());
+
+    ret.add(start);
+    ret.add(end);
+    return ret;
+  }
+
+}
+
+
