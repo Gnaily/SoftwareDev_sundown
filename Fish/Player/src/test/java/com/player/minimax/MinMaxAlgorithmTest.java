@@ -227,4 +227,61 @@ public class MinMaxAlgorithmTest {
     assertEquals(new Move(new Coord(0, 0), new Coord(0, 2)),
         MinMaxAlgorithm.findBestMove(this.gt1.getState()));
   }
+
+  @Test
+  public void testAddMoveMiddleTree() {
+    List<MoveValue> scores = this.fms.addMoveMiddleOfTree(
+        this.gt1.getNextGameTree(new Move(new Coord(0, 5), new Coord(0, 3))),
+        0, new ArrayList<>());
+
+    assertEquals(1, scores.size());
+    assertEquals(new Move(new Coord(0, 5), new Coord(0, 3)), scores.get(0).getMove());
+    assertEquals(7, scores.get(0).getValue());
+
+    scores = this.fms.addMoveMiddleOfTree(
+        this.gt1.getNextGameTree(new Move(new Coord(0, 5), new Coord(0, 1))),
+        0, scores);
+
+    assertEquals(2, scores.size());
+    assertEquals(new Move(new Coord(0, 5), new Coord(0, 1)), scores.get(1).getMove());
+    assertEquals(3, scores.get(1).getValue());
+  }
+
+  @Test
+  public void addFinalMove() {
+    List<MoveValue> scores = this.fms.addFinalMove(this.gt1, new ArrayList<>());
+
+    assertEquals(1, scores.size());
+    assertEquals(new Move(new Coord(0, 5), new Coord(0, 1)), scores.get(0).getMove());
+    assertEquals(2, scores.get(0).getValue());
+  }
+
+  @Test
+  public void testAddFinalMoveMultiplePenguins() {
+    GameBoard gb = new HexGameBoard(new int[][]{{2, 1, 3,5,2,2}, {3, 2, 5, 2, 1, 1}});
+    List<InternalPlayer> players = Arrays.asList(new HexPlayer(PlayerColor.RED),
+        new HexPlayer(PlayerColor.BLACK));
+
+    GameState gs = new HexGameState();
+    gs.initGame(gb, players);
+    gs.placePenguin(new Coord(0, 5), PlayerColor.RED);
+    gs.placePenguin(new Coord(0, 0), PlayerColor.BLACK);
+    gs.placePenguin(new Coord(1, 2), PlayerColor.RED);
+    gs.placePenguin(new Coord(0, 3), PlayerColor.BLACK);
+
+    gs.startPlay();
+    this.gt2 = new HexGameTree(gs);
+
+    List<MoveValue> scores = new ArrayList<>();
+    scores.add(new MoveValue(new Move(new Coord(1, 1), new Coord(1, 2)), 3));
+
+    scores = this.fms.addFinalMove(this.gt2, scores);
+
+    assertEquals(2, scores.size());
+    assertEquals(new Move(new Coord(1, 1), new Coord(1, 2)), scores.get(0).getMove());
+    assertEquals(3, scores.get(0).getValue());
+
+    assertEquals(new Move(new Coord(1, 2), new Coord(1, 0)), scores.get(1).getMove());
+    assertEquals(5, scores.get(1).getValue());
+  }
 }

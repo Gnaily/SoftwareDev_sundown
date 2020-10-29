@@ -58,48 +58,74 @@ public class MinMaxAlgorithm implements IFunc<List<MoveValue>> {
    */
   @Override
   public List<MoveValue> apply(GameTree gameTree, List<MoveValue> scores) {
+    // this avoids a data race where multiple versions of this object are modifying this.numMoves
     int numberMoves = this.numMoves;
     if (gameTree.getState().getCurrentPlayer().equals(this.startingColor) || skippedPlayer(gameTree)) {
       numberMoves += 1;
     }
 
     if (numberMoves >= this.maxMoves && gameTree.getPreviousMoves().size() != 0) {
-      // find max of all child states, then return the previous move
-      if (gameTree.getPossibleGameStates().size() == 0) {
-        return scores;
-      }
-
-      Move m = findBestMove(gameTree.getState());
-
-      GameTree gt = gameTree.getNextGameTree(m);
-      int score = gt.getState().getScoreBoard().get(this.startingColor);
-      scores.add(new MoveValue(m, score));
-      return scores;
+      return this.addFinalMove(gameTree, scores);
     }
 
+    return this.addMoveMiddleOfTree(gameTree, numberMoves, scores);
 
+  }
+
+  /**
+   * Find the ideal move for the current node. This functions by adding a single value to the
+   * list passed in. Parent nodes use the result of this function to calculate their decision.
+   *
+   * @param gameTree The current game tree
+   * @param numberMoves The number of Moves that have already been taken by the tracked player in
+   *                    this tree
+   * @param scores the other valid moves the append this function call's results to
+   * @return An updated list of MoveValues with the move that reached this node and it's corresponding
+   *  value.
+   */
+  List<MoveValue> addMoveMiddleOfTree(GameTree gameTree, int numberMoves, List<MoveValue> scores) {
     List<MoveValue> nextScores =
         HexGameTree.applyToAllReachableStates(gameTree,
             new MinMaxAlgorithm(numberMoves, this.maxMoves, this.startingColor), new ArrayList<>());
 
-    if (gameTree.getPreviousMoves().size() == 0) {
-      return calculateBestMove(nextScores);
+
+
+    int val;
+    if (nextScores.size() == 0) {
+      val = gameTree.getState().getScoreBoard().get(this.startingColor);
     }
     else {
+      val = bestValue(nextScores, gameTree.getState().getCurrentPlayer().equals(this.startingColor));
+    }
 
-      int val;
-      if (nextScores.size() == 0) {
-        val = gameTree.getState().getScoreBoard().get(this.startingColor);
-      }
-      else {
-        val = bestValue(nextScores, gameTree.getState().getCurrentPlayer().equals(this.startingColor));
-      }
+    Move previousMove = gameTree.getPreviousMoves().get(0).getMove();
+    scores.add(new MoveValue(previousMove, val));
+    return scores;
+  }
 
-      Move previousMove = gameTree.getPreviousMoves().get(0).getMove();
-      scores.add(new MoveValue(previousMove, val));
+  /**
+   * Return the final move in this search. This function can be achieved by always taking the move that
+   *  results in the maximum number of fish for the tracked player. This works because:
+   *  - if it is the player's turn, they would like to get the most points
+   *  - if it is not the player's turn, that means the player has been skipped and their point value
+   *   will remain constant for the rest of the game.
+   * @param gameTree the game tree to find the final move for
+   * @param scores the other moves calculated at this level of the tree
+   * @return the input list with the current node's value added to it
+   */
+  List<MoveValue> addFinalMove(GameTree gameTree, List<MoveValue> scores) {
+    if (gameTree.getPossibleGameStates().size() == 0) {
       return scores;
     }
+
+    Move m = findBestMove(gameTree.getState());
+
+    GameTree gt = gameTree.getNextGameTree(m);
+    int score = gt.getState().getScoreBoard().get(this.startingColor);
+    scores.add(new MoveValue(m, score));
+    return scores;
   }
+
 
   /**
    * Helper for finding the base case to our algorithm. Our implementation of
