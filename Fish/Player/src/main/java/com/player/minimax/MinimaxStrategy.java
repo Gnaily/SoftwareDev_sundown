@@ -11,9 +11,34 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Player Strategy class for placing and moving penguins. This class defines two static methods -
+ * on that places penguins and another that calculates the best move for a penguin.
+ *
+ * Penguin placement is as follows:
+ * - Given a GameState, place a penguin in the lowest row possible, and within each row, the lowest
+ *  column possible. This method returns a Coord of the recommended penguin location
+ *
+ * Penguin movement is as follows:
+ * - Given a GameState and a number of moves to look ahead, apply a minimax algorithm to the game
+ *  tree for maximizing the current player's penguins after N turns (the number passed in). This
+ *  version of minimax calculates the point value of the maximizing player's score at each node, then
+ *  decides what to do depending on if it is the player's or an opponent's turn.
+ *    - if it is the player's turn, select the move that results in the most points for the player
+ *    - if it is an opponents turn, select the move that results in the fewest points for the player.
+ */
 public class MinimaxStrategy {
 
-
+  /**
+   * Basic Strategy for finding the next valid PenguinPlacement.
+   *
+   * Given a GameState, the next valid penguin placement is as followed:
+   *  - the tile in the lowest row with only one 1 fish on it
+   *  - if there are multiple tiles in the row that satisfy this condition, the one with the lowest
+   *   column number.
+   * @param gs the gamestate to find a penguin location for
+   * @return The Coord representing where the player should put their penguin
+   */
   public static Coord findNextPenguinPlacement(GameState gs) {
     Map<Coord, PlayerColor> penguins = gs.getPenguinLocations();
     for (int ii = 0; ii < gs.getHeight(); ii++) {
@@ -36,6 +61,20 @@ public class MinimaxStrategy {
     return null;
   }
 
+  /**
+   * Find the best move for the current player after looking ahead N turns according to a basic minimax
+   * algorithm. This looks ahead N turns for the current player, which at a max could be N*number of players
+   * turns in the game of Fish.
+   *
+   * For each node, the starting player's score is calculated and the decision is made as follows:
+   *  - if it is an opponent's turn, chose the move that results in the starting player having the fewest points
+   *   out of all children nodes
+   *  - if it is the starting player's turn, chose the move that results in the them having the most
+   *   points out of all children nodes
+   * @param gs The Gamestate to evaluate the minimax function on
+   * @param nn The number of moves to make on behalf of the starting player
+   * @return The best move for the player as determined by the algorithm
+   */
   public static Move findCurrentPlayersBestMove(GameState gs, int nn) {
     if (nn <= 1) {
       return MinMaxAlgorithm.findBestMove(gs);
@@ -51,111 +90,4 @@ public class MinimaxStrategy {
     return bestMove.getMove();
   }
 
-
-
-
-
-
-//  public static Move findCurrentPlayersBestMove(GameState gs, int lookAhead) {
-//
-//    if (lookAhead <= 1) {
-//      return findMoveForCurrentPosition(gs);
-//    }
-////    Map<Coord, PlayerColor> penguinLocations = gs.getPenguinLocations();
-////    GameTree tree = new HexGameTree(gs);
-////
-////    Map<Move, GameState> moves = tree.getPossibleGameStates();
-////    Map<Move, Integer> minimumScore = new HashMap<>();
-////
-////    for (Move move : moves.keySet()) {
-////      minimumScore.put(move, getMinimumScore(lookAhead, move, gs));
-////    }
-//
-//    GameTree gt = new HexGameTree(gs);
-//    Map<Move, GameState> moves = gt.getPossibleGameStates();
-//
-//
-//    Map<Move, Integer> minimumScore = getMinimumScores(moves, lookAhead - 1);
-//    Move best = null;
-//    int max = 0;
-//    for (Move m : minimumScore.keySet()) {
-//      if (minimumScore.get(m) > max) {
-//        best = m;
-//        max = minimumScore.get(m);
-//      }
-//    }
-//
-//    // this needs to be changed so that it does the same penguin searching stuff
-//    return best;
-//  }
-//
-//  // TEST
-//  static Move findMoveForCurrentPosition(GameState gs) {
-//    PlayerColor pc = gs.getCurrentPlayer();
-//    List<Coord> pLocs = new ArrayList<>();
-//    Map<Coord, PlayerColor> allPenguins = gs.getPenguinLocations();
-//    for (Coord cc : allPenguins.keySet()) {
-//      if (allPenguins.get(cc) == pc) {
-//        pLocs.add(cc);
-//      }
-//    }
-//
-//
-//    Coord pengiunToMove = findLowestRowCol(pLocs);
-//    List<Coord> reachable = gs.getTilesReachableFrom(pengiunToMove);
-//
-//    Coord destination = findLowestRowCol(reachable);
-//
-//    return new Move(pengiunToMove, destination);
-//  }
-//
-//
-//  //TEST
-//  static Coord findLowestRowCol(List<Coord> locs) {
-//    Coord val = locs.get(0);
-//
-//    for (int ii = 1; ii < locs.size(); ii++) {
-//      Coord potential = locs.get(ii);
-//      if (potential.getY() < val.getY()) {
-//        val = potential;
-//      }
-//      else if (potential.getY() == val.getY()) {
-//        if (potential.getX() < val.getX()) {
-//          val = potential;
-//        }
-//      }
-//    }
-//
-//
-//    return val;
-//  }
-//
-//  static Map<Move, Integer> getMinimumScores(Map<Move, GameState> moves, int lookAhead) {
-//    Map<Move, Integer> moveIntegerMap = new HashMap<>();
-//
-//    while ()
-//
-//
-//    return moveIntegerMap;
-//  }
-//
-//  static int getMinimumScore(int lookAhead, Move move, GameState gs) {
-//    List<InternalPlayer> playersAtBeginning = gs.getPlayers();
-//
-//    List<PlayerColor> playerColorOrder = new ArrayList<>();
-//    for (InternalPlayer p : playersAtBeginning) {
-//      playerColorOrder.add(p.getColor());
-//    }
-//
-//    int ii = 0;
-//    while (ii < lookAhead) {
-//
-//
-//
-//
-//      ii++;
-//    }
-//
-//    return 0;
-//  }
 }
