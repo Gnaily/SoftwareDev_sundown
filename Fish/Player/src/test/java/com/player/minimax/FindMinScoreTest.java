@@ -40,7 +40,7 @@ public class FindMinScoreTest {
   @Test
   public void applyToRed() {
     FindMinScore fms = new FindMinScore(2, PlayerColor.BLACK);
-    System.out.println(HexGameTree.applyToAllReachableStates(this.gt1, fms, new ArrayList<>()));
+    //System.out.println(HexGameTree.applyToAllReachableStates(this.gt1, fms, new ArrayList<>()));
     // [3, 3, 3, 3, 1, 3, 3, 1, 1, 2, 2, 2, 1, 1, 1, 5, 5, 1, 1]
     //System.out.println(HexGameTree.applyToAllReachableStates(this.gt1, new NodeCounter(), 0));
   }

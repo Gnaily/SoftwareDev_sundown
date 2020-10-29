@@ -13,8 +13,8 @@ public class FindMinScore implements IFunc<Map<Move, Integer>> {
   private PlayerColor startingColor;
   private int numMoves;
 
-  public FindMinScore(int numMoves, PlayerColor startingColor){
-    this.maxMoves = numMoves;
+  public FindMinScore(int maxMoves, PlayerColor startingColor){
+    this.maxMoves = maxMoves;
     this.startingColor = startingColor;
     this.numMoves = 0;
   }
@@ -29,15 +29,18 @@ public class FindMinScore implements IFunc<Map<Move, Integer>> {
 
   @Override
   public Map<Move, Integer> apply(GameTree gameTree, Map<Move, Integer> scores) {
+
     if (gameTree.getState().getCurrentPlayer().equals(this.startingColor) || skippedPlayer(gameTree)) {
       this.numMoves += 1;
     }
 
+    // search for max here (need to add)
     if (this.numMoves >= this.maxMoves) {
       Move m = findMoveForCurrentPosition(gameTree.getState());
       GameTree gt = gameTree.getNextGameTree(m);
       int score = gt.getState().getScoreBoard().get(this.startingColor);
       scores.put(m, score);
+      return scores;
     }
 
     // player's turn
@@ -61,9 +64,10 @@ public class FindMinScore implements IFunc<Map<Move, Integer>> {
       }
 
       Move optimal = findOptimalMove(maxScoreMoves);
-      Map<Move, Integer> bestMove = new HashMap<>();
-      bestMove.put(optimal, moves.get(optimal));
-      return bestMove;
+      //Map<Move, Integer> bestMove = new HashMap<>();
+      //bestMove.put(optimal, moves.get(optimal));
+      scores.put(optimal, moves.get(optimal));
+      return scores;
     }
 
     // someone else's turn
@@ -71,6 +75,7 @@ public class FindMinScore implements IFunc<Map<Move, Integer>> {
       Map<Move, Integer> moves = HexGameTree.applyToAllReachableStates(gameTree,
           new FindMinScore(this), new HashMap<>());
 
+      // change
       int min = 9999;
       for (Move m : moves.keySet()) {
         if (moves.get(m) < min) {
@@ -87,26 +92,9 @@ public class FindMinScore implements IFunc<Map<Move, Integer>> {
       }
 
       Move optimal = findOptimalMove(minScoreMoves);
-      Map<Move, Integer> bestMove = new HashMap<>();
-      bestMove.put(optimal, moves.get(optimal));
-      return bestMove;
+      scores.put(optimal, moves.get(optimal));
+      return scores;
     }
-
-
-//    if (gameTree.getState().getCurrentPlayer().equals(this.startingColor) || this.skippedPlayer(gameTree)) {
-//      this.numMoves += 1;
-//      //System.out.println(this.numMoves);
-//    }
-//
-//    if (this.numMoves >= this.maxMoves || gameTree.getPossibleGameStates().size() == 0) {
-//      System.out.println(this.numMoves >= this.maxMoves);
-//      scores.add(gameTree.getState().getScoreBoard().get(this.startingColor));
-//      return scores;
-//    }
-//
-//    return HexGameTree.applyToAllReachableStates(gameTree, new FindMinScore(this), scores);
-
-    return null;
   }
 
   static Move findOptimalMove(List<Move> moves) {
@@ -129,48 +117,56 @@ public class FindMinScore implements IFunc<Map<Move, Integer>> {
     return new Move(start, end);
   }
 
-    static Move findMoveForCurrentPosition(GameState gs) {
-      PlayerColor pc = gs.getCurrentPlayer();
-      List<Coord> pLocs = new ArrayList<>();
-      Map<Coord, PlayerColor> allPenguins = gs.getPenguinLocations();
-      for (Coord cc : allPenguins.keySet()) {
-        if (allPenguins.get(cc) == pc) {
-          pLocs.add(cc);
-        }
+  static Move findMoveForCurrentPosition(GameState gs) {
+    PlayerColor pc = gs.getCurrentPlayer();
+    List<Coord> pLocs = new ArrayList<>();
+    Map<Coord, PlayerColor> allPenguins = gs.getPenguinLocations();
+    for (Coord cc : allPenguins.keySet()) {
+      if (allPenguins.get(cc) == pc) {
+        pLocs.add(cc);
       }
-
-
-      Coord pengiunToMove = findLowestRowCol(pLocs);
-      List<Coord> reachable = gs.getTilesReachableFrom(pengiunToMove);
-
-      Coord destination = findLowestRowCol(reachable);
-
-      return new Move(pengiunToMove, destination);
     }
 
 
-    //TEST
-    static Coord findLowestRowCol(List<Coord> locs) {
-      Coord val = locs.get(0);
+    Coord pengiunToMove = findLowestRowCol(pLocs);
+    List<Coord> reachable = gs.getTilesReachableFrom(pengiunToMove);
 
-      for (int ii = 1; ii < locs.size(); ii++) {
-        Coord potential = locs.get(ii);
-        if (potential.getY() < val.getY()) {
+    Coord destination = findLowestRowCol(reachable);
+
+    return new Move(pengiunToMove, destination);
+  }
+
+
+  //TEST
+  static Coord findLowestRowCol(List<Coord> locs) {
+    Coord val = locs.get(0);
+
+    for (int ii = 1; ii < locs.size(); ii++) {
+      Coord potential = locs.get(ii);
+      if (potential.getY() < val.getY()) {
+        val = potential;
+      } else if (potential.getY() == val.getY()) {
+        if (potential.getX() < val.getX()) {
           val = potential;
-        } else if (potential.getY() == val.getY()) {
-          if (potential.getX() < val.getX()) {
-            val = potential;
-          }
         }
       }
-      return val;
     }
+    return val;
+  }
 
-  private boolean skippedPlayer(GameTree gt) {
+
+  boolean skippedPlayer(GameTree gt) {
     List<MoveState> previousMoves = gt.getPreviousMoves();
     if (previousMoves.size() == 0) {
       return false;
     }
+
+    // tracking color BROWN
+    // RED, WHITE, BROWN, BLACK
+    // red makes move
+    // WHITE, BROWN, BLACK, RED
+    // white makes a move, brown dosent have moves left
+    // BLACK, RED, WHITE, BROWN
     GameState currentState = gt.getState();
     GameState previousState = previousMoves.get(previousMoves.size() - 1).getGameState();
 
@@ -190,6 +186,6 @@ public class FindMinScore implements IFunc<Map<Move, Integer>> {
     }
 
     //System.out.println(previousIndex != 0 && previousIndex <= currentIndex);
-    return previousIndex != 0 && previousIndex <= currentIndex;
+    return previousIndex != 0 && previousIndex >= currentIndex;
   }
 }
