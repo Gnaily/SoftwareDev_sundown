@@ -44,25 +44,4 @@ public class XJson {
     }
     return jsonArray;
   }
-
-  /**
-   * Format the given JsonArray for output as specified by assignment C (xJson)
-   *
-   * @return String containing the specified json
-   */
-  static String formatJson(JsonArray jsonArray) {
-
-    JsonElement count = new JsonPrimitive(jsonArray.size());
-    JsonObject output = new JsonObject();
-    output.add("count", count);
-    output.add("seq", jsonArray);
-    JsonArray reverse = new JsonArray();
-    reverse.add(count);
-    for (int i = jsonArray.size(); i>0; i--) {
-      reverse.add(jsonArray.get(i-1));
-    }
-
-    return output.toString() + "\n" + reverse.toString() + "\n";
-  }
-
 }

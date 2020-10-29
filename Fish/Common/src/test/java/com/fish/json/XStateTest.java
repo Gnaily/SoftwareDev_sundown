@@ -1,11 +1,11 @@
 package com.fish.json;
 
 import com.fish.model.Coord;
-import com.fish.model.board.GameBoard;
-import com.fish.model.board.HexGameBoard;
 import com.fish.model.state.*;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import java.util.ArrayList;
+import java.util.HashMap;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -17,94 +17,106 @@ import static org.junit.Assert.*;
 
 public class XStateTest {
 
-  JsonObject stateAsJson;
-  GameState gs;
-  JsonObject smallJsonState;
-  GameState smallGameState;
+  private JsonObject southMoveJson;
+
+  private JsonObject falseMoveJson;
+  private GameState falseMoveGameState;
+
+  private JsonObject northWestMoveJson;
+  private GameState northWestMoveGameState;
 
   @Before public void setUp() throws Exception {
-    String jsonAsString = "{\n" + "  \"players\" : [\n" + "    {\n" + "      \"color\" : \"red\",\n"
-        + "      \"score\" : 10,\n" + "      \"places\" : [[0,0],[1,0]]\n" + "    },\n" + "    {\n"
-        + "      \"color\" : \"white\",\n" + "      \"score\" : 0,\n"
-        + "      \"places\" : [[0,1],[1,1]]\n" + "    }],\n"
+
+    //Example of making a south move
+    String southMoveString = "{\n"
+        + "  \"players\" : [\n"
+        + "    {\n"
+        + "      \"color\" : \"red\",\n"
+        + "      \"score\" : 10,\n"
+        + "      \"places\" : [[0,0],[1,0]]\n" + "    },\n"
+        + "    {\n"
+        + "      \"color\" : \"white\",\n"
+        + "      \"score\" : 0,\n"
+        + "      \"places\" : [[0,1],[1,1]]\n"
+        + "    }],\n"
         + "    \"board\" : [[2,3,4],[1,1,1],[5,5,5],[4,4,4],[3,3,3],[2,2,2]]\n" + "}\n";
+    JsonArray southMoveArray = XJson.processInput(new Scanner(southMoveString));
+    this.southMoveJson = southMoveArray.get(0).getAsJsonObject();
+    //Hold off on making the gameState to be able to test this
 
-    JsonArray xJsonArray = XJson.processInput(new Scanner(jsonAsString));
-    this.stateAsJson = xJsonArray.get(0).getAsJsonObject();
-    this.gs = setupGameState();
+    //Example of a false outcome
+    String falseString = "{\n"
+        + "  \"players\" : [\n"
+        + "    {\n"
+        + "      \"color\" : \"red\",\n"
+        + "      \"score\" : 10,\n"
+        + "      \"places\" : [[0,0],[1,0]]\n" + "    },\n"
+        + "    {\n"
+        + "      \"color\" : \"white\",\n"
+        + "      \"score\" : 0,\n"
+        + "      \"places\" : [[0,1],[1,1]]\n"
+        + "    }],\n"
+        + "    \"board\" : [[2,3,4],[1,1,1]]\n" + "}\n";
+    JsonArray falseMoveArray = XJson.processInput(new Scanner(falseString));
+    this.falseMoveJson = falseMoveArray.get(0).getAsJsonObject();
+    this.falseMoveGameState = XState.jsonToGameState(this.falseMoveJson);
 
-    jsonAsString = "{\n" + "  \"players\" : [\n" + "    {\n" + "      \"color\" : \"red\",\n"
-        + "      \"score\" : 10,\n" + "      \"places\" : [[0,0],[1,0]]\n" + "    },\n" + "    {\n"
-        + "      \"color\" : \"white\",\n" + "      \"score\" : 0,\n"
-        + "      \"places\" : [[0,1],[1,1]]\n" + "    }],\n"
-        + "    \"board\" : [[2,3,4],[1,1,1],[5]]\n" + "}\n";
-
-    xJsonArray = XJson.processInput(new Scanner(jsonAsString));
-    this.smallJsonState = xJsonArray.get(0).getAsJsonObject();
-    this.smallGameState = setupSmallGameState();
-
-  }
-
-  private GameState setupGameState() {
-    int[][] valuesFromInput = XBoard.getTileValues(stateAsJson, "board");
-    GameBoard boardFromInput = new HexGameBoard(valuesFromInput);
-
-    JsonArray playerArray = stateAsJson.getAsJsonArray("players");
-    List<InternalPlayer> players = XState.getPlayersList(playerArray);
-
-    return new HexGameState(GameStage.IN_PLAY, boardFromInput, players);
-  }
-
-  private GameState setupSmallGameState() {
-    int[][] valuesFromInput = XBoard.getTileValues(smallJsonState, "board");
-    GameBoard boardFromInput = new HexGameBoard(valuesFromInput);
-
-    JsonArray playerArray = smallJsonState.getAsJsonArray("players");
-    List<InternalPlayer> players = XState.getPlayersList(playerArray);
-
-    return new HexGameState(GameStage.IN_PLAY, boardFromInput, players);
+    //Example of pushing the algorithm to the last possible move, northwest
+    String nwString = "{\n"
+        + "  \"players\" : [\n"
+        + "    {\n"
+        + "      \"color\" : \"red\",\n"
+        + "      \"score\" : 10,\n"
+        + "      \"places\" : [[3,1],[4,1]]\n" + "    },\n"
+        + "    {\n"
+        + "      \"color\" : \"white\",\n"
+        + "      \"score\" : 0,\n"
+        + "      \"places\" : [[0,1],[1,1]]\n"
+        + "    }],\n"
+        + "    \"board\" : [[2,3,4],[1,1,1],[5,5,0],[4,4,4],[3,3,0],[2,0,2]]\n" + "}\n";
+    JsonArray nwArray = XJson.processInput(new Scanner(nwString));
+    this.northWestMoveJson = nwArray.get(0).getAsJsonObject();
+    this.northWestMoveGameState = XState.jsonToGameState(this.northWestMoveJson);
   }
 
   @Test
-  public void getPlayerColor() {
-    assertEquals(PlayerColor.WHITE, XState.getPlayerColor("white"));
-    assertEquals(PlayerColor.RED, XState.getPlayerColor("red"));
-    assertEquals(PlayerColor.BLACK, XState.getPlayerColor("black"));
-    assertEquals(PlayerColor.BROWN, XState.getPlayerColor("brown"));
+  public void testJsonToGameState(){
+    GameState gs = XState.jsonToGameState(this.southMoveJson);
+
+    //Test that the characteristics of the board are accurately set up
+    assertEquals(GameStage.IN_PLAY, gs.getGameStage());
+    assertEquals(3, gs.getWidth());
+    assertEquals(6, gs.getHeight());
+    assertEquals(2, gs.getTileAt(new Coord(0,0)).getNumFish());
+    assertEquals(1, gs.getTileAt(new Coord(0,1)).getNumFish());
+    assertEquals(PlayerColor.RED, gs.getCurrentPlayer());
+
+    Map<PlayerColor, Integer> scoreBoard = new HashMap<>();
+    scoreBoard.put(PlayerColor.RED, 10);
+    scoreBoard.put(PlayerColor.WHITE, 0);
+    assertEquals(scoreBoard, gs.getScoreBoard());
+
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  public void getPlayerColorBadInput() {
-    XState.getPlayerColor("blue");
-  }
+  @Test public void testJsonToPlayer() {
+    //Generate players from the Json
+    List<InternalPlayer> players = XState.jsonToPlayer(this.southMoveJson);
 
-  @Test public void getPlayersList() {
-    JsonArray playerArray = stateAsJson.getAsJsonArray("players");
-    List<InternalPlayer> players = XState.getPlayersList(playerArray);
+    //Check that the characteristics of the players are right
     assertEquals(2, players.size());
     assertEquals(10, players.get(0).getScore());
     assertEquals(PlayerColor.RED, players.get(0).getColor());
+
+    //Check the penguins of players is right
+    List<Coord> redsPenguins = new ArrayList<>();
+    redsPenguins.add(new Coord(0,0));
+    redsPenguins.add(new Coord(0,1));
+
+    assertEquals(redsPenguins, players.get(0).getPenguinLocs());
   }
 
-  @Test public void placePenguins() {
-    JsonArray playerArray = stateAsJson.getAsJsonArray("players");
-    Map<Coord, PlayerColor> penguinLocs = XState.placePenguins(playerArray);
 
-    assertNull(penguinLocs.get(new Coord(2, 2)));
-    assertEquals(PlayerColor.RED, penguinLocs.get(new Coord(0, 0)));
-    assertEquals(PlayerColor.RED, penguinLocs.get(new Coord(0, 1)));
-    assertEquals(PlayerColor.WHITE, penguinLocs.get(new Coord(1, 0)));
-    assertEquals(PlayerColor.WHITE, penguinLocs.get(new Coord(1, 1)));
-  }
-
-  @Test public void getFirstPlayersFirstPenguin() {
-    JsonArray playerArray = stateAsJson.getAsJsonArray("players");
-    Coord firstP = XState.getFirstPlayersFirstPenguin(playerArray);
-
-    assertEquals(new Coord(0, 0), firstP);
-  }
-
-  @Test public void getDirectionalTilesEvenY() {
+  @Test public void testGetDirectionalTilesEvenY() {
     List<Coord> moves = XState.getDirectionalTiles(new Coord(4, 4));
     assertEquals(6, moves.size());
 
@@ -116,7 +128,7 @@ public class XStateTest {
     assertEquals(new Coord(3, 3), moves.get(5));
   }
 
-  @Test public void getDirectionalTilesOddY() {
+  @Test public void testGetDirectionalTilesOddY() {
     List<Coord> moves = XState.getDirectionalTiles(new Coord(5, 5));
     assertEquals(6, moves.size());
 
@@ -128,136 +140,188 @@ public class XStateTest {
     assertEquals(new Coord(5, 4), moves.get(5));
   }
 
-  @Test public void findLegalMove() {
-    assertEquals(new Coord(0, 2), XState.findLegalMove(this.gs, new Coord(0, 0)));
-    assertEquals(new Coord(2, 0), XState.findLegalMove(this.gs, new Coord(1, 1)));
+  @Test public void testAttemptDirectionalAlgo() {
+    GameState southGS = XState.jsonToGameState(this.southMoveJson);
 
-    gs.movePenguin(new Coord(0, 1), new Coord(0, 2));
-    assertNull(XState.findLegalMove(this.gs, new Coord(0, 0)));
+    //This method either outputs a new, altered GameState, or the original gameState if no move has been made
+    GameState southOutput = XState.attemptDirectionalAlgoOnFirstPlayerFirstPenguin(southGS);
+    GameState falseOutput = XState.attemptDirectionalAlgoOnFirstPlayerFirstPenguin(this.falseMoveGameState);
+    GameState nwOutput = XState.attemptDirectionalAlgoOnFirstPlayerFirstPenguin(this.northWestMoveGameState);
+
+    //Test the equality of the input vs output:
+    assertNotEquals(southOutput, southGS);//Move has been made, so output no longer equals input GS
+    assertEquals(falseOutput, this.falseMoveGameState);//move has not been made, so the gamestate is the same
+    assertNotEquals(nwOutput, this.northWestMoveGameState);//move has been made, so output no longer equals input GS
   }
 
-  @Test public void adjustStateAfterMove() {
-    gs.movePenguin(new Coord(0, 0), new Coord(0, 2));
-    XState.adjustStateAfterMove(this.stateAsJson, this.gs,
-        new Coord(0, 0), new Coord(0, 2));
+  @Test public void getFirstPlayersFirstPenguin() {
+    GameState southGS = XState.jsonToGameState(this.southMoveJson);
+    Coord fpfpSouth = XState.getFirstPlayersFirstPenguin(southGS);
 
-    assertEquals(12, this.stateAsJson.getAsJsonArray("players")
-      .get(1).getAsJsonObject().getAsJsonPrimitive("score").getAsInt());
-    assertEquals(0, this.stateAsJson.getAsJsonArray("board")
-        .get(0).getAsJsonArray().get(0).getAsInt());
-    JsonArray out = new JsonArray();
-    out.add(2);
-    out.add(0);
-    assertEquals(out, this.stateAsJson.getAsJsonArray("players")
-        .get(1).getAsJsonObject().getAsJsonArray("places").get(0).getAsJsonArray());
+    Coord fpfpFalse = XState.getFirstPlayersFirstPenguin(this.falseMoveGameState);
+    Coord fpfpNW = XState.getFirstPlayersFirstPenguin(this.northWestMoveGameState);
 
+    assertEquals(new Coord(0, 0), fpfpSouth);
+    assertEquals(new Coord(0, 0), fpfpFalse);
+    assertEquals(new Coord(1, 3), fpfpNW); //Note the inverse row,col - the input is (3,1)
   }
 
-  @Test public void testAdjustStateAfterMove() {
-    gs.movePenguin(new Coord(0, 1), new Coord(0, 2));
-    XState.adjustStateAfterMove(this.stateAsJson, this.gs,
-        new Coord(0, 1), new Coord(0, 2));
+  @Test
+  public void testReconstructOnePlayerToJson() {
+    //Example of a player that doesnt end up moving:
+    InternalPlayer aPlayer = this.falseMoveGameState.getPlayers().get(0);
+    JsonObject actualJsonOutput = XState.reconstructPlayerToJson(aPlayer);
+    JsonArray playersArray = this.falseMoveJson.getAsJsonArray("players");
+    JsonObject expectedJsonOutput = playersArray.get(0).getAsJsonObject();
 
-    assertEquals(11, this.stateAsJson.getAsJsonArray("players")
-        .get(1).getAsJsonObject().getAsJsonPrimitive("score").getAsInt());
-    assertEquals(0, this.stateAsJson.getAsJsonArray("board")
-        .get(1).getAsJsonArray().get(0).getAsInt());
+    assertEquals(expectedJsonOutput, actualJsonOutput);
 
-    JsonArray out = new JsonArray();
-    out.add(2);
-    out.add(0);
-    assertEquals(out, this.stateAsJson.getAsJsonArray("players")
-        .get(1).getAsJsonObject().getAsJsonArray("places").get(0).getAsJsonArray());
-  }
+    //Example of a reconstruction of a player that has moved
+    GameState nwOutput = XState.attemptDirectionalAlgoOnFirstPlayerFirstPenguin(this.northWestMoveGameState);
+    //notice the player list has rotated, so now the red penguin is at index 1
+    actualJsonOutput = XState.reconstructPlayerToJson(nwOutput.getPlayers().get(1));
 
-  @Test public void updateBoardPosition() {
-    this.gs.movePenguin(new Coord(0,0), new Coord(0,2));
-    this.gs.movePenguin(new Coord(1, 0), new Coord(1,2));
-    XState.updateBoardPosition(this.stateAsJson, this.gs);
-    assertEquals(0, this.stateAsJson.getAsJsonArray("board")
-        .get(0).getAsJsonArray().get(0).getAsInt());
-
-    XState.updateBoardPosition(this.stateAsJson, this.gs);
-    assertEquals(0, this.stateAsJson.getAsJsonArray("board")
-        .get(0).getAsJsonArray().get(1).getAsInt());
-  }
-
-  @Test public void updatePlayerScore() {
-    JsonObject fp = this.stateAsJson.getAsJsonArray("players").get(0).getAsJsonObject();
-    gs.movePenguin(new Coord(0, 1), new Coord(0, 2));
-    XState.updatePlayerScore(fp, this.gs, new Coord(0, 2));
-
-    assertEquals(11, fp.getAsJsonPrimitive("score").getAsInt());
-  }
-
-  @Test public void testUpdatePlayerScore() {
-    JsonObject fp = this.stateAsJson.getAsJsonArray("players").get(0).getAsJsonObject();
-    gs.movePenguin(new Coord(0, 0), new Coord(0, 2));
-    XState.updatePlayerScore(fp, this.gs, new Coord(0, 2));
-
-    assertEquals(12, fp.getAsJsonPrimitive("score").getAsInt());
-  }
-
-  @Test public void updatePlayerPenguinPositions()  {
-    JsonObject fp = this.stateAsJson.getAsJsonArray("players").get(0).getAsJsonObject();
-    XState.updatePlayerPenguinPositions(fp, new Coord(3, 3));
-
-    JsonArray out = new JsonArray();
-    out.add(3);
-    out.add(3);
-    assertEquals(out, fp.getAsJsonArray("places").get(0).getAsJsonArray());
-
-    XState.updatePlayerPenguinPositions(fp, new Coord(1, 2));
-
-    out = new JsonArray();
-    out.add(2);
-    out.add(1);
-    assertEquals(out, fp.getAsJsonArray("places").get(0).getAsJsonArray());
-
+    assertEquals(14, actualJsonOutput.getAsJsonPrimitive("score").getAsInt());
+    assertEquals("red", actualJsonOutput.getAsJsonPrimitive("color").getAsString());
+    assertEquals(2, actualJsonOutput.getAsJsonArray("places").size());
   }
 
   @Test
   public void testReconstructStateToJson() {
-    JsonObject state = XState.reconstructStateToJson(this.gs);
+    GameState southGS = XState.jsonToGameState(this.southMoveJson);
+    GameState southOutput = XState.attemptDirectionalAlgoOnFirstPlayerFirstPenguin(southGS); //apply the move to the output
+    JsonObject outputStateAsJson = XState.reconstructStateToJson(southOutput);//reconstruct as json
 
-    assertEquals(6, state.getAsJsonArray("board").size());
-    assertEquals(2, state.getAsJsonArray("players").size());
-    assertEquals(2, state.entrySet().size());
+    assertEquals(2, outputStateAsJson.entrySet().size());
+    assertEquals(6, outputStateAsJson.getAsJsonArray("board").size());
+    assertEquals(2, outputStateAsJson.getAsJsonArray("players").size());
+
+    JsonArray boardArray = outputStateAsJson.getAsJsonArray("board");
+    assertEquals(0,
+        boardArray.get(0).getAsJsonArray().get(0).getAsJsonPrimitive().getAsInt());//check the hole was made from the move
+    assertEquals(5,
+        boardArray.get(2).getAsJsonArray().get(0).getAsJsonPrimitive().getAsInt());//check the destination Tile is not a hole
+
+    JsonArray playersArray = outputStateAsJson.getAsJsonArray("players");
+    JsonObject whitePlayer = playersArray.get(0).getAsJsonObject();
+    assertEquals("white", whitePlayer.getAsJsonPrimitive("color").getAsString());//check that the players rotated
+    JsonObject redPlayer = playersArray.get(1).getAsJsonObject();
+    assertEquals("red", redPlayer.getAsJsonPrimitive("color").getAsString());//check that the players rotated
+
+    assertEquals(12, redPlayer.getAsJsonPrimitive("score").getAsInt());//check the score was updated
+
+    JsonArray listOfPosn = redPlayer.getAsJsonArray("places");
+    JsonArray onePosn = listOfPosn.get(0).getAsJsonArray();
+    int rowNum = onePosn.get(0).getAsJsonPrimitive().getAsInt();
+    int colNum = onePosn.get(1).getAsJsonPrimitive().getAsInt();
+    assertEquals(2, rowNum);//check places was updated
+    assertEquals(0, colNum);//check places was updated
   }
 
-  @Test
-  public void testCreatePlayerObject() {
-    JsonObject p1 = XState.createPlayerObject(this.gs.getPlayers().get(0), this.gs);
-
-    assertEquals(10, p1.getAsJsonPrimitive("score").getAsInt());
-    assertEquals("red", p1.getAsJsonPrimitive("color").getAsString());
-    assertEquals(2, p1.getAsJsonArray("places").size());
-  }
-
-  @Test
-  public void testCreateBoard() {
-    JsonArray board = XState.createBoardJson(this.gs);
-
-    assertEquals(6, board.size());
-    assertEquals(3, board.get(0).getAsJsonArray().size());
-
-    assertEquals(5, board.get(2).getAsJsonArray().get(2).getAsInt());
-    assertEquals(3, board.get(4).getAsJsonArray().get(1).getAsInt());
-  }
-
-  @Test
-  public void testPadOutBoard() {
-    JsonArray board = XState.createBoardJson(this.smallGameState);
-
-    assertEquals(3, board.size());
-    assertEquals(3, board.get(2).getAsJsonArray().size());
-
-    assertEquals(0, board.get(2).getAsJsonArray().get(1).getAsInt());
-
-  }
 
   @Test
   public void testThereAndBackAgain() {
-    assertEquals(this.stateAsJson, XState.reconstructStateToJson(this.gs));
+    GameState southGS = XState.jsonToGameState(this.southMoveJson);
+    assertEquals(this.southMoveJson, XState.reconstructStateToJson(southGS));
   }
+
+  @Test
+  public void getAsPlayerColor() {
+    assertEquals(PlayerColor.WHITE, XState.getAsPlayerColor("white"));
+    assertEquals(PlayerColor.RED, XState.getAsPlayerColor("red"));
+    assertEquals(PlayerColor.BLACK, XState.getAsPlayerColor("black"));
+    assertEquals(PlayerColor.BROWN, XState.getAsPlayerColor("brown"));
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void getPlayerColorBadInput() {
+    XState.getAsPlayerColor("blue");
+  }
+
+
+
+
+
+
+////Tests for old method of constructing output JSON
+
+//  @Test public void adjustStateAfterMove() {
+//    gs.movePenguin(new Coord(0, 0), new Coord(0, 2));
+//    XState.adjustStateAfterMove(this.southMoveJson, this.gs,
+//        new Coord(0, 0), new Coord(0, 2));
+//
+//    assertEquals(12, this.southMoveJson.getAsJsonArray("players")
+//      .get(1).getAsJsonObject().getAsJsonPrimitive("score").getAsInt());
+//    assertEquals(0, this.southMoveJson.getAsJsonArray("board")
+//        .get(0).getAsJsonArray().get(0).getAsInt());
+//    JsonArray out = new JsonArray();
+//    out.add(2);
+//    out.add(0);
+//    assertEquals(out, this.southMoveJson.getAsJsonArray("players")
+//        .get(1).getAsJsonObject().getAsJsonArray("places").get(0).getAsJsonArray());
+//
+//  }
+//
+//  @Test public void testAdjustStateAfterMove() {
+//    gs.movePenguin(new Coord(0, 1), new Coord(0, 2));
+//    XState.adjustStateAfterMove(this.southMoveJson, this.gs,
+//        new Coord(0, 1), new Coord(0, 2));
+//
+//    assertEquals(11, this.southMoveJson.getAsJsonArray("players")
+//        .get(1).getAsJsonObject().getAsJsonPrimitive("score").getAsInt());
+//    assertEquals(0, this.southMoveJson.getAsJsonArray("board")
+//        .get(1).getAsJsonArray().get(0).getAsInt());
+//
+//    JsonArray out = new JsonArray();
+//    out.add(2);
+//    out.add(0);
+//    assertEquals(out, this.southMoveJson.getAsJsonArray("players")
+//        .get(1).getAsJsonObject().getAsJsonArray("places").get(0).getAsJsonArray());
+//  }
+//
+//  @Test public void updateBoardPosition() {
+//    this.gs.movePenguin(new Coord(0,0), new Coord(0,2));
+//    this.gs.movePenguin(new Coord(1, 0), new Coord(1,2));
+//    XState.updateBoardPosition(this.southMoveJson, this.gs);
+//    assertEquals(0, this.southMoveJson.getAsJsonArray("board")
+//        .get(0).getAsJsonArray().get(0).getAsInt());
+//
+//    XState.updateBoardPosition(this.southMoveJson, this.gs);
+//    assertEquals(0, this.southMoveJson.getAsJsonArray("board")
+//        .get(0).getAsJsonArray().get(1).getAsInt());
+//  }
+//
+//  @Test public void updatePlayerScore() {
+//    JsonObject fp = this.southMoveJson.getAsJsonArray("players").get(0).getAsJsonObject();
+//    gs.movePenguin(new Coord(0, 1), new Coord(0, 2));
+//    XState.updatePlayerScore(fp, this.gs, new Coord(0, 2));
+//
+//    assertEquals(11, fp.getAsJsonPrimitive("score").getAsInt());
+//  }
+//
+//  @Test public void testUpdatePlayerScore() {
+//    JsonObject fp = this.southMoveJson.getAsJsonArray("players").get(0).getAsJsonObject();
+//    gs.movePenguin(new Coord(0, 0), new Coord(0, 2));
+//    XState.updatePlayerScore(fp, this.gs, new Coord(0, 2));
+//
+//    assertEquals(12, fp.getAsJsonPrimitive("score").getAsInt());
+//  }
+//
+//  @Test public void updatePlayerPenguinPositions()  {
+//    JsonObject fp = this.southMoveJson.getAsJsonArray("players").get(0).getAsJsonObject();
+//    XState.updatePlayerPenguinPositions(fp, new Coord(3, 3));
+//
+//    JsonArray out = new JsonArray();
+//    out.add(3);
+//    out.add(3);
+//    assertEquals(out, fp.getAsJsonArray("places").get(0).getAsJsonArray());
+//
+//    XState.updatePlayerPenguinPositions(fp, new Coord(1, 2));
+//
+//    out = new JsonArray();
+//    out.add(2);
+//    out.add(1);
+//    assertEquals(out, fp.getAsJsonArray("places").get(0).getAsJsonArray());
+//
+//  }
 }

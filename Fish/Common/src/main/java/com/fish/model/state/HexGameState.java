@@ -15,6 +15,7 @@ import java.util.Map;
  *
  * GameState Interpretations:
  *
+ * -----gameStage-----
  * GameStage.NOT_STARTED:
  *   The 'waiting room' stage wherein a GameState (or simply just a game) has been instantiated
  *   but the referee is waiting for players to gather. Therefore, when a HxGameState is instantiated
@@ -32,14 +33,18 @@ import java.util.Map;
  * GameStage.GAMEOVER:
  *   Once no player can make a valid move, the game is over.
  *
- * Players is a list of InternalPlayers where each element represents one internal players of this
- * game. Each player has a PlayerColor, an int representing the player's score, and a list of
- * Coord objects representing the locations of their penguins on the board.
+ * -----players-----
+ * Players is a list of InternalPlayer where each element represents one internal player of this game.
+ * Each player has a PlayerColor, an int of the player's score, and a list of Coord objects
+ * representing the locations of their penguins on the board.
  * The Players list must be passed into initGame in the order of player turns. As turns advance, the
  * players list is cycled around so that the current player is always at index zero.
+ * If a player has no moves, their turn is skipped using the skipPlayerIfNoMoves() method.
+ * If multiple players in a row have no moves, they will all be skipped.
  *
+ * -----gameBoard-----
  * Gameboard is a GameBoard object representing the collection of tiles the game is played on.
- * The gameboard must also be passed into initGame in order to create the collection of Tiles the
+ * The gameBoard must be passed into initGame in order to generate the collection of Tiles the
  * game is played on.
  *
  */
@@ -253,7 +258,7 @@ public class HexGameState implements GameState {
   }
 
   /**
-   * If the game has ended, returns the list of winners.
+   * Returns the list of winners.
    * The list may have one playerColor on it, or if there is a tie then the list includes all
    * tied winners.
    * @return a list of playerColor of winners
@@ -308,7 +313,9 @@ public class HexGameState implements GameState {
   //Info about penguins
 
   /**
-   * Get the current locations of penguins on the board
+   * Returns a HashMap of penguin locations, formatted such that
+   * the Coord is the unique key (since only one penguin can be on a tile at a time) and
+   * the PlayerColor is the value, to identify which player's penguin is on that location.
    *
    * @return (Map<Coord, PlayerColor>) the current penguin locations on the board
    */
@@ -322,6 +329,27 @@ public class HexGameState implements GameState {
       }
     }
     return allPenguinLocs;
+  }
+
+  /**
+   * Given a PlayerColor, returns a list of Coord locations of all that player's penguins on the
+   * board.
+   * May return an empty list if:
+   *  -- the player with the given player color has not placed any penguins or
+   *  -- the given player color is not in this game
+   *     (eg it is RED but there are no red avatars in this particular game at this time)
+   *
+   * @param playerColor the PlayerColor to search for penguin locations
+   * @return a list of Coords representing that player's penguin locations
+   */
+  @Override
+  public List<Coord> getPenguinLocationsOf(PlayerColor playerColor) {
+    for (InternalPlayer ip : players) {
+      if (ip.getColor() == playerColor) {
+        return ip.getPenguinLocs();
+      }
+    }
+    return new ArrayList<>();
   }
 
   //Info about Players
@@ -361,13 +389,25 @@ public class HexGameState implements GameState {
     throw new IllegalArgumentException("HexPlayer not found");
   }
 
-
   //Info about Board
+
+  /**
+   * Returns a copy of this GameState's current Gameboard
+   * @return a GameBoard object of the current collection of tiles in the playable game
+   */
+  @Override
+  public GameBoard getGameBoard() {
+    return this.gameBoard.getCopyGameBoard();
+  }
 
   /**
    * Get the tile at the given location on the board.
    * The getTileAt method in the board handles errors when the given Coord has negative or
    * out of bounds inputs.
+   * Use:
+   *  -- tile.getnumFish() -> returns an int representing the number of fish on the Tile
+   *  -- tile.isPresent() -> returns a boolean determining whether the Tile is a hole (false)
+   *        or is present (true)
    *
    * @param loc (Coord) the coordinate location of the desired Tile
    * @return (Tile) the tile at the given location

@@ -20,7 +20,7 @@ import java.util.Random;
  * value represents the row number.
  *
  * <p>
- *  The Coordinate system for a hexagonal game is used as follows:
+ *  The Coordinate system for a hexGameBoard is designed as follows:
  *
  *    ,--.     >--.
  *   /    \___/    \___
@@ -47,8 +47,14 @@ import java.util.Random;
  * But in this implementation the later is used throughout because the method implements checks that
  * enforce the Tile object being retrieved is in fact on this board.
  *
- * Finally, the Random object in the rand field is used to generate a constant board for testing
- * purposes through the use of a random seed of 1 in all our testing.
+ * This implementation assumes that the game is always initiated as a rectangular board,
+ * hence the width and height fields. Technically, if a circular board is desired, this is made
+ * possible using the constructor that takes in a list of Coords of where holes should be initiated
+ * on the board. Just initiate holes around the pointed edges of the rectangular representation
+ * to create a circular playing field.
+ *
+ * Finally, the Random object in the rand field is used to generate constant boards for testing
+ * purposes through the use of a random seed.
  */
 public class HexGameBoard implements GameBoard {
 
@@ -60,7 +66,7 @@ public class HexGameBoard implements GameBoard {
   private static final int MAX_FISH = 5;
 
   /**
-   * Constructor to build a hex game board with randomized fish numbers per tile.
+   * Constructor to build a hexGameBoard with randomized fish numbers per tile.
    * @param rows the number of rows of tiles on the board
    * @param cols the number of columns of tiles on the board
    * @param holes a list of the specific location of holes in the initial board
@@ -83,7 +89,7 @@ public class HexGameBoard implements GameBoard {
   }
 
   /**
-   * Constructor to build a general game board with no holes and the same number of fish
+   * Constructor to build a hexGameBoard with no holes and the same number of fish
    * on every tile.
    * @param rows the number of rows of tiles on the board
    * @param cols the number of columns of tiles on the board
@@ -132,7 +138,7 @@ public class HexGameBoard implements GameBoard {
    * Takes in a 2d Array of int where each int represents the num fish on a Tile, and
    * instantiates a board with those fish values at the corresponding Coord location.
    * Note that the 2d Array needs to be set up such that the x is the column number and
-   * y is the row number.
+   * y is the row number, similar to the 2dArray example in the HexGameBoard class javadoc above.
    * @param values a 2d Array of integers, where each int represents the number of fish on a tile
    */
   public HexGameBoard(int[][] values) {
@@ -298,7 +304,7 @@ public class HexGameBoard implements GameBoard {
    */
   @Override
   public Tile getTileAt(Coord loc) throws IllegalArgumentException {
-    checkTileInBounds(loc, "Cannot retrieve a tile not on the board");
+    checkTileInBounds(loc, "This tile is out of bounds");
     return tiles[loc.getX()][loc.getY()];
   }
 

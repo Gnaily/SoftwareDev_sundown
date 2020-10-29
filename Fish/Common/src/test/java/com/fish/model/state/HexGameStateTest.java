@@ -7,6 +7,7 @@ import com.fish.model.tile.Tile;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -247,6 +248,38 @@ public class HexGameStateTest {
     assertEquals(PlayerColor.WHITE, this.twoPlayerGame.getCurrentPlayer());
   }
 
+  ///////////PENGUIN RETRIEVING - both individually and for an entire state
+
+  @Test
+  public void testGetPenguinLocations() {
+    //This returns a map of Coord to PlayerColor, so construct the expected hashmap:
+    Map<Coord, PlayerColor> penguinLocs = new HashMap<>();
+    penguinLocs.put(new Coord(0,1), PlayerColor.BROWN);
+    penguinLocs.put(new Coord(0,2), PlayerColor.BLACK);
+    penguinLocs.put(new Coord(0,3), PlayerColor.WHITE);
+    penguinLocs.put(new Coord(1,2), PlayerColor.RED);
+
+    assertEquals(penguinLocs, this.fourPlayerGame.getPenguinLocations());
+  }
+
+  @Test
+  public void testGetOnePlayersPenguinLocations() {
+    //Coord (1,2) has been added to White's penguin list above in the setup method
+    this.twoPlayerGame.placePenguin(new Coord(0, 2), PlayerColor.WHITE);
+    this.twoPlayerGame.advanceToNextPlayer();
+    this.twoPlayerGame.placePenguin(new Coord(0, 4), PlayerColor.WHITE);
+
+    //This returns a list of Coord, so construct the expected hashmap:
+    List<Coord> whitesPenguinLocs = new ArrayList<>();
+    whitesPenguinLocs.add(new Coord(1,2));
+    whitesPenguinLocs.add(new Coord(0,2));
+    whitesPenguinLocs.add(new Coord(0,4));
+
+    assertEquals(whitesPenguinLocs, this.twoPlayerGame.getPenguinLocationsOf(PlayerColor.WHITE));
+    //Test getting a player who isn't in the game returns an empty list
+    assertEquals(new ArrayList<>(), this.twoPlayerGame.getPenguinLocationsOf(PlayerColor.BROWN));
+  }
+
   ////////////PLAYER HANDLING
 
   @Test
@@ -300,7 +333,34 @@ public class HexGameStateTest {
     assertEquals(PlayerColor.RED, strandedExample.getCurrentPlayer());
     //At this point, RED is the only penguin left with any turns, so it should continue being red's turn
     assertEquals(PlayerColor.RED, strandedExample.getCurrentPlayer());
+  }
 
+  @Test
+  public void testNoMovesFromState() {
+    //If a game starts out and no moves can be made by any penguin:
+
+    //Step 1: create a board situation that will cause 4 out of 4 players to get stranded:
+    GameState strandedExample = new HexGameState();
+    // Four Players:
+    List<InternalPlayer> fourPlayers = new ArrayList<>(Arrays.asList(
+        new HexPlayer(PlayerColor.BROWN), new HexPlayer(PlayerColor.BLACK),
+        new HexPlayer(PlayerColor.WHITE), new HexPlayer(PlayerColor.RED)));
+
+    //Board: 8 rows x 3 columns; holes from holes list
+    strandedExample.initGame(new HexGameBoard(4, 1, new ArrayList<>(), 1,
+            1), fourPlayers);
+
+    //Place Penguins
+    strandedExample.placePenguin(new Coord(0, 0), PlayerColor.BROWN); // stranded
+    strandedExample.placePenguin(new Coord(0, 1), PlayerColor.BLACK); // stranded
+    strandedExample.placePenguin(new Coord(0, 2), PlayerColor.WHITE); // stranded
+    strandedExample.placePenguin(new Coord(0, 3), PlayerColor.RED);  // stranded
+
+    strandedExample.startPlay();
+
+    //Test that the gameStage is GAMEOVER and that the current player never advanced at all
+    assertEquals(PlayerColor.BROWN, strandedExample.getCurrentPlayer());
+    assertEquals(GameStage.GAMEOVER, strandedExample.getGameStage());
   }
 
   @Test
@@ -468,6 +528,20 @@ public class HexGameStateTest {
 
   /////Tests for Tile Handling
   @Test
+  public void testGetBoard() {
+    GameBoard gb = this.twoPlayerGame.getGameBoard();
+    int[][] actualTileValues = gb.getBoardDataRepresentation();
+
+    //create a 2-d Array in our Coord structure
+    int[][] expectedTileValues =
+        {{1, 1, 1, 5, 4, 1},
+            {1, 4, 5, 4, 5, 2}};
+
+    //Confirm that the copy returns the board with accurate fish nums
+    assertArrayEquals(expectedTileValues, actualTileValues);
+  }
+
+  @Test
   public void testGetTileAtValid() {
     assertEquals(3, this.fourPlayerGame.getTileAt(new Coord(0, 1)).getNumFish());
     assertEquals(1, this.fourPlayerGame.getTileAt(new Coord(1, 0)).getNumFish());
@@ -509,8 +583,12 @@ public class HexGameStateTest {
 
   @Test
   public void testEqualsCopy() {
+    //Make a copy
     GameState gs = this.twoPlayerGame.getCopyGameState();
+    //Test that they are the same
     assertEquals(gs, this.twoPlayerGame);
+    //Test that our equals method works
+    assertTrue(gs.equals(this.twoPlayerGame));
   }
 
   @Test
@@ -530,10 +608,14 @@ public class HexGameStateTest {
     this.constantFishNumGame.startPlay();
 
     assertEquals(gs, this.constantFishNumGame);
+    assertTrue(gs.equals(this.constantFishNumGame));
+
     gs.movePenguin(new Coord(0, 0), new Coord(0, 2));
     assertNotEquals(gs, this.constantFishNumGame);
+    assertFalse(gs.equals(this.twoPlayerGame));
 
     this.constantFishNumGame.movePenguin(new Coord(0, 0), new Coord(0, 2));
     assertEquals(gs, this.constantFishNumGame);
+    assertTrue(gs.equals(this.constantFishNumGame));
   }
 }

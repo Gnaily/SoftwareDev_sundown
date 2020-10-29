@@ -1,5 +1,7 @@
 package com.fish.json;
 
+import com.fish.model.state.GameState;
+import com.fish.model.tile.Tile;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -25,57 +27,78 @@ public class XBoard {
     //grab the input from STD in
     Scanner scan = new Scanner(System.in);
     //create a JasonArray Java object whose elements are each JSON object from STD in
-    JsonArray xJson = XJson.processInput(scan);
-    //Grab the first JSON object, which is the board represented in JSON
-    JsonObject obj = xJson.get(0).getAsJsonObject();
+    JsonArray inputArray = XJson.processInput(scan);
+    //Grab the first (and only) JSON object, which is the board represented in JSON
+    JsonObject obj = inputArray.get(0).getAsJsonObject();
 
     //////HANDLE "board" INPUT
-    //turn that into an actual 2D array board representation in Java
-    int[][] values = getTileValues(obj, "board");
-    //Create the GameBoard object with the values from the JSON input
-    GameBoard gb = new HexGameBoard(values);
+    //Turn the Json representation of a board INTO a GameBoard object
+    GameBoard gameBoard = jsonToGameBoard(obj);
 
     //////HANDLE "position" INPUT
-    Coord start = getStartingCoordinate(obj, "position");
-    int numTilesReachableFromPosn = gb.getTilesReachableFrom(start, new ArrayList<>()).size();
+    //Turn the Json representation of a position INTO a Coord object (our position structure)
+    Coord origin = jsonToCoord(obj);
 
-    //Print the number of tiles reachable from
+    //Now calculate the desired output, and do not consider that there are any penguins on the board,
+    //(hence the empty array of penguin locs passed into getTilesReachableFrom)
+    int numTilesReachableFromPosn = getTilesReachableFromPosn(gameBoard, origin);
+
+    //Print the number of tiles reachable from the given position
     System.out.println(numTilesReachableFromPosn);
   }
 
   /**
-   * Assumes well-formatted JSON as specified in the testing guidelines. Turns the given JSON object's
-   *  "board" field into a 2D array of ints to be used for board creation
+   * Quickly calculate the number of tiles reachable from the input posn
+   * Separated out here in order to test this functionality
    *
-   * @param jsonObject (JsonObject) The properly formatted JSON object
+   * @param gameBoard the gameboard to test the reachable tiles from
+   * @param origin the Coordinate point of origin
+   * @return the number of tiles reachable from the origin in valid moves
+   */
+  static int getTilesReachableFromPosn(GameBoard gameBoard, Coord origin) {
+    return gameBoard.getTilesReachableFrom(origin, new ArrayList<>()).size();
+  }
+
+  /**
+   * Assumes well-formatted JSON as specified in the testing guidelines.
+   * Turns the given JSON object's "board" field into a GameBoard object.
+   *
+   * @param boardAsJsonObject (JsonObject) The properly formatted JSON object
    * @return (int[][]) 2D array of ints representing tile values
    */
-  static int[][] getTileValues(JsonObject jsonObject, String key) {
+  static GameBoard jsonToGameBoard(JsonObject boardAsJsonObject) {
+    JsonArray boardInputArray = boardAsJsonObject.getAsJsonArray("board");
 
-    JsonArray array = jsonObject.getAsJsonArray(key);
-
-    if (array.size() == 0) {
-      return new int[0][0];
+    //Base case - an empty board
+    if (boardInputArray.size() == 0) {
+      return new HexGameBoard(new int[0][0]); //will return a the desired exception that this input is too small
     }
 
-    int cols = findMaxLengthInArray(array);
+    //Make up for holes that are omitted from the json representation
+    int cols = findMaxLengthInArray(boardInputArray);
+    //Create the 2-d Array of values, initialized like OUR Coord-based representation of the board.
+    int[][] coordValuesArray = new int[cols][boardInputArray.size()];
 
-    int[][] values = new int[cols][array.size()];
-
-    for (int ii = 0; ii < array.size(); ii++) {
-      JsonArray row = array.get(ii).getAsJsonArray();
+    //Note that our Coord-based system is inverted compared to the testing harness's system.
+    //Here, we do the inverting in order to set up our GameBoard object.
+    //Their representation == boardArray
+    //Our representation == valuesArray
+    for (int ii = 0; ii < boardInputArray.size(); ii++) {
+      JsonArray row = boardInputArray.get(ii).getAsJsonArray();
 
       for (int jj = 0; jj < cols; jj++) {
         if (jj >= row.size()) {
-          values[jj][ii] = 0;
+          //invert:
+          coordValuesArray[jj][ii] = 0;
         }
         else {
-          values[jj][ii] = row.get(jj).getAsInt();
+          //invert:
+          coordValuesArray[jj][ii] = row.get(jj).getAsInt();
         }
 
       }
     }
-    return values;
+    return new HexGameBoard(coordValuesArray);
   }
 
   /**
@@ -98,16 +121,68 @@ public class XBoard {
 
 
   /**
-   * Assuming well-formatted JSON, parse the position field into a coordinate
+   * Assuming well-formatted JSON, parse the position field into a Coord object.
+   * Note again that the given json input structure is the inverse of ours.
+   * Eg:
+   * INPUT "position": [1,5] corresponds to
+   * COORD Coord(5,1)
+   *
+   * For this reason, the second element of the positionInputArray is the x value of the Coord
+   * and the first element of the positionInputArray is the y value.
    *
    * @param obj (JsonObject) JSON object containing position field to turn into a coordinate
    * @return (Coord) the coordinate found in the json object
    */
-  static Coord getStartingCoordinate(JsonObject obj, String key) {
-    JsonArray array = obj.getAsJsonArray(key);
+  static Coord jsonToCoord(JsonObject obj) {
+    JsonArray positionInputArray = obj.getAsJsonArray("position");
 
     return new Coord(
-            array.get(0).getAsInt(),
-            array.get(1).getAsInt());
+        positionInputArray.get(1).getAsInt(),
+        positionInputArray.get(0).getAsInt());
+  }
+
+  /**
+   * Assuming well-formatted JSON, parse the position field into a Coord object.
+   * Note again that the given json input structure is the inverse of ours.
+   * Eg:
+   * INPUT "position": [1,5] corresponds to
+   * COORD Coord(5,1)
+   *
+   * For this reason, the second element of the positionInputArray is the x value of the Coord
+   * and the first element of the positionInputArray is the y value.
+   *
+   * Note this method is different from the previous in that it takes in a JsonArray,
+   * instead of a JsonObject.
+   *
+   * @param jsonArray (JsonArray) JSON array containing position field to turn into a coordinate
+   * @return (Coord) the coordinate found in the json object
+   */
+  static Coord jsonToCoord(JsonArray jsonArray) {
+    return new Coord(
+        jsonArray.get(1).getAsInt(),
+        jsonArray.get(0).getAsInt());
+  }
+
+  /**
+   * Transforms a given gameBoard into a JSON representtion
+   * @param gameBoard the gameboard to transform
+   * @return a JSON Array of the board
+   */
+  static JsonArray boardToJson(GameBoard gameBoard) {
+    JsonArray board = new JsonArray();
+    for (int ii = 0; ii < gameBoard.getHeight(); ii++) {
+      JsonArray row = new JsonArray();
+      for (int jj = 0; jj < gameBoard.getWidth(); jj++) {
+        Tile t = gameBoard.getTileAt(new Coord(jj, ii));
+        if (t.isPresent()) {
+          row.add(t.getNumFish());
+        }
+        else {
+          row.add(0);
+        }
+      }
+      board.add(row);
+    }
+    return board;
   }
 }
