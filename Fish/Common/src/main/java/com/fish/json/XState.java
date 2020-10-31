@@ -2,6 +2,7 @@ package com.fish.json;
 
 import com.fish.model.Coord;
 import com.fish.model.board.GameBoard;
+import com.fish.model.board.ProtectedGameBoard;
 import com.fish.model.state.*;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -150,8 +151,8 @@ public class XState {
    */
   static Coord getFirstPlayersFirstPenguin(GameState gameState) {
     //Get the first player's first penguin location:
-    List<InternalPlayer> players = gameState.getPlayers();
-    InternalPlayer firstPlayer = players.get(0);
+    List<ProtectedPlayer> players = gameState.getPlayers();
+    ProtectedPlayer firstPlayer = players.get(0);
     return firstPlayer.getPenguinLocs().get(0);
   }
 
@@ -196,7 +197,7 @@ public class XState {
 
     //////HANDLE PLAYERS JSON
     JsonArray playersArray = new JsonArray();
-    for (InternalPlayer p : gs.getPlayers()) {
+    for (ProtectedPlayer p : gs.getPlayers()) {
       playersArray.add(reconstructPlayerToJson(p));
     }
 
@@ -214,7 +215,7 @@ public class XState {
    * @param p the internal player data
    * @return a JsonObject with the player's information
    */
-  static JsonObject reconstructPlayerToJson(InternalPlayer p) {
+  static JsonObject reconstructPlayerToJson(ProtectedPlayer p) {
     JsonObject onePlayerJsonObject = new JsonObject();
 
     //construct color in json

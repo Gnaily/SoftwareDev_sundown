@@ -1,6 +1,7 @@
 package com.fish.model.board;
 
 import com.fish.model.Coord;
+import com.fish.model.tile.ProtectedTile;
 import com.fish.model.tile.Tile;
 
 import java.util.List;
@@ -8,75 +9,45 @@ import java.util.List;
 /**
  * Interface for a GameBoard object in a game of Hey, That's my Fish! (HTMF)
  *
- * Interpretation: The GameBoard object is a collection of Tile objects that represent the tiles
- * used to play out a game of HTMF.
+ * DATA DEFINITION:
+ * A data structure used to maintain the state of the collection of Tile that represent the playable
+ * game board in a game of HTMF.
  *
- * The user of this interface has control over how to generate the precise design of the
- * board, including the shape of the tiles, determining the number of fish on tiles, and where
- * holes are initiated.
- * An implementation of a GameBoard object must handle identifying the location of tiles,
- * removing tiles, calculating valid moves from each Tile location in a game, and
- * generating defensive copies of the board.
- * The location of tiles on the board layout is specifically identified using Coord objects,
- * which contains one x and one y value that is used to point to the exact point of the board
- * data representation where the desired Tile lives.
+ * GameBoard extends ProtectedGameBoard, a read-only version of the GameBoard interface.
+ * When communicating with external players, only Protected versions of objects are shared.
+ *
+ * An implementation of a GameBoard object must contain
+ * --a data structure to represent the collection of tiles
+ * and have mechanisms to
+ * --determine which tiles are reachable from other other tiles in a valid move
+ * --retrieve data about a particular Tile in a precise location,
+ * --alter the Tiles as the game proceeds.
+ * The location of tiles on the visible board layout is identified using Coord objects,
+ * which contain one x value (column number) and one y value (row number).
+ *
+ * INTERPRETATION:
+ * The collection of tiles that a game of HTMF is played on and their current states.
  */
-public interface GameBoard {
-
-  /**
-   * Given a coordinate of origin, returns a list of all possible coordinates a player can
-   * make a valid move to from the origin.
-   * @param start the coord of origin
-   * @param penguinLocs the location of all penguins on the board
-   * @return a list of Coord indicating the possible valid moves
-   * @throws IllegalArgumentException if the coord of origin is out of bounds or is a hole
-   */
-  List<Coord> getTilesReachableFrom(Coord start, List<Coord> penguinLocs);
+public interface GameBoard extends ProtectedGameBoard {
 
   /**
    * Given a coordinate location within the dimensions of the game board,
-   * returns the Tile object at that coordinate location.
-   * @param loc the coordinate location of the desired tile on the board
-   * @return the Tile object at that location
-   * @throws IllegalArgumentException if the requested tile is out of the bounds of the board
-   */
-  Tile getTileAt(Coord loc);
-
-  /**
-   * Given a coordinate location within the dimensions of the game board,
-   * removes the tile from that coordinate location on the board, replacing it with null,
-   * and returns the Tile.
+   * turns that Tile into a hole by altering its isPresent boolean to False.
+   * Returns the tile as a ProtectedTile so that it is immutable but can be sent to an external
+   * player to know the number of fish at that tile.
+   *
    * @param loc the coordinate location of the tile to remove on the board
-   * @return the Tile object at that location
+   * @return the ProtectedTile object at that location
    * @throws IllegalArgumentException if the requested tile is out of bounds or is already a hole
-   * on the board, represented by a null value
+   * on the board
    */
-  Tile removeTileAt(Coord loc) throws IllegalArgumentException;
+  ProtectedTile removeTileAt(Coord loc) throws IllegalArgumentException;
 
   /**
-   * Returns a copy of the gameboard by constructing a new version
-   * @return a GameBoard with all of the relevant information copied over
+   * Returns a deep copy of the GameBoard
+   * @return a deep copy of this gameBoard
    */
   GameBoard getCopyGameBoard();
-
-  /**
-   * Constructs a 2dArray of integers that represent the number of fish on the Tile at location
-   * Coord(jj, ii), where ii and jj directly correlate to the indices of a 2dArray[ii][jj]
-   * @return a 2dArray of integers
-   */
-  int[][] getBoardDataRepresentation();
-
-  /**
-   * Returns the width of the game board, defined by the number of columns on the visual board.
-   * @return an int with the width
-   */
-  int getWidth();
-
-  /**
-   * Returns the height of the game board, defined by the number of rows on the visual board.
-   * @return an int with the height
-   */
-  int getHeight();
 
 
 }

@@ -3,7 +3,8 @@ package com.fish.model.state;
 
 import com.fish.model.Coord;
 import com.fish.model.board.GameBoard;
-import com.fish.model.tile.Tile;
+import com.fish.model.board.ProtectedGameBoard;
+import com.fish.model.tile.ProtectedTile;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,9 +14,12 @@ import java.util.Map;
 /**
  * Implementation for a GameState object in a game of Hey, That's my Fish! (HTMF)
  *
- * GameState Interpretations:
+ * GameState Data Definitions:
  *
  * -----gameStage-----
+ * The enforcing of the gameStage is used to signal to the referee whether a player is taking
+ * an action at the wrong TIME during a game, making it illegal.
+ *
  * GameStage.NOT_STARTED:
  *   The 'waiting room' stage wherein a GameState (or simply just a game) has been instantiated
  *   but the referee is waiting for players to gather. Therefore, when a HxGameState is instantiated
@@ -41,6 +45,11 @@ import java.util.Map;
  * players list is cycled around so that the current player is always at index zero.
  * If a player has no moves, their turn is skipped using the skipPlayerIfNoMoves() method.
  * If multiple players in a row have no moves, they will all be skipped.
+ * Note that while it is possible to retrieve a list of ProtectedPlayer for query of individual
+ * player stats based on the ProtectedPlayer data format,
+ * most of our player stat retrieval methods handle PlayerColors, as we assume it will be easier
+ * for other players to keep track of their opponents by color rather than by internal player
+ * data representations.
  *
  * -----gameBoard-----
  * Gameboard is a GameBoard object representing the collection of tiles the game is played on.
@@ -56,8 +65,9 @@ public class HexGameState implements GameState {
 
 
   /**
-   * Initiates a game of HTMF that has not been started.
-   * The next step must be to called initGame() to initialize the board and players.
+   * Constructs a game of HTMF that has not been started (see gameStage explanations above).
+   * Does not instantiate the gameBoard nor the players.
+   * The next step must be to call initGame() to initialize the board and players.
    */
   public HexGameState() {
     this.gameStage = GameStage.NOT_STARTED;
@@ -70,14 +80,11 @@ public class HexGameState implements GameState {
    * The constructor allows for the initialization of a controlled GameBoard, such that:
    *  -- holes and num fish values are intentionally picked
    *  -- penguins are already placed on board (via placing penguins in each individual Player object's list)
-   *  -- the current player is at index zero of the player list
+   *  -- the desired current player is at index zero of the player list, and the list is ordered by player turn.
    *
-   * This allows one to construct a GameState that represents a snapshot of the middle of a game.
-   * This is also used by the copyGameState method to make copies of each of the fields and generate
-   * the copied GameState as it is in the middle of the ongoing game.
    * @param gameStage the current stage of the game
-   * @param players the players in order of player-turn
-   * @param board the GameBoard on which the game is playing
+   * @param players the players in order of player-turn with current player at index 0
+   * @param board the GameBoard on which the game is proceeding
    */
   public HexGameState(GameStage gameStage, GameBoard board, List<InternalPlayer> players) {
     this.gameStage = gameStage;
@@ -89,8 +96,11 @@ public class HexGameState implements GameState {
 
   /**
    * Constructs the GameBoard and ordered Players list to carry out a game of HTMF and
-   * moves the gameStage to the next stage, PLACING_PENGUINS,
-   * which allows players to start placing their penguins in order of player turn.
+   * moves the gameStage to the next stage, PLACING_PENGUINS
+   * (see gameStage explanations in class javaDoc)
+   *
+   * This method may be used by the referee to initialize a game once the referee has chosen
+   * the board setup and received players from the tournament manager.
    * @param board (GameBoard) the board to construct for the game
    * @param players (List of Players) the list of players involved in the game
    */
@@ -133,7 +143,13 @@ public class HexGameState implements GameState {
   /////////////////////////////////ADVANCE TO IN_PLAY
 
   /**
-   * Advances the game stage to IN_PLAY in order to enable game play to proceed.
+   * Converts the gameStage to IN_PLAY (see gameStage explanations in class javaDoc).
+   * The enforcing of the gameStage is used to signal to the referee whether a player is taking
+   * an action at the wrong time during a game, making it illegal.
+   *
+   * If the first player starts out the game with no moves, skipPlayerIfNoMoves is called
+   * to skip to the next player with moves. If every player in the game starts out with NO
+   * legal moves, the skip method handles putting the gameStage into GAMEOVER.
    */
   @Override
   public void startPlay() {
@@ -149,6 +165,7 @@ public class HexGameState implements GameState {
    *  - That there is a penguin to move from the Tile of origin(handled in Player class)
    *  - That the penguin on the Tile of origin is a penguin of the current player
    *  - That the Tile to place the penguin on is not currently occupied nor a hole
+   *  - That the move is legal
    * Then:
    *  - Adjusts the penguinLocs list of the current player to reflect the changes made
    *
@@ -163,14 +180,19 @@ public class HexGameState implements GameState {
     this.checkValidMoveForCurrentPlayer(origin, destination);
 
     this.players.get(0).movePenguin(origin, destination);
-    Tile tileToHole = this.gameBoard.removeTileAt(origin);
+    ProtectedTile tileToHole = this.gameBoard.removeTileAt(origin);
     this.players.get(0).addToScore(tileToHole.getNumFish());
     this.advanceToNextPlayer();
     this.skipPlayerIfNoMoves();
   }
 
 
-  //Checks that the move being made is valid for the current player
+  //Checks that the move being made is valid for the current player. Checks that:
+  // -- the gameStage is IN_PLAY
+  // -- the tile to move TO is present (not a hole)
+  // -- the tile to move TO does not have a penguin on it
+  // -- that the destination is reachable from the origin in a VALID move
+  // --> The check that the current player has a penguin on the tile of origin is in the player class
   //Either: Throws the exception OR does nothing, allowing the movePenguin method to move on
   private void checkValidMoveForCurrentPlayer(Coord origin, Coord destination)
       throws IllegalArgumentException, IllegalStateException {
@@ -179,10 +201,10 @@ public class HexGameState implements GameState {
       throw new IllegalStateException(
           "You cannot move penguins before or after a game is in play.");
     }
-
-    // unneeded - this is now handled by the InternalPlayer's move method
-    //this.checkCurrentPlayer(this.getPenguinLocations().get(origin));
-
+    if (!this.getTilesReachableFrom(origin).contains(destination)) {
+      throw new IllegalArgumentException(
+          "This is NOT a legal move!");
+    }
     this.checkIfTilePresent(destination); //we do not need to check from because if a penguin is there, the tile is present
     this.checkIfPengAlreadyOnTile(destination);
   }
@@ -212,20 +234,6 @@ public class HexGameState implements GameState {
   public void removeCurrentPlayer() {
     this.players.remove(0);
     this.skipPlayerIfNoMoves();
-  }
-
-  /**
-   * Constructs a hashmap of playerColor to int representing the current score of each player.
-   * @return a hashmap of playerColor to score
-   */
-  @Override
-  public Map<PlayerColor, Integer> getScoreBoard() {
-    Map<PlayerColor, Integer> scoreBoard = new HashMap<>();
-
-    for (InternalPlayer ip : this.players) {
-      scoreBoard.put(ip.getColor(), ip.getScore());
-    }
-    return scoreBoard;
   }
 
   /////////////////////////////////Game Closing
@@ -284,20 +292,26 @@ public class HexGameState implements GameState {
 
   /////////////////////////////////Info Retrieval & Helpers
 
+  @Override
+  public GameState getCopyGameState() {
+    List<InternalPlayer> players = new ArrayList<>();
+
+    for (InternalPlayer p : this.players) {
+      players.add(p.getCopyPlayer());
+    }
+
+    return new HexGameState(this.gameStage, this.gameBoard.getCopyGameBoard(), players);
+  }
+
   //Info about the Sate
 
   /**
-   * Returns a deep copy of the GameState.
-   * Every mutable field is copied so that the original is not modified.
-   * @return a deep copy of the gamestate
+   * Returns a ProtectedGameState, which is immutable.
+   * @return this GameState as a ProtectedGameState
    */
   @Override
-  public GameState getCopyGameState() {
-    List<InternalPlayer> playersCopy = new ArrayList<>();
-    for (InternalPlayer p: this.players){
-      playersCopy.add(p.getCopyPlayer());
-    }
-    return new HexGameState(this.gameStage, this.gameBoard.getCopyGameBoard(), playersCopy);
+  public ProtectedGameState getGameState() {
+    return this;
   }
 
   /**
@@ -366,13 +380,28 @@ public class HexGameState implements GameState {
     return this.players.get(0).getColor();
   }
 
+
+  /**
+   * Constructs a hashmap of playerColor to int representing the current score of each player.
+   * @return a hashmap of playerColor to score
+   */
+  @Override
+  public Map<PlayerColor, Integer> getScoreBoard() {
+    Map<PlayerColor, Integer> scoreBoard = new HashMap<>();
+
+    for (InternalPlayer ip : this.players) {
+      scoreBoard.put(ip.getColor(), ip.getScore());
+    }
+    return scoreBoard;
+  }
+
   /**
    * Return the array of players in this game of fish
    *
    * @return the array of players
    */
   @Override
-  public List<InternalPlayer> getPlayers() {
+  public List<ProtectedPlayer> getPlayers() {
     return new ArrayList<>(this.players);
   }
 
@@ -396,8 +425,8 @@ public class HexGameState implements GameState {
    * @return a GameBoard object of the current collection of tiles in the playable game
    */
   @Override
-  public GameBoard getGameBoard() {
-    return this.gameBoard.getCopyGameBoard();
+  public ProtectedGameBoard getGameBoard() {
+    return this.gameBoard;
   }
 
   /**
@@ -413,7 +442,7 @@ public class HexGameState implements GameState {
    * @return (Tile) the tile at the given location
    */
   @Override
-  public Tile getTileAt(Coord loc) {
+  public ProtectedTile getTileAt(Coord loc) {
     return this.gameBoard.getTileAt(loc);
   }
 
@@ -428,21 +457,11 @@ public class HexGameState implements GameState {
     return this.gameBoard.getTilesReachableFrom(start, new ArrayList<>(this.getPenguinLocations().keySet()));
   }
 
-  /**
-   * Get the current width of the board
-   *
-   * @return (int) this board's width
-   */
   @Override
   public int getWidth() {
     return this.gameBoard.getWidth();
   }
 
-  /**
-   * Get the height of this game's board
-   *
-   * @return (int) the height of the board
-   */
   @Override
   public int getHeight() {
     return this.gameBoard.getHeight();
@@ -521,7 +540,7 @@ public class HexGameState implements GameState {
         return false;
       }
     }
-    List<InternalPlayer> otherPlayers = other.getPlayers();
+    List<ProtectedPlayer> otherPlayers = other.getPlayers();
     if (this.players.size() != otherPlayers.size()) {
       return false;
     }

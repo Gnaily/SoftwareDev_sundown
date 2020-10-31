@@ -242,9 +242,9 @@ public class HexGameTreeTest {
     assertEquals(2, gs.getPlayers().size());
     assertEquals(PlayerColor.BROWN, gs.getCurrentPlayer());
     assertEquals(8, gs.getPenguinLocations().size());
-    List<InternalPlayer> players = gs.getPlayers();
+    List<ProtectedPlayer> players = gs.getPlayers();
     List<Coord> coords = new ArrayList<>();
-    for (InternalPlayer p : players) {
+    for (ProtectedPlayer p : players) {
       if (p.getColor().equals(PlayerColor.BROWN)) {
         coords = p.getPenguinLocs();
         break;
@@ -287,9 +287,9 @@ public class HexGameTreeTest {
     GameState gs = HexGameTree.getResultState(this.twoPlayerTree, new Move(new Coord(2, 0), new Coord(2, 1)));
 
     assertEquals(Integer.valueOf(2), gs.getScoreBoard().get(PlayerColor.BROWN));
-    List<InternalPlayer> players = gs.getPlayers();
+    List<ProtectedPlayer> players = gs.getPlayers();
     List<Coord> coords = new ArrayList<>();
-    for (InternalPlayer p : players) {
+    for (ProtectedPlayer p : players) {
       if (p.getColor().equals(PlayerColor.BROWN)) {
         coords = p.getPenguinLocs();
         break;
@@ -306,9 +306,9 @@ public class HexGameTreeTest {
   public void getResultState() {
 
     GameState gs = HexGameTree.getResultState(this.twoPlayerTree, new Move(new Coord(0, 0), new Coord(1, 2)));
-    List<InternalPlayer> players = gs.getPlayers();
+    List<ProtectedPlayer> players = gs.getPlayers();
     List<Coord> coords = new ArrayList<>();
-    for (InternalPlayer p : players) {
+    for (ProtectedPlayer p : players) {
       if (p.getColor().equals(PlayerColor.BROWN)) {
         coords = p.getPenguinLocs();
         break;

@@ -5,6 +5,7 @@ import com.fish.game.Move;
 import com.fish.model.Coord;
 import com.fish.model.state.GameState;
 import com.fish.model.state.PlayerColor;
+import com.fish.model.tile.ProtectedTile;
 import com.fish.model.tile.Tile;
 
 import java.util.ArrayList;
@@ -50,7 +51,7 @@ public class MinimaxStrategy {
         if (penguins.get(loc) != null) {
           continue;
         }
-        Tile tile = gs.getTileAt(loc);
+        ProtectedTile tile = gs.getTileAt(loc);
         if (tile.isPresent() && tile.getNumFish() == 1) {
           return loc;
         }

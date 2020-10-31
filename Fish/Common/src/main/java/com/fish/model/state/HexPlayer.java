@@ -8,11 +8,19 @@ import java.util.List;
 /**
  * Implementation of an internal player of a game of Hey, That's my Fish! (HTMF)
  *
- * Interpretation: a class to track information about a game participant's standings in a game,
- * which includes
- * --their unique assigned avatar color
- * --their score as it changes, and
- * --the location of their penguins on the board as the game progresses.
+ * DATA DEFINITION:
+ * color: this player's assigned color, one of four defined in the ENUM PlayerColor, assigned by
+ *      the Referee component when the Referee is building the game.
+ * score: the accumulated score of this player
+ * penguinLocs: A list of Coord locations that indicate the precise locations of this player's
+ *      penguin avatars on the board during a game. When the player places a penguin, the Coord
+ *      location of it is added to the back of this list.
+ *      When a player moves its penguin, the original Coord location of that penguin is REPLACED
+ *      with the new one in the same index of the list as the old one, such that the list of
+ *      penguinLocs is always ordered in the same order.
+ *
+ * Interpretation:
+ * Represents one participant in a game of HTMF that has control over their color-coded penguin avatars.
  */
 public class HexPlayer implements InternalPlayer {
 
@@ -20,22 +28,32 @@ public class HexPlayer implements InternalPlayer {
   private int score;
   private List<Coord> penguinLocs;
 
+  /**
+   * Constructor to create a player at the beginning of a game of HTMF
+   * with score of zero, no penguins placed, and the assigned PlayerColor passed in.
+   * @param pc the assigned color of the player
+   */
   public HexPlayer(PlayerColor pc) {
     this.color = pc;
     this.score = 0;
     this.penguinLocs = new ArrayList<>();
   }
 
-  private HexPlayer(PlayerColor pc, List<Coord> locs, int score) {
+  /**
+   * Convenience constructor to create a player example from the middle of an ongoing game.
+   * @param pc the assigned color of the player
+   * @param penguinLocs the Coord locations of the player's penguins
+   * @param score the player's current score
+   */
+  private HexPlayer(PlayerColor pc, List<Coord> penguinLocs, int score) {
     this.color = pc;
-    this.penguinLocs = new ArrayList<>(locs);
+    this.penguinLocs = new ArrayList<>(penguinLocs);
     this.score = score;
   }
 
 
   /**
-   * Adds a penguin to the penguinLocs list.
-   * Interpretation: adds a penguin to the board during the PLACING_PENGUINS stage.
+   * Adds a penguin to this player's penguin avatars and tracks the Coord location of that penguin.
    * @param location the coordinate location to place the penguin
    * @throws IllegalArgumentException if player places two penguins in one location
    */
@@ -49,13 +67,16 @@ public class HexPlayer implements InternalPlayer {
   }
 
   /**
-   * Moves the location of a penguin avatar by removing its original Coord location from the list of
-   * penguin locations and adding its new destination location to the end of the List.
+   * Moves the location of a penguin avatar by
+   * replacing its original Coord with its new Coord
+   * in the same index space on the penguinLocs list, such that the penguinLocs list is always
+   * in the same order.
    * @param origin the Tile to move from
    * @param destination the Tile to move to
    * @throws IllegalArgumentException if the origin Tile does not have a penguin on it to move,
    * or if the destination Tile already has a penguin on it, blocking the move.
    */
+  @Override
   public void movePenguin(Coord origin, Coord destination) throws IllegalArgumentException {
     if (this.penguinLocs.contains(destination)) {
       throw new IllegalArgumentException("You already have a penguin here; move elsewhere.");
@@ -71,10 +92,11 @@ public class HexPlayer implements InternalPlayer {
   }
 
   /**
-   * Add points to this player's score.
+   * Add the given amount of points to this player's score.
    *
    * @param points (int) the points to add
    */
+  @Override
   public void addToScore(int points) {
     this.score += points;
   }
@@ -85,35 +107,24 @@ public class HexPlayer implements InternalPlayer {
    *
    * @return a List of Coord of the player's penguin locations
    */
+  @Override
   public List<Coord> getPenguinLocs() {
     return new ArrayList<>(this.penguinLocs);
   }
 
-  /**
-   * Returns this player's assigned avatar color as a PlayerColor.
-   *
-   * @return (PlayerColor) the player's color
-   */
+  @Override
+  public InternalPlayer getCopyPlayer() {
+    return new HexPlayer(this.color, this.getPenguinLocs(), this.score);
+  }
+
+  @Override
   public PlayerColor getColor() {
     return this.color;
   }
 
-  /**
-   * Returns this player's current score.
-   *
-   * @return (int) this player's score
-   */
+  @Override
   public int getScore() {
     return this.score;
-  }
-
-  /**
-   * Returns a defensive copy of this HexPlayer, meaning any change to the resulting copy
-   * will never alter the original object.
-   * @return the HexPlayer
-   */
-  public InternalPlayer getCopyPlayer() {
-    return new HexPlayer(this.color, this.getPenguinLocs(), this.score);
   }
 
   @Override

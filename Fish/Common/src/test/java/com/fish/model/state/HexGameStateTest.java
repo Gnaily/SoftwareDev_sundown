@@ -3,6 +3,8 @@ package com.fish.model.state;
 import com.fish.model.Coord;
 import com.fish.model.board.GameBoard;
 import com.fish.model.board.HexGameBoard;
+import com.fish.model.board.ProtectedGameBoard;
+import com.fish.model.tile.ProtectedTile;
 import com.fish.model.tile.Tile;
 
 import java.util.ArrayList;
@@ -466,7 +468,7 @@ public class HexGameStateTest {
 
     for (int ii = 0; ii < copy.getWidth(); ii++) {
       for (int jj = 0; jj < copy.getHeight(); jj++) {
-        Tile tile = copy.getTileAt(new Coord(ii, jj));
+        ProtectedTile tile = copy.getTileAt(new Coord(ii, jj));
         if (tile.isPresent()) {
           assertEquals(tile.getNumFish(), this.twoPlayerGame.getTileAt(new Coord(ii, jj)).getNumFish());
         }
@@ -529,7 +531,7 @@ public class HexGameStateTest {
   /////Tests for Tile Handling
   @Test
   public void testGetBoard() {
-    GameBoard gb = this.twoPlayerGame.getGameBoard();
+    ProtectedGameBoard gb = this.twoPlayerGame.getGameBoard();
     int[][] actualTileValues = gb.getBoardDataRepresentation();
 
     //create a 2-d Array in our Coord structure
@@ -586,7 +588,10 @@ public class HexGameStateTest {
     //Make a copy
     GameState gs = this.twoPlayerGame.getCopyGameState();
     //Test that they are the same
-    assertEquals(gs, this.twoPlayerGame);
+
+    assertEquals(gs.getPlayers(), this.twoPlayerGame.getPlayers());
+
+   assertEquals(gs, this.twoPlayerGame);
     //Test that our equals method works
     assertTrue(gs.equals(this.twoPlayerGame));
   }

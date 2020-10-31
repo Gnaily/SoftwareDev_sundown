@@ -1,6 +1,8 @@
 package com.fish.json;
 
+import com.fish.model.board.ProtectedGameBoard;
 import com.fish.model.state.GameState;
+import com.fish.model.tile.ProtectedTile;
 import com.fish.model.tile.Tile;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -168,12 +170,12 @@ public class XBoard {
    * @param gameBoard the gameboard to transform
    * @return a JSON Array of the board
    */
-  static JsonArray boardToJson(GameBoard gameBoard) {
+  static JsonArray boardToJson(ProtectedGameBoard gameBoard) {
     JsonArray board = new JsonArray();
     for (int ii = 0; ii < gameBoard.getHeight(); ii++) {
       JsonArray row = new JsonArray();
       for (int jj = 0; jj < gameBoard.getWidth(); jj++) {
-        Tile t = gameBoard.getTileAt(new Coord(jj, ii));
+        ProtectedTile t = gameBoard.getTileAt(new Coord(jj, ii));
         if (t.isPresent()) {
           row.add(t.getNumFish());
         }

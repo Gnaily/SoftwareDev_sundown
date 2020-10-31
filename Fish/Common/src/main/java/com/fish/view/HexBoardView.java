@@ -3,6 +3,7 @@ package com.fish.view;
 import com.fish.model.Coord;
 import com.fish.model.state.GameState;
 import com.fish.model.state.PlayerColor;
+import com.fish.model.tile.ProtectedTile;
 import com.fish.model.tile.Tile;
 
 import java.awt.*;
@@ -58,7 +59,7 @@ public class HexBoardView extends JPanel implements GameView {
 
     for (int ii = 0; ii < state.getWidth(); ii++) {
       for (int jj = 0; jj < state.getHeight(); jj++) {
-        Tile tile = state.getTileAt(new Coord(ii, jj));
+        ProtectedTile tile = state.getTileAt(new Coord(ii, jj));
         if (tile.isPresent()) {
           this.drawHexagon(tile, this.calculateTopLeftXValue(new Coord(ii, jj)), jj * PIXEL_STEP, g2d);
         }
@@ -80,7 +81,7 @@ public class HexBoardView extends JPanel implements GameView {
    * @param xx Top Left x pixel of where to draw the hexagon
    * @param yy Top left y pixel of where to draw the hexagon
    */
-  private void drawHexagon(Tile tile, int xx, int yy, Graphics2D g2d) {
+  private void drawHexagon(ProtectedTile tile, int xx, int yy, Graphics2D g2d) {
 
     // light blue, icy color
     g2d.setColor(new Color(158, 195, 255));

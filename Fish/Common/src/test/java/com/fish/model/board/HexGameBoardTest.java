@@ -1,6 +1,7 @@
 package com.fish.model.board;
 
 import com.fish.model.Coord;
+import com.fish.model.tile.ProtectedTile;
 import com.fish.model.tile.Tile;
 
 import java.util.*;
@@ -209,6 +210,16 @@ public class HexGameBoardTest {
     noHolesBoard.removeTileAt(new Coord(0,5));
     assertEquals(1, this.noHolesBoard.getTileAt(new Coord(0, 5)).getNumFish());
     assertFalse(this.noHolesBoard.getTileAt(new Coord(0, 5)).isPresent());
+
+    ProtectedTile immutable = this.noHolesBoard.getTileAt(new Coord(1,1));
+    //Test that the getters can be called on the retrieved tile:
+    assertTrue(immutable.isPresent());
+    //But note that java will not compile if you try to mutate it (hence its commented out)
+    //mmutable.meltTile();
+
+    //Note that java will also not compile if you try to assign a mutable Tile object the result
+    //of this method:
+    //Tile mutable = this.noHolesBoard.getTileAt(new Coord(1,1));
   }
 
   @Test
@@ -235,6 +246,10 @@ public class HexGameBoardTest {
     assertEquals(3, this.holesBoard.removeTileAt(new Coord(0, 1)).getNumFish());
     assertEquals(5, this.holesBoard.removeTileAt(new Coord(0, 6)).getNumFish());
     assertEquals(3, this.holesBoard.removeTileAt(new Coord(2, 7)).getNumFish());
+
+    //Note that java will not compile if you try to mutate the return value of this method:
+    ProtectedTile immutable = this.noHolesBoard.removeTileAt(new Coord(0,0));
+    //immutable.meltTile();
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -278,49 +293,6 @@ public class HexGameBoardTest {
     assertEquals(4, this.constantFishNumBoard.getHeight());
   }
 
-
-  //// Tests for copying a board
-  @Test
-  public void testGetCopyBoardTilesConsistent() {
-    GameBoard copy = this.noHolesBoard.getCopyGameBoard();
-
-    for (int ii = 0; ii < copy.getWidth(); ii++) {
-      for (int jj = 0; jj < copy.getHeight(); jj++) {
-        Tile tile = copy.getTileAt(new Coord(ii, jj));
-        if (tile.isPresent()) {
-          assertEquals(tile.getNumFish(), this.noHolesBoard.getTileAt(new Coord(ii, jj)).getNumFish());
-        }
-        else {
-          assertFalse(this.noHolesBoard.getTileAt(new Coord(ii, jj)).isPresent());
-        }
-      }
-
-    }
-
-  }
-
-  @Test
-  public void testGetCopyAlterBoard() {
-    GameBoard copy = this.holesBoard.getCopyGameBoard();
-    Coord cc = new Coord(0, 4);
-    assertTrue(this.holesBoard.getTileAt(cc).isPresent());
-    assertTrue(copy.getTileAt(cc).isPresent());
-
-    this.holesBoard.removeTileAt(cc);
-    assertTrue(copy.getTileAt(cc).isPresent());
-    assertFalse(this.holesBoard.getTileAt(cc).isPresent());
-
-    cc = new Coord(0, 2);
-    copy.removeTileAt(cc);
-    assertFalse(copy.getTileAt(cc).isPresent());
-    assertTrue(this.holesBoard.getTileAt(cc).isPresent());
-  }
-
-  @Test
-  public void testEqualsCopy() {
-    GameBoard copy = this.holesBoard.getCopyGameBoard();
-    assertEquals(this.holesBoard, copy);
-  }
 
   @Test
   public void testEqualsNotCopy() {

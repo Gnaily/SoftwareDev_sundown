@@ -6,15 +6,28 @@ import java.util.List;
 /**
  * Interface for an internal player of a game of Hey, That's my Fish! (HTMF)
  *
- * Interpretation: This interface is to track the score, avatar color, and penguins of a game
- * participant, but not to track information about the human subject behind the player, such as
- * their age.
+ * DATA DEFINITION:
+ * A structure that contains the current state of one internal player in an ongoing game.
+ *
+ * InternalPlayer extends ProtectedPlayer, a read-only version of the InternalPlayer interface.
+ * When communicating with external players, only Protected versions of objects are shared.
+ *
+ * An InternalPlayer does NOT contain the personal information of the external player behind the
+ * internal player.
+ * An implementation must contain data re:
+ * -- the location of penguin avatars of this player
+ * -- assigned PlayerColor
+ * -- player score (int)
+ *
+ * INTERPRETATION:
+ * Represents one participant in a game of HTMF that has control over their color-coded penguin
+ * avatars. The participant moves their penguins throughout the game to acquire fish from the
+ * tiles they land on, which adds to their score each time they move.
  */
-public interface InternalPlayer {
+public interface InternalPlayer extends ProtectedPlayer {
 
   /**
-   * Adds a penguin to the penguinLocs list.
-   * Interpretation: adds a penguin to the board during the PLACING_PENGUINS stage.
+   * Adds a penguin to this player's penguin avatars and tracks the Coord location of that penguin.
    * @param location the coordinate location to place the penguin
    * @throws IllegalArgumentException if player places two penguins in one location
    */
@@ -38,31 +51,8 @@ public interface InternalPlayer {
   void addToScore(int points);
 
   /**
-   * Returns a copy of this player's current penguin locations
-   * in terms of their Coord location on the GameBoard.
-   *
-   * @return a List of Coord of the player's penguin locations
-   */
-  List<Coord> getPenguinLocs();
-
-  /**
-   * Returns this player's assigned avatar color as a PlayerColor.
-   *
-   * @return (PlayerColor) the player's color
-   */
-  PlayerColor getColor();
-
-  /**
-   * Returns this player's current score.
-   *
-   * @return (int) this player's score
-   */
-  int getScore();
-
-  /**
-   * Returns a defensive copy of this HexPlayer, meaning any change to the resulting copy
-   * will never alter the original object.
-   * @return the HexPlayer
+   * Returns a deep copy of this player
+   * @return a deep copy of this Player
    */
   InternalPlayer getCopyPlayer();
 

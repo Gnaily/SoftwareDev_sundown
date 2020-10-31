@@ -1,6 +1,7 @@
 package com.fish.json;
 
 import com.fish.model.Coord;
+import com.fish.model.board.ProtectedGameBoard;
 import com.fish.model.state.*;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -169,7 +170,7 @@ public class XStateTest {
   @Test
   public void testReconstructOnePlayerToJson() {
     //Example of a player that doesnt end up moving:
-    InternalPlayer aPlayer = this.falseMoveGameState.getPlayers().get(0);
+    ProtectedPlayer aPlayer = this.falseMoveGameState.getPlayers().get(0);
     JsonObject actualJsonOutput = XState.reconstructPlayerToJson(aPlayer);
     JsonArray playersArray = this.falseMoveJson.getAsJsonArray("players");
     JsonObject expectedJsonOutput = playersArray.get(0).getAsJsonObject();

@@ -2,6 +2,7 @@ package com.fish.model.state;
 
 import com.fish.model.Coord;
 import com.fish.model.board.GameBoard;
+import com.fish.model.tile.ProtectedTile;
 import com.fish.model.tile.Tile;
 import java.util.HashMap;
 import java.util.List;
@@ -10,18 +11,31 @@ import java.util.Map;
 /**
  * Interface for a GameState in a game of Hey Thats my Fish (HTMF)
  *
- * Interpretation:
+ * DATA DEFINITION:
+ * A structure that contains the current state of one ongoing game of HTMF.
+ *
+ * GameState extends ProtectedGameState, a read-only version of the GameState interface.
+ * When communicating with external players, only Protected versions of objects are shared.
+ *
+ * The GameState:
+ *  - allows for control over the construction of the board to play on
  *  - Manages the player turns
  *  - Ability to place and move penguins on the board
  *  - Determine if the game is over
  *  - Calculate score and winning players
+ *
+ * INTERPRETATION:
+
  */
-public interface GameState {
+public interface GameState extends ProtectedGameState {
 
   /**
    * Constructs the GameBoard and ordered Players list to carry out a game of HTMF and
-   * moves the gameStage to the next stage, PLACING_PENGUINS, which allows players to start
-   * placing their penguins in order of player turn.
+   * moves the gameStage to the next stage, PLACING_PENGUINS
+   * (see gameStage explanations in class javaDoc)
+   *
+   * This method may be used by the referee to initialize a game once the referee has chosen
+   * the board setup and received players from the tournament manager.
    * @param board (GameBoard) the board to construct for the game
    * @param players (List of Players) the list of players involved in the game
    */
@@ -33,6 +47,7 @@ public interface GameState {
    *  - That the given PlayerColor is the player whose turn it is
    *  - That the tile to place the penguin on is not currently occupied and
    *  - That the given Coord location is not a hole.
+   *  - That the move is legal
    *  Then:
    *  - Adds an element to the penguinLocs map and advances the CurrentPlayerIndex by one.
    * @param loc (Coord) the coordinate location on the GameBoard
@@ -43,8 +58,9 @@ public interface GameState {
   void placePenguin(Coord loc, PlayerColor playerColor);
 
   /**
-   * Advances the game stage to IN_PLAY in order to enable game playing to proceed, including
-   * moving penguins across the board.
+   * Converts the gameStage to IN_PLAY (see gameStage explanations in class javaDoc).
+   * The enforcing of the gameStage is used to signal to the referee whether a player is taking
+   * an action at the wrong time during a game, making it illegal.
    */
   void startPlay();
 
@@ -65,25 +81,35 @@ public interface GameState {
   void movePenguin(Coord from, Coord to);
 
   /**
-   * Advance the game to be the next player's turn
+   * Advances the current player to the next player by rotating the HexPlayer list.
+   * The current player is always at index 0, so remove this element and put it to the
+   * back of the list.
+   * Once the turn is advanced
+   * -- check that this new current player has moves.
+   * -- If not, skip them and keep moving on until reaching a player that can make a move.
    */
   void advanceToNextPlayer();
 
   /**
-   * Removes a player from the game by removing all of its penguins off the board and deleting
-   * its score from the scoreKeeper field.
+   * Removes a player from the game by:
+   *  - remove the player from the player list
+   *  - remove all the player's penguins from the board
+   *    (without removing the tiles they were removed from)
+   *  - moving on to the next player with moves's turn
    */
   void removeCurrentPlayer();
 
   /**
-   * Constructs a hashmap of playerColor to int representing the current score of each player.
-   * @return a hashmap of playerColor to score
-   */
-  Map<PlayerColor, Integer> getScoreBoard();
-
-  /**
-   * Determines whether there remains any valid move for any HexPlayer in the game.
-   * @return a boolean which determines if the game is over
+   * Checks whether the game is over by:
+   *  - Checking if there are any valid moves stemming from any penguin's location left on the board
+   *  - Checking if there is only one player left, meaning the rest got kicked out
+   *
+   * If there are no more valid moves OR if there is only one player left, the game immediately ends.
+   * Meaning:
+   *  - the method returns false and
+   *  - the GameStage is set to GAME_OVER
+   *
+   * @return (boolean) a boolean that determines whether the game is over
    */
   boolean isGameOver();
 
@@ -96,86 +122,9 @@ public interface GameState {
   List<PlayerColor> getWinners();
 
   /**
-   * Returns a deep copy of the GameState.
-   * Every mutable field is copied so that the original is not modified.
-   * @return a deep copy of the gamestate
+   * Returns a deep copy of this GameState
+   * @return a deep copy of this GameState
    */
   GameState getCopyGameState();
-
-  /**
-   * Return the GameStage emuneration that represents the current stage of the game, either
-   * NOT_STARTED, PLACING_PENGUINS, IN_PLAY, or GAMEOVER.
-   */
-  GameStage getGameStage();
-
-  /**
-   * Returns a HashMap of penguin locations, formatted such that
-   * the Coord is the unique key (since only one penguin can be on a tile at a time) and
-   * the PlayerColor is the value, to identify which player's penguin is on that location.
-   * @return a HashMap of Coord to PlayerColor values
-   */
-  Map<Coord, PlayerColor> getPenguinLocations();
-
-  /**
-   * Given a PlayerColor, returns a list of Coord locations of all that player's penguins on the
-   * board.
-   * May return an empty list if:
-   *  -- the player with the given player color has not placed any penguins or
-   *  -- the given player color is not in this game
-   *     (eg it is RED but there are no red avatars in this particular game at this time)
-   *
-   * @param playerColor the PlayerColor to search for penguin locations
-   * @return a list of Coords representing that player's penguin locations
-   */
-  List<Coord> getPenguinLocationsOf(PlayerColor playerColor);
-
-  /**
-   * Return the current Internal Player's color
-   *
-   * @return (PlayerColor) the current player's color
-   */
-  PlayerColor getCurrentPlayer();
-
-  /**
-   * Return the players (in order) of this game
-   *
-   * @return the list of players
-   */
-  List<InternalPlayer> getPlayers();
-
-  /**
-   * Returns a copy of this GameState's current Gameboard
-   * @return a GameBoard object of the current collection of tiles in the playable game
-   */
-  GameBoard getGameBoard();
-
-  /**
-   * Retrieves the Tile located at the coordinate in the GameBoard.
-   * @param loc the coordinate location of the desired Tile
-   * @return the Tile object located there
-   */
-  Tile getTileAt(Coord loc);
-
-  /**
-   * Return a list of Coordinates of all the tiles reachable from a starting
-   * Coord given the location of all the other penguins on the board
-   * @param start the starting coordinate location
-   * @return the list of possible tiles to move to
-   */
-  List<Coord> getTilesReachableFrom(Coord start);
-
-  /**
-   * Returns the width of the game board, defined by the number of columns on the board data
-   * representation.
-   * @return an int with the width
-   */
-  int getWidth();
-
-  /**
-   * Returns the height of the game board, defined by the number of rows on the board data
-   * representation.
-   * @return an int with the height
-   */
-  int getHeight();
 
 }

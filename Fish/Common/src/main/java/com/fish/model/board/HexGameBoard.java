@@ -2,6 +2,7 @@ package com.fish.model.board;
 
 import com.fish.model.Coord;
 import com.fish.model.tile.HexTile;
+import com.fish.model.tile.ProtectedTile;
 import com.fish.model.tile.Tile;
 
 import java.util.ArrayList;
@@ -11,13 +12,12 @@ import java.util.Random;
 /**
  * Implementation of a GameBoard object in a game of Hey, That's my Fish! (HTMF)
  *
- * Interpretation: The GameBoard object is a collection of Tile objects that represent the tiles
- * used to play out a game of HTMF.
- *
- * This implementation handles hexagon-shaped tiles, the layout of which is described
- * below. The location of each Tile in the data representation of the board can be found using a
- * Coord object. For any given Coord (x, y) the x value represents the column number and the y
- * value represents the row number.
+ * DATA DEFINITION:
+ * A collection of hexagon-shaped tiles stored in a 2d-array of Tile called tiles.
+ * The location of each Tile in the data representation of the board can be located using a Coord.
+ * For any given Coord (x, y)
+ * the x value represents the column number and
+ * the y value represents the row number.
  *
  * <p>
  *  The Coordinate system for a hexGameBoard is designed as follows:
@@ -41,6 +41,7 @@ import java.util.Random;
  * Note that the data structure for the above board looks as follows:
  * {{0,0  ,  0,1  ,  0,2  ,  0,3  ,  0,4  ,  0,5},
  *  {1,0  ,  1,1  ,  1,2  ,  1,3  ,  1,4  ,  1,5}};
+ *
  * A Tile of the board illustrated above can be located using either one of the following methods:
  * tiles[0][1] OR
  * this.getTileAT(new Coord(1,0))
@@ -53,8 +54,14 @@ import java.util.Random;
  * on the board. Just initiate holes around the pointed edges of the rectangular representation
  * to create a circular playing field.
  *
- * Finally, the Random object in the rand field is used to generate constant boards for testing
+ * The Random object in the rand field is used to generate constant boards for testing
  * purposes through the use of a random seed.
+ *
+ * INTERPRETATION:
+ * A HexGameBoard represents the collection of hexagon-shaped tiles that a game of HTMF is played on
+ * where players can land and move their avatars around on. As the game proceeds, the board
+ * changes by tiles becoming holes when players move their avatars from them.
+ *
  */
 public class HexGameBoard implements GameBoard {
 
@@ -295,51 +302,46 @@ public class HexGameBoard implements GameBoard {
 
   /**
    * Given a coordinate location within the dimensions of the game board,
-   * returns the Tile object at that coordinate location.
-   * The Tile object that is returned may be a hole, in which case if you call
-   * isPresent on that Tile it returns false.
+   * returns the ProtectedTile object at that coordinate location.
+   * The result of this method may be sent to an external player to evaluate the number of points
+   * they may receive from passing over the tile. For this reason, the return tile must be
+   * protected so that they cannot mutate the tile or turn it into a hole.
    * @param loc the coordinate location of the desired tile on the board
-   * @return the Tile object at that location
+   * @return the ProtectedTile object at that location
    * @throws IllegalArgumentException if the requested tile is out of the bounds of the board
    */
   @Override
-  public Tile getTileAt(Coord loc) throws IllegalArgumentException {
-    checkTileInBounds(loc, "This tile is out of bounds");
+  public ProtectedTile getTileAt(Coord loc) throws IllegalArgumentException {
+    checkTileInBounds(loc, "The tile you requested is out of bounds");
     return tiles[loc.getX()][loc.getY()];
   }
 
   /**
    * Given a coordinate location within the dimensions of the game board,
    * turns that Tile into a hole by altering its isPresent boolean to False.
+   * Returns the tile as a ProtectedTile so that it is immutable but can be sent to an external
+   * player to know the number of fish at that tile.
    * @param loc the coordinate location of the tile to remove on the board
    * @return the Tile object at that location
    * @throws IllegalArgumentException if the requested tile is out of bounds or is already a hole
    * on the board
    */
   @Override
-  public Tile removeTileAt(Coord loc) throws IllegalArgumentException {
+  public ProtectedTile removeTileAt(Coord loc) throws IllegalArgumentException {
     checkTileInBounds(loc, "Cannot remove a tile that is not on the board");
     checkTilePresent(loc, "Cannot remove a tile where a hole is already located");
 
-    Tile returnTile = getTileAt(loc);
-    returnTile.meltTile();
-    return returnTile;
+    Tile TileToRemove = tiles[loc.getX()][loc.getY()];
+    TileToRemove.meltTile();
+    return TileToRemove;
   }
 
 
   /////////////////////////////////Getters and Helpers
 
-  /**
-   * Returns a copy of the HexGameBoard by constructing a new object with the exact
-   * same number of fish on each tile and location of holes at the time of invocation.
-   *
-   * @return a GameBoard with all of the relevant information copied over
-   */
-  @Override
   public GameBoard getCopyGameBoard() {
     return new HexGameBoard(this.getBoardDataRepresentation());
   }
-
 
   /**
    * Constructs a 2dArray of integers that represent the number of fish on the Tile at location
@@ -386,31 +388,22 @@ public class HexGameBoard implements GameBoard {
   public boolean equals(Object o) {
     if (o instanceof HexGameBoard) {
       HexGameBoard other = (HexGameBoard) o;
-
       // BOARD EQUALITY:
-      // SAME NUMBER OF TILES, HOLES in the same places.
+      // SAME NUMBER OF TILES, HOLES in the same places, TILES with same num fish
       if (this.width == other.getWidth() && this.height == other.getHeight()) {
         for (int ii = 0; ii < this.width; ii++) {
           for (int jj = 0; jj < this.height; jj++) {
             Coord loc = new Coord(ii, jj);
-            Tile myTile = this.getTileAt(loc);
-            Tile otherTile = other.getTileAt(loc);
-            if (myTile.isPresent() &&  otherTile.isPresent() && myTile.getNumFish() == otherTile.getNumFish()) {
-              // tiles are equal
-            }
-            else if (!myTile.isPresent() && !otherTile.isPresent()) {
-              // considered equals
-            }
-            else {
+            ProtectedTile thisTile = this.getTileAt(loc);
+            ProtectedTile otherTile = other.getTileAt(loc);
+            if (!thisTile.equals(otherTile)) {
               return false;
             }
           }
         }
-
         return true;
       }
     }
-
     return false;
   }
 

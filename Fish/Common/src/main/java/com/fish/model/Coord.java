@@ -1,14 +1,13 @@
 package com.fish.model;
 
 /**
- * A single point on a Cartesian coordinate plane with an x and y value,
- * denoted xx and yy.
+ * DATA: A single point on a Cartesian coordinate plane, indicated by an x and y value.
  *
- * Interpretation/In relation to HTMF:
- * The location of a Tile on the visible game board,
- * where the 0,0 Coord is in the upper left hand corner of the board and
- * the xx and yy values increment in the same manner that they do on the lower right quartile
- * of a full cartesian plane.
+ * INTERPRETATION/In relation to HTMF:
+ * The location of a Tile in the collection of tiles that make up the board the game is played on.
+ * The 0,0 Coord is in the upper left hand corner of the board.
+ * xx represents the column number, and xx increases the further right the column is.
+ * yy represents the row number, and yy increases the further down the row is.
  */
 public class Coord {
 
@@ -16,9 +15,9 @@ public class Coord {
   private int yy;
 
   /**
-   * Constructor to instantiate a Coord object.
-   * @param xx the x point
-   * @param yy the y point
+   * Only constructor to create a Coord object.
+   * @param xx the x point, or column
+   * @param yy the y point, or row
    */
   public Coord(int xx, int yy) {
     this.xx = xx;
@@ -26,28 +25,20 @@ public class Coord {
 
   }
 
-  /**
-   * Returns the Coordinate point's x-value
-   * @return the x value
-   */
   public int getX() {
     return this.xx;
   }
 
-  /**
-   * Returns the Coordinate point's y-value
-   * @return the y value
-   */
   public int getY() {
     return this.yy;
   }
 
   /**
-   * Defines whether the given Coord is equal to this coord,
+   * Defines whether the given Coord is equal to this Coord,
    * defined by whether both the x-coordinate and the y-coordinate of the given object
-   * are the same as x-coordinate and the y-coordinate of this Coord.
-   * @param o
-   * @return a boolean that determines if the given object is equal to this object
+   * are the same integer value as x-coordinate and the y-coordinate of this Coord.
+   * @param o the object to compare to this Coord
+   * @return a boolean determining if the given object is equal to this object(t) or not(f)
    */
   @Override
   public boolean equals(Object o) {
@@ -60,7 +51,7 @@ public class Coord {
   }
 
   /**
-   * Creates a unique identifier for this Coord object
+   * Creates a unique identifier for this Coord object.
    * @return a unique integer
    */
   @Override
