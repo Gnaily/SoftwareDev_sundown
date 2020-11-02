@@ -58,7 +58,7 @@ public class XState {
    * @param stateAsJson the state represented as Json values
    * @return a GameState of those values
    */
-  static GameState jsonToGameState(JsonObject stateAsJson) {
+  public static GameState jsonToGameState(JsonObject stateAsJson) {
 
     //////HANDLE "board" INPUT - turn that into an actual board using XBoard class
     GameBoard boardFromInput = XBoard.jsonToGameBoard(stateAsJson);

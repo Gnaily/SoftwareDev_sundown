@@ -163,7 +163,7 @@ public class XTree {
    * @param move Move object
    * @return a JsonArray containing the action
    */
-  static JsonArray moveToJson(Move move) {
+  public static JsonArray moveToJson(Move move) {
     JsonArray ret = new JsonArray();
     JsonArray start = new JsonArray();
     JsonArray end = new JsonArray();

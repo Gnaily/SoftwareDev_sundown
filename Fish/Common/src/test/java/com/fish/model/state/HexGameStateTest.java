@@ -5,7 +5,6 @@ import com.fish.model.board.GameBoard;
 import com.fish.model.board.HexGameBoard;
 import com.fish.model.board.ProtectedGameBoard;
 import com.fish.model.tile.ProtectedTile;
-import com.fish.model.tile.Tile;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -488,6 +487,7 @@ public class HexGameStateTest {
     Map<Coord, PlayerColor> penguinCopy = copy.getPenguinLocations();
 
     assertEquals(original.size(), penguinCopy.size());
+
     for (Coord c : original.keySet()) {
       assertEquals(original.get(c), penguinCopy.get(c));
     }
@@ -623,4 +623,5 @@ public class HexGameStateTest {
     assertEquals(gs, this.constantFishNumGame);
     assertTrue(gs.equals(this.constantFishNumGame));
   }
+
 }

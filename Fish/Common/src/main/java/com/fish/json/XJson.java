@@ -25,7 +25,7 @@ public class XJson {
    * @param scan scanner to process.
    * @return a JsonArray with the inputs
    */
-  static JsonArray processInput(Scanner scan) {
+  public static JsonArray processInput(Scanner scan) {
     JsonArray jsonArray = new JsonArray();
     String jsonString = "";
 

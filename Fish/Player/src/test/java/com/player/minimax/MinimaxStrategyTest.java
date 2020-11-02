@@ -5,6 +5,7 @@ import com.fish.model.Coord;
 import com.fish.model.board.GameBoard;
 import com.fish.model.board.HexGameBoard;
 import com.fish.model.state.*;
+import java.util.ArrayList;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -108,5 +109,28 @@ public class MinimaxStrategyTest {
 
     move = MinimaxStrategy.findCurrentPlayersBestMove(this.gs1, 3);
     assertEquals(new Move(new Coord(1, 2), new Coord(1, 3)), move);
+  }
+
+  @Test
+  public void testStrategyForHarness() {
+    int[][] board = {{2, 1, 5, 0, 3, 2}, {3, 1, 5, 4, 3, 2}, {4, 1, 5, 4, 3, 2}};
+    GameBoard gb = new HexGameBoard(board);
+    GameState gs = new HexGameState();
+
+    List<InternalPlayer> players = new ArrayList<>();
+
+    players.add(new HexPlayer(PlayerColor.RED));
+    players.add(new HexPlayer(PlayerColor.WHITE));
+
+    gs.initGame(gb, players);
+    players.get(0).addToScore(10);
+    gs.placePenguin( new Coord(0,2), PlayerColor.RED);
+    gs.placePenguin( new Coord(0,1), PlayerColor.WHITE);
+    gs.placePenguin( new Coord(1,0), PlayerColor.RED);
+    gs.placePenguin( new Coord(1,1), PlayerColor.WHITE);
+    gs.startPlay();
+
+    assertEquals(new Move(new Coord(1,0), new Coord(1,2)),
+        MinimaxStrategy.findCurrentPlayersBestMove(gs, 2));
   }
 }
