@@ -82,6 +82,9 @@ public class HexGameState implements GameState {
    *  -- penguins are already placed on board (via placing penguins in each individual Player object's list)
    *  -- the desired current player is at index zero of the player list, and the list is ordered by player turn.
    *
+   *  This constructor does not validate that the current player has a valid move. If you wish to
+   *  change this, you could add a call to skipPlayerIfNoMoves
+   *
    * @param gameStage the current stage of the game
    * @param players the players in order of player-turn with current player at index 0
    * @param board the GameBoard on which the game is proceeding
@@ -89,7 +92,7 @@ public class HexGameState implements GameState {
   public HexGameState(GameStage gameStage, GameBoard board, List<InternalPlayer> players) {
     this.gameStage = gameStage;
     this.gameBoard = board;
-    this.players = players;
+    this.players = new ArrayList<>(players);
   }
 
   ///////////////////////////////// ADVANCE TO PLACING_PENGUINS

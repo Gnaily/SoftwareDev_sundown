@@ -1,6 +1,7 @@
 package com.json;
 
 import com.fish.game.GameTree;
+import com.fish.game.HexGameTree;
 import com.fish.game.Move;
 import com.fish.json.XJson;
 import com.fish.json.XState;
@@ -30,6 +31,12 @@ public class XStrategy {
     JsonObject state = ds.get(1).getAsJsonObject();
 
     GameState inputGS = XState.jsonToGameState(state);
+
+    GameTree gt = new HexGameTree(inputGS);
+    if (gt.getPossibleGameStates().size() == 0) {
+      System.out.println("false");
+      return;
+    }
 
     Move m = MinimaxStrategy.findCurrentPlayersBestMove(inputGS, depth);
 
