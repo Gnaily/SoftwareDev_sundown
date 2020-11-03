@@ -1,6 +1,6 @@
 package com.referee;
 
-import com.external.player.ExternalPlayer;
+import com.fish.externalplayer.PlayerInterface;
 
 import java.util.List;
 
@@ -16,5 +16,5 @@ public interface Referee {
    *
    * @param players
    */
-  void runGame(List<ExternalPlayer> players);
+  void runGame(List<PlayerInterface> players);
 }

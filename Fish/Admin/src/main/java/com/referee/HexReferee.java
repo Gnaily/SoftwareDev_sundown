@@ -1,6 +1,6 @@
 package com.referee;
 
-import com.external.player.ExternalPlayer;
+import com.fish.externalplayer.PlayerInterface;
 import com.fish.game.GameTree;
 import com.fish.game.HexGameTree;
 import com.fish.game.Move;
@@ -18,16 +18,23 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class HexReferee implements Referee {
 
   private List<InternalPlayer> cheaters;
-  private Map<PlayerColor, ExternalPlayer> colorToExternalPlayer;
+  private Map<PlayerColor, PlayerInterface> colorToExternalPlayer;
 
 
   private static final int PENGUIN_SUBRACT_NUM = 6;
   private static final int BOARD_ROW = 10;
   private static final int BOARD_COLS = 6;
+  private static final int TIMEOUT_SECONDS = 15;
 
 
   public HexReferee() {
@@ -40,7 +47,7 @@ public class HexReferee implements Referee {
 
   // TODO: how to contact each player
 
-  public void runGame(List<ExternalPlayer> players) {
+  public void runGame(List<PlayerInterface> players) {
     int size = players.size();
 
     if (size <= 1 || size > 4) {
@@ -73,13 +80,13 @@ public class HexReferee implements Referee {
 
   }
 
-  private List<InternalPlayer> makePlayersInternal(List<ExternalPlayer> externalPlayers) {
+  private List<InternalPlayer> makePlayersInternal(List<PlayerInterface> players) {
     // list of external players is already ordered by age
     List<InternalPlayer> ips = new ArrayList<>();
     List<PlayerColor> colors = Arrays.asList(PlayerColor.WHITE, PlayerColor.RED, PlayerColor.BLACK, PlayerColor.BROWN);
 
-    for (int ii = 0; ii < externalPlayers.size(); ii++) {
-      ips.add(makeSinglePlayerInternal(externalPlayers.get(ii), colors.get(ii)));
+    for (int ii = 0; ii < players.size(); ii++) {
+      ips.add(makeSinglePlayerInternal(players.get(ii), colors.get(ii)));
     }
 
     return ips;
@@ -87,7 +94,7 @@ public class HexReferee implements Referee {
 
   // this function also handles creating the link between an external player and who they are inside the
   //  game
-  private InternalPlayer makeSinglePlayerInternal(ExternalPlayer ep, PlayerColor color) {
+  private InternalPlayer makeSinglePlayerInternal(PlayerInterface ep, PlayerColor color) {
     this.colorToExternalPlayer.put(color, ep);
     return new HexPlayer(color);
   }
@@ -127,12 +134,12 @@ public class HexReferee implements Referee {
       for (int jj = 0; jj < numPlayers; jj++) {
         PlayerColor currentPlayer = gs.getCurrentPlayer();
 
-        ExternalPlayer ep = this.colorToExternalPlayer.get(currentPlayer);
+        PlayerInterface ep = this.colorToExternalPlayer.get(currentPlayer);
 
-        // TODO: add in some timeout to this / handle it
-        Coord attempt = ep.getPenguinPlacement();
-
+        // TODO: add in some timeout to this / handle it - might be done
+        Coord attempt;
         try {
+          attempt = this.getPlayerPlacement(ep);
           gs.placePenguin(attempt, currentPlayer);
         } catch (Exception e) {
           gs.removeCurrentPlayer();
@@ -147,6 +154,11 @@ public class HexReferee implements Referee {
     return gs;
   }
 
+  private Coord getPlayerPlacement(PlayerInterface pi) throws TimeoutException {
+    Callable<Coord> task = pi::getPenguinPlacement;
+    return communicateWithPlayer(task);
+  }
+
   // ---- MOVING PENGUINS PHASE ---- //
   private GameState runMovingPenguins(GameState gs) {
 
@@ -155,12 +167,13 @@ public class HexReferee implements Referee {
     while (!gt.getState().isGameOver()) {
       PlayerColor currentPlayer = gs.getCurrentPlayer();
 
-      ExternalPlayer ep = this.colorToExternalPlayer.get(currentPlayer);
+      PlayerInterface ep = this.colorToExternalPlayer.get(currentPlayer);
 
-      // TODO: add timeout
-      Move attempt = ep.getPenguinMovement();
+      // TODO: add timeout - might be done
+      Move attempt;
 
       try {
+        attempt  = this.getPlayerMove(ep);
         gt = gt.getNextGameTree(attempt);
       } catch (Exception e) {
         gs.removeCurrentPlayer();
@@ -173,18 +186,52 @@ public class HexReferee implements Referee {
     return gt.getState();
   }
 
+  private Move getPlayerMove(PlayerInterface pi) throws TimeoutException {
+    Callable<Move> task = pi::getPengiunMovement;
+    return communicateWithPlayer(task);
+  }
+
 
   // ---- BROADCAST MESSAGES ---- //
   private void broadcastPlayerRemoved(PlayerColor removedPlayer) {
     // TODO: implement
+    for (PlayerColor color : this.colorToExternalPlayer.keySet()) {
+      PlayerInterface pi = this.colorToExternalPlayer.get(color);
+      pi.receivePlayerRemoved(removedPlayer);
+    }
   }
 
   private void broadcastPenguinPlacement(Coord loc, PlayerColor color) {
     // TODO: implement
+    for (PlayerColor cc : this.colorToExternalPlayer.keySet()) {
+      PlayerInterface pi = this.colorToExternalPlayer.get(color);
+      pi.receivePenguinPlacement(loc, color);
+    }
   }
 
   private void broadcastPenguinMovement(Move move, PlayerColor color) {
     // TODO: implement
+    for (PlayerColor cc : this.colorToExternalPlayer.keySet()) {
+      PlayerInterface pi = this.colorToExternalPlayer.get(color);
+      pi.receivePenguinMovement(move, color);
+    }
+  }
+
+  // TODO: explain/figure out what this does
+  static <T> T communicateWithPlayer(Callable<T> action) throws TimeoutException {
+    ExecutorService executor = Executors.newCachedThreadPool();
+    T result;
+    Future<T> future = executor.submit(action);
+    try {
+      result = future.get(5, TimeUnit.SECONDS);
+    } catch (Exception e) {
+      throw new TimeoutException("hit it");
+    } finally {
+      // this will cancel execution if there is a timeout
+      future.cancel(true);
+    }
+
+    return result;
   }
 
 }

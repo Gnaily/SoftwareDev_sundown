@@ -1,4 +1,4 @@
-package com.player;
+package com.fish.externalplayer;
 
 import com.fish.game.Move;
 import com.fish.model.Coord;

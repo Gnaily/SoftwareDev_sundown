@@ -4,3 +4,5 @@ mvn -f ./Common/pom.xml test -q -Dmy.exe=XTest
 
 mvn -f ./Player/pom.xml test -q
 
+mvn -f ./Admin/pom.xml test -q
+
