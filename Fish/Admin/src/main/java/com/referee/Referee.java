@@ -16,5 +16,5 @@ public interface Referee {
    *
    * @param players
    */
-  void runGame(List<PlayerInterface> players);
+  Results runGame(List<PlayerInterface> players);
 }

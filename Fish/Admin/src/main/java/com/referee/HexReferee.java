@@ -27,14 +27,14 @@ import java.util.concurrent.TimeoutException;
 
 public class HexReferee implements Referee {
 
-  private List<InternalPlayer> cheaters;
+  private List<PlayerInterface> cheaters;
   private Map<PlayerColor, PlayerInterface> colorToExternalPlayer;
 
 
   private static final int PENGUIN_SUBRACT_NUM = 6;
   private static final int BOARD_ROW = 10;
   private static final int BOARD_COLS = 6;
-  private static final int TIMEOUT_SECONDS = 15;
+  private static final int TIMEOUT_SECONDS = 60;
 
 
   public HexReferee() {
@@ -42,17 +42,13 @@ public class HexReferee implements Referee {
     this.colorToExternalPlayer = new HashMap<>();
   }
 
-
   //Game.getCurrentPlayer -> find the correct player for color -> player.getNextMove();
 
-  // TODO: how to contact each player
-
-  public void runGame(List<PlayerInterface> players) {
+  public Results runGame(List<PlayerInterface> players) {
     int size = players.size();
 
     if (size <= 1 || size > 4) {
-      //TODO: handle not enough players
-      return;
+      throw new IllegalArgumentException("Not the right amount of players");
     }
 
 
@@ -66,18 +62,20 @@ public class HexReferee implements Referee {
     gs.initGame(gb, internalPlayers);
 
     List<PlayerColor> winners = this.playGame(gs);
+    List<PlayerInterface> extWinners = new ArrayList<>();
+    for (PlayerColor pc : winners) {
+      extWinners.add(colorToExternalPlayer.get(pc));
+    }
 
-    // TODO: do something about the winners
+    return new Results(extWinners, this.cheaters);
   }
 
 
   // ---- GAME SETUP ---- //
 
   private GameBoard makeGameBoard(int minOneFish) {
-    //TODO: add in difficulty
+    //If desired you may add difficulty to the game here
     return new HexGameBoard(BOARD_ROW, BOARD_COLS, new ArrayList<>(), minOneFish);
-
-
   }
 
   private List<InternalPlayer> makePlayersInternal(List<PlayerInterface> players) {
@@ -103,21 +101,14 @@ public class HexReferee implements Referee {
   // ---- RUNNING GAME ---- //
 
   private List<PlayerColor> playGame(GameState gs) {
-    // TODO: broadcast initial gamestate
+    this.broadcastGameState(gs);
 
     // place penguins (we know there are enough spots)
     gs = this.runPlacePenguins(gs);
     gs.startPlay();
 
     // play the entire movement phase
-
-    // TODO: broadcast the game is starting
-    // TODO: run moving penguins method
     gs = this.runMovingPenguins(gs);
-
-    // TODO: report back winners
-    // report back the winner
-    // TODO: broadcast winners to the players
 
     return gs.getWinners();
 
@@ -129,20 +120,24 @@ public class HexReferee implements Referee {
     int numPlayers = gs.getPlayers().size();
     int numRounds = PENGUIN_SUBRACT_NUM - numPlayers;
 
-    // TODO: handle the game ending while placing penguins
     for (int ii = 0; ii < numRounds; ii++) {
       for (int jj = 0; jj < numPlayers; jj++) {
+        if (numPlayers <= 1){
+          return gs;
+        }
         PlayerColor currentPlayer = gs.getCurrentPlayer();
 
         PlayerInterface ep = this.colorToExternalPlayer.get(currentPlayer);
 
-        // TODO: add in some timeout to this / handle it - might be done
         Coord attempt;
         try {
           attempt = this.getPlayerPlacement(ep);
           gs.placePenguin(attempt, currentPlayer);
         } catch (Exception e) {
+          System.out.println("Cheat when placing");
+          cheaters.add(ep);
           gs.removeCurrentPlayer();
+          numPlayers--;
           jj--;
           this.broadcastPlayerRemoved(currentPlayer);
           continue;
@@ -169,13 +164,14 @@ public class HexReferee implements Referee {
 
       PlayerInterface ep = this.colorToExternalPlayer.get(currentPlayer);
 
-      // TODO: add timeout - might be done
       Move attempt;
 
       try {
         attempt  = this.getPlayerMove(ep);
         gt = gt.getNextGameTree(attempt);
       } catch (Exception e) {
+        System.out.println("Cheat when moving");
+        cheaters.add(ep);
         gs.removeCurrentPlayer();
         this.broadcastPlayerRemoved(currentPlayer);
         continue;
@@ -193,8 +189,14 @@ public class HexReferee implements Referee {
 
 
   // ---- BROADCAST MESSAGES ---- //
+  private void broadcastGameState(GameState gs) {
+    for (PlayerColor color : this.colorToExternalPlayer.keySet()) {
+      PlayerInterface pi = this.colorToExternalPlayer.get(color);
+      pi.receiveInitialGameState(gs.getCopyGameState());
+    }
+  }
+
   private void broadcastPlayerRemoved(PlayerColor removedPlayer) {
-    // TODO: implement
     for (PlayerColor color : this.colorToExternalPlayer.keySet()) {
       PlayerInterface pi = this.colorToExternalPlayer.get(color);
       pi.receivePlayerRemoved(removedPlayer);
@@ -202,7 +204,6 @@ public class HexReferee implements Referee {
   }
 
   private void broadcastPenguinPlacement(Coord loc, PlayerColor color) {
-    // TODO: implement
     for (PlayerColor cc : this.colorToExternalPlayer.keySet()) {
       PlayerInterface pi = this.colorToExternalPlayer.get(cc);
       pi.receivePenguinPlacement(loc, color);
@@ -210,27 +211,25 @@ public class HexReferee implements Referee {
   }
 
   private void broadcastPenguinMovement(Move move, PlayerColor color) {
-    // TODO: implement
     for (PlayerColor cc : this.colorToExternalPlayer.keySet()) {
       PlayerInterface pi = this.colorToExternalPlayer.get(cc);
       pi.receivePenguinMovement(move, color);
     }
   }
 
-  // TODO: explain/figure out what this does
   static <T> T communicateWithPlayer(Callable<T> action) throws TimeoutException {
     ExecutorService executor = Executors.newCachedThreadPool();
     T result;
     Future<T> future = executor.submit(action);
     try {
-      result = future.get(5, TimeUnit.SECONDS);
+      result = future.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
     } catch (Exception e) {
+      System.out.println("timeout");
       throw new TimeoutException("hit it");
     } finally {
       // this will cancel execution if there is a timeout
       future.cancel(true);
     }
-
     return result;
   }
 

@@ -3,6 +3,7 @@ package com.player;
 import com.fish.externalplayer.PlayerInterface;
 import com.fish.game.Move;
 import com.fish.model.Coord;
+import com.fish.model.state.GameStage;
 import com.fish.model.state.GameState;
 import com.fish.model.state.PlayerColor;
 import com.player.minimax.MinimaxStrategy;
@@ -19,9 +20,11 @@ public class HousePlayer implements PlayerInterface {
 
   private int depth;
   private GameState gs;
+  private String name;
 
-  public HousePlayer(int depth) {
+  public HousePlayer(int depth, String name) {
     this.depth = depth;
+    this.name = name;
   }
 
 
@@ -37,6 +40,9 @@ public class HousePlayer implements PlayerInterface {
   @Override
   public Move getPengiunMovement() {
     if (this.gs != null) {
+      if (this.gs.getGameStage() != GameStage.IN_PLAY) {
+        this.gs.startPlay();
+      }
       return MinimaxStrategy.findCurrentPlayersBestMove(this.gs, this.depth);
     }
 
@@ -55,6 +61,9 @@ public class HousePlayer implements PlayerInterface {
 
   @Override
   public void receivePenguinMovement(Move move, PlayerColor color) {
+    if (this.gs.getGameStage() != GameStage.IN_PLAY) {
+      this.gs.startPlay();
+    }
     this.gs.movePenguin(move.getOrigin(), move.getDestination());
   }
 
@@ -67,5 +76,10 @@ public class HousePlayer implements PlayerInterface {
   public void receiveGameOver(List<PlayerColor> winners) {
     // this method does nothing for now - this player does not care or have anything to do once they
     // have received the winners.
+  }
+
+  @Override
+  public String toString() {
+    return this.name + " : " + this.depth;
   }
 }
