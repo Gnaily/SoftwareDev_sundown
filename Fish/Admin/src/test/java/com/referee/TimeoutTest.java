@@ -17,6 +17,8 @@ public class TimeoutTest {
     this.sleepsFor45Seconds();
     System.out.println("done");
   }
+
+
   private void sleepsFor45Seconds() throws TimeoutException, InterruptedException {
     Callable<Integer> task = () -> {
       Thread.sleep(6000);

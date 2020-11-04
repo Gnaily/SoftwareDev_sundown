@@ -204,7 +204,7 @@ public class HexReferee implements Referee {
   private void broadcastPenguinPlacement(Coord loc, PlayerColor color) {
     // TODO: implement
     for (PlayerColor cc : this.colorToExternalPlayer.keySet()) {
-      PlayerInterface pi = this.colorToExternalPlayer.get(color);
+      PlayerInterface pi = this.colorToExternalPlayer.get(cc);
       pi.receivePenguinPlacement(loc, color);
     }
   }
@@ -212,7 +212,7 @@ public class HexReferee implements Referee {
   private void broadcastPenguinMovement(Move move, PlayerColor color) {
     // TODO: implement
     for (PlayerColor cc : this.colorToExternalPlayer.keySet()) {
-      PlayerInterface pi = this.colorToExternalPlayer.get(color);
+      PlayerInterface pi = this.colorToExternalPlayer.get(cc);
       pi.receivePenguinMovement(move, color);
     }
   }
