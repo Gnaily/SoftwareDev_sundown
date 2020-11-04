@@ -139,6 +139,11 @@ public class XTreeTest {
     assertEquals(expectedMove, actualMove);
   }
 
+  @Test
+  public void testFailedAnnettaCase() {
+    
+  }
+
 
   @Test public void moveToJson() {
     JsonArray move = new JsonArray();
@@ -153,6 +158,16 @@ public class XTreeTest {
     move.add(from);
     move.add(to);
     assertEquals(move, XTree.moveToJson(new Move(new Coord(5, 3), new Coord(1, 0))));
+  }
+
+  @Test
+  public void testDetermineTieBreaker() {
+    List<Move> moves = new ArrayList<>(Arrays.asList(new Move(new Coord(0, 1), new Coord(1, 2)),
+        new Move(new Coord(1, 0), new Coord(1, 2))));
+
+    Move finalMove = XTree.determineTieBreaker(moves);
+
+    assertEquals(new Move(new Coord(1, 0), new Coord(1, 2)), finalMove);
   }
 
   @Test public void testMoveToJson() {

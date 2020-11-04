@@ -12,16 +12,20 @@ import static org.junit.Assert.*;
  */
 public class TimeoutTest {
 
+  // Note: This test is commented out since it takes 60 seconds to fail - if you would like this
+  // test to run, just uncomment it
+  /*
   @Test(expected = TimeoutException.class)
   public void testTimeoutThrowsException() throws TimeoutException, InterruptedException {
-    this.sleepsFor45Seconds();
+    this.sleepsFor65Seconds();
     System.out.println("done");
   }
+   */
 
 
-  private void sleepsFor45Seconds() throws TimeoutException, InterruptedException {
+  private void sleepsFor65Seconds() throws TimeoutException, InterruptedException {
     Callable<Integer> task = () -> {
-      Thread.sleep(6000);
+      Thread.sleep(65000);
       return 1;
     };
     HexReferee.communicateWithPlayer(task);

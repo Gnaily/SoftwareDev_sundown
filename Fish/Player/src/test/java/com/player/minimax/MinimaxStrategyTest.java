@@ -133,4 +133,32 @@ public class MinimaxStrategyTest {
     assertEquals(new Move(new Coord(1,0), new Coord(1,2)),
         MinimaxStrategy.findCurrentPlayersBestMove(gs, 2));
   }
+
+  @Test
+  public void testStrategyForHarnessExample() {
+    int[][] board = {{1, 1, 0, 0, 1, 1, 1}, {1, 1, 0, 0, 1, 1, 1}, {1, 1, 0, 0, 0, 1, 1}};
+    GameBoard gb = new HexGameBoard(board);
+    GameState gs = new HexGameState();
+
+    List<InternalPlayer> players = new ArrayList<>();
+
+    players.add(new HexPlayer(PlayerColor.RED));
+    players.add(new HexPlayer(PlayerColor.WHITE));
+    players.add(new HexPlayer(PlayerColor.BROWN));
+
+    gs.initGame(gb, players);
+    gs.placePenguin( new Coord(0,0), PlayerColor.RED);
+    gs.placePenguin( new Coord(0,5), PlayerColor.WHITE);
+    gs.placePenguin( new Coord(0,6), PlayerColor.BROWN);
+    gs.placePenguin( new Coord(0,4), PlayerColor.RED);
+    gs.placePenguin( new Coord(1,5), PlayerColor.WHITE);
+    gs.placePenguin( new Coord(1,6), PlayerColor.BROWN);
+    gs.placePenguin( new Coord(1,4), PlayerColor.RED);
+    gs.placePenguin( new Coord(2,5), PlayerColor.WHITE);
+    gs.placePenguin( new Coord(2,6), PlayerColor.BROWN);
+    gs.startPlay();
+
+    assertEquals(new Move(new Coord(0,0), new Coord(0,1)),
+        MinimaxStrategy.findCurrentPlayersBestMove(gs, 2));
+  }
 }

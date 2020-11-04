@@ -25,6 +25,29 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+/**
+ * Implementation of the Referee class that is used by a tournament manager to run a game of Fish.
+ *
+ * Externally, the tournament manager knows that the runGame method can be invoked by sending the
+ * referee a list of players, and the referee will return back the winners and the cheaters once
+ * the game is completed.
+ *
+ * A player is considered a cheater if:
+ *  - they disconnect/fail to respond to a move request
+ *  - request a valid move/placement for their penguins
+ *  - attempt to move another player's penguins
+ *
+ * The game is terminated once there is only one player left (everyone else cheated) or there are
+ * no more moves for any players.
+ *
+ * To accomplish this, the Referee keeps track of:
+ *  - a list of (external) players who have cheated - this starts empty
+ *  - a map of color to external player - this is how the referee keeps track of in-game colors
+ *     and how to contact/get responses from the corresponding player
+ *
+ * Each time the tournament manager would like to run a new game of fish, they should create a new
+ * instance of this object.
+ */
 public class HexReferee implements Referee {
 
   private List<PlayerInterface> cheaters;
@@ -37,13 +60,25 @@ public class HexReferee implements Referee {
   private static final int TIMEOUT_SECONDS = 60;
 
 
+  /**
+   * Public constructor - does not take any arguments.
+   *
+   * Initializes the cheaters and the map of color->player to both be empty.
+   */
   public HexReferee() {
     this.cheaters = new ArrayList<>();
     this.colorToExternalPlayer = new HashMap<>();
   }
 
-  //Game.getCurrentPlayer -> find the correct player for color -> player.getNextMove();
-
+  /**
+   * Run a game of Fish for the given set of Players. The players passed in are assumed to be ordered
+   * by age (or whatever metric will determine turn order). The game will be run according to the
+   * rules of fish implemented by the state. The referee will use these rules to determine if and
+   * when a player is cheating (as described above).
+   *
+   * @param players an ordered list of players to run a game of fish for
+   * @return the results from this game of fish, containing the winners and the cheaters.
+   */
   public Results runGame(List<PlayerInterface> players) {
     int size = players.size();
 
@@ -73,12 +108,12 @@ public class HexReferee implements Referee {
 
   // ---- GAME SETUP ---- //
 
-  private GameBoard makeGameBoard(int minOneFish) {
+  GameBoard makeGameBoard(int minOneFish) {
     //If desired you may add difficulty to the game here
     return new HexGameBoard(BOARD_ROW, BOARD_COLS, new ArrayList<>(), minOneFish);
   }
 
-  private List<InternalPlayer> makePlayersInternal(List<PlayerInterface> players) {
+  List<InternalPlayer> makePlayersInternal(List<PlayerInterface> players) {
     // list of external players is already ordered by age
     List<InternalPlayer> ips = new ArrayList<>();
     List<PlayerColor> colors = Arrays.asList(PlayerColor.WHITE, PlayerColor.RED, PlayerColor.BLACK, PlayerColor.BROWN);
@@ -90,9 +125,15 @@ public class HexReferee implements Referee {
     return ips;
   }
 
-  // this function also handles creating the link between an external player and who they are inside the
-  //  game
-  private InternalPlayer makeSinglePlayerInternal(PlayerInterface ep, PlayerColor color) {
+  /**
+   * Make an internal player (to be used in a game of fish) as well as update the color->external
+   * player map to include this player's mapping.
+   *
+   * @param ep the external player
+   * @param color the assigned color to this player
+   * @return an internal representation of the given external player
+   */
+  InternalPlayer makeSinglePlayerInternal(PlayerInterface ep, PlayerColor color) {
     this.colorToExternalPlayer.put(color, ep);
     return new HexPlayer(color);
   }
@@ -100,7 +141,17 @@ public class HexReferee implements Referee {
 
   // ---- RUNNING GAME ---- //
 
-  private List<PlayerColor> playGame(GameState gs) {
+  /**
+   * Run each of the phases of fish as well as broadcast moves to the players. This does the following:
+   *  - broadcast the initial gamestate
+   *  - run the placing of penguins
+   *  - run the moving of penguins
+   *  - return the winners of the game once it is over
+   *
+   * @param gs the gamestate to run a game on
+   * @return the winners of this game
+   */
+  List<PlayerColor> playGame(GameState gs) {
     this.broadcastGameState(gs);
 
     // place penguins (we know there are enough spots)
@@ -115,7 +166,7 @@ public class HexReferee implements Referee {
   }
 
   // ---- PLACING PENGUINS PHASE ---- //
-  private GameState runPlacePenguins(GameState gs) {
+  GameState runPlacePenguins(GameState gs) {
     //
     int numPlayers = gs.getPlayers().size();
     int numRounds = PENGUIN_SUBRACT_NUM - numPlayers;
@@ -134,6 +185,7 @@ public class HexReferee implements Referee {
           attempt = this.getPlayerPlacement(ep);
           gs.placePenguin(attempt, currentPlayer);
         } catch (Exception e) {
+//          throw new IllegalArgumentException(e);
           System.out.println("Cheat when placing");
           cheaters.add(ep);
           gs.removeCurrentPlayer();
@@ -149,13 +201,13 @@ public class HexReferee implements Referee {
     return gs;
   }
 
-  private Coord getPlayerPlacement(PlayerInterface pi) throws TimeoutException {
+  Coord getPlayerPlacement(PlayerInterface pi) throws TimeoutException {
     Callable<Coord> task = pi::getPenguinPlacement;
     return communicateWithPlayer(task);
   }
 
   // ---- MOVING PENGUINS PHASE ---- //
-  private GameState runMovingPenguins(GameState gs) {
+  GameState runMovingPenguins(GameState gs) {
 
     GameTree gt = new HexGameTree(gs);
 
@@ -182,41 +234,42 @@ public class HexReferee implements Referee {
     return gt.getState();
   }
 
-  private Move getPlayerMove(PlayerInterface pi) throws TimeoutException {
+  Move getPlayerMove(PlayerInterface pi) throws TimeoutException {
     Callable<Move> task = pi::getPengiunMovement;
     return communicateWithPlayer(task);
   }
 
 
   // ---- BROADCAST MESSAGES ---- //
-  private void broadcastGameState(GameState gs) {
+  void broadcastGameState(GameState gs) {
     for (PlayerColor color : this.colorToExternalPlayer.keySet()) {
       PlayerInterface pi = this.colorToExternalPlayer.get(color);
       pi.receiveInitialGameState(gs.getCopyGameState());
     }
   }
 
-  private void broadcastPlayerRemoved(PlayerColor removedPlayer) {
+  void broadcastPlayerRemoved(PlayerColor removedPlayer) {
     for (PlayerColor color : this.colorToExternalPlayer.keySet()) {
       PlayerInterface pi = this.colorToExternalPlayer.get(color);
       pi.receivePlayerRemoved(removedPlayer);
     }
   }
 
-  private void broadcastPenguinPlacement(Coord loc, PlayerColor color) {
+  void broadcastPenguinPlacement(Coord loc, PlayerColor color) {
     for (PlayerColor cc : this.colorToExternalPlayer.keySet()) {
       PlayerInterface pi = this.colorToExternalPlayer.get(cc);
       pi.receivePenguinPlacement(loc, color);
     }
   }
 
-  private void broadcastPenguinMovement(Move move, PlayerColor color) {
+  void broadcastPenguinMovement(Move move, PlayerColor color) {
     for (PlayerColor cc : this.colorToExternalPlayer.keySet()) {
       PlayerInterface pi = this.colorToExternalPlayer.get(cc);
       pi.receivePenguinMovement(move, color);
     }
   }
 
+  // request a response from a player. If the method fails, it will throw a timeout exception
   static <T> T communicateWithPlayer(Callable<T> action) throws TimeoutException {
     ExecutorService executor = Executors.newCachedThreadPool();
     T result;
