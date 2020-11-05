@@ -20,7 +20,7 @@ public class HexGameTree implements GameTree {
 
   private GameState currentState;
   private List<MoveState> history;
-  private Map<Move, GameState> possibleMoves;
+  //private Map<Move, GameState> possibleMoves;
 
 
   // private Constructor for creating a new GameTree given a list of pr+evious MoveStates and the
@@ -29,7 +29,7 @@ public class HexGameTree implements GameTree {
     this.currentState = gs;
     this.history = moves;
 
-    this.possibleMoves = this.generatePossibleGameStates();
+    //this.possibleMoves = this.generatePossibleGameStates();
   }
 
   /**
@@ -70,7 +70,7 @@ public class HexGameTree implements GameTree {
    */
   @Override
   public Map<Move, GameState> getPossibleGameStates() {
-    return new HashMap<>(this.possibleMoves);
+    return new HashMap<>(this.generatePossibleGameStates());
   }
 
   /**

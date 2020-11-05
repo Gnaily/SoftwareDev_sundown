@@ -8,6 +8,13 @@ import com.referee.Results;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This main method can be used to run a demo game of Fish - ie how the manager might run a
+ * game and then get the results.
+ *
+ * Instead of doing anything useful with the results (ie like determining the next game or recording
+ * player statistics), this prints out the winners and the cheaters to STDOUT.
+ */
 public class DemoGame {
 
   public static void main(String[] args) {

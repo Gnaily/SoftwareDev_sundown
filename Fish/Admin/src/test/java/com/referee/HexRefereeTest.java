@@ -13,6 +13,8 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeoutException;
 
 import static org.junit.Assert.*;
 
@@ -126,7 +128,132 @@ public class HexRefereeTest {
     assertEquals(PlayerColor.RED, pcs.get(1));
   }
 
+  @Test
+  public void testRunPlacingPengiuns() {
+    this.redWhiteRef.broadcastGameState(this.smallStartingGs);
+    GameState resultState = this.redWhiteRef.runPlacePenguins(this.smallStartingGs);
 
+
+    Map<Coord, PlayerColor> locs = resultState.getPenguinLocations();
+
+    assertEquals(PlayerColor.WHITE, locs.get(new Coord(0, 0)));
+    assertEquals(PlayerColor.WHITE, locs.get(new Coord(0, 1)));
+    assertEquals(PlayerColor.WHITE, locs.get(new Coord(0, 2)));
+    assertEquals(PlayerColor.WHITE, locs.get(new Coord(0, 3)));
+    assertEquals(PlayerColor.RED, locs.get(new Coord(1, 0)));
+    assertEquals(PlayerColor.RED, locs.get(new Coord(1, 1)));
+    assertEquals(PlayerColor.RED, locs.get(new Coord(1, 2)));
+    assertEquals(PlayerColor.RED, locs.get(new Coord(1, 3)));
+
+  }
+
+  @Test
+  public void testPlacePenguinsCheater() {
+    HexReferee ref = new HexReferee();
+    GameBoard gb = new HexGameBoard(new int[][] {{1, 1, 1, 1, 1, 3},{1, 1, 1, 1, 0, 2}});
+
+    List<InternalPlayer> ips = ref.makePlayersInternal(
+        Arrays.asList(new Cheater(), new HousePlayer(1, "bill")));
+    this.smallStartingGs = new HexGameState(GameStage.PLACING_PENGUINS, gb, ips);
+
+    //List<PlayerColor> pcs = ref.playGame(this.smallStartingGs);
+    ref.broadcastGameState(this.smallStartingGs);
+    GameState other = ref.runPlacePenguins(this.smallStartingGs);
+
+
+    assertEquals(1, other.getPlayers().size());
+    assertTrue(other.isGameOver());
+  }
+
+  @Test(expected = TimeoutException.class)
+  public void testGetPlacementCheater() throws TimeoutException {
+    this.redWhiteRef.getPlayerPlacement(new Cheater());
+  }
+
+  @Test
+  public void testGetPengiunPlacementValid() throws TimeoutException {
+    HexReferee ref = new HexReferee();
+    GameBoard gb = new HexGameBoard(new int[][] {{2, 2, 2, 1, 1, 3},{3, 3, 1, 1, 0, 2}});
+
+    PlayerInterface pi = new HousePlayer(1, "bella");
+    List<InternalPlayer> ips = ref.makePlayersInternal(
+        Arrays.asList(pi, new HousePlayer(1, "bill")));
+    this.smallStartingGs = new HexGameState(GameStage.PLACING_PENGUINS, gb, ips);
+
+    //List<PlayerColor> pcs = ref.playGame(this.smallStartingGs);
+
+    //assertEquals(1, pcs.size());
+
+    //assertEquals(PlayerColor.RED, pcs.get(0));
+    ref.broadcastGameState(this.smallStartingGs);
+    Coord loc = ref.getPlayerPlacement(pi);
+
+    assertEquals(new Coord(1, 2), loc);
+  }
+
+  @Test
+  public void testRunMovingPengiuns() {
+    this.redWhiteRef.broadcastGameState(this.smallStartingGs);
+    GameState resultState = this.redWhiteRef.runPlacePenguins(this.smallStartingGs);
+    resultState.startPlay();
+    GameState finalState = this.redWhiteRef.runMovingPenguins(resultState);
+
+
+    Map<Coord, PlayerColor> locs = finalState.getPenguinLocations();
+
+    assertEquals(PlayerColor.WHITE, locs.get(new Coord(0, 0)));
+    assertEquals(PlayerColor.WHITE, locs.get(new Coord(0, 1)));
+    assertEquals(PlayerColor.WHITE, locs.get(new Coord(0, 5)));
+    assertEquals(PlayerColor.WHITE, locs.get(new Coord(0, 4)));
+    assertEquals(PlayerColor.RED, locs.get(new Coord(1, 0)));
+    assertEquals(PlayerColor.RED, locs.get(new Coord(1, 1)));
+    assertEquals(PlayerColor.RED, locs.get(new Coord(1, 5)));
+    assertEquals(PlayerColor.RED, locs.get(new Coord(1, 2)));
+
+  }
+
+  @Test
+  public void testMovePenguinsCheater() {
+    HexReferee ref = new HexReferee();
+    GameBoard gb = new HexGameBoard(new int[][] {{1, 1, 1, 1, 1, 3},{1, 1, 1, 1, 0, 2}});
+
+    List<InternalPlayer> ips = ref.makePlayersInternal(
+        Arrays.asList(new Cheater(), new HousePlayer(1, "bill")));
+    this.smallStartingGs = new HexGameState(GameStage.PLACING_PENGUINS, gb, ips);
+    this.smallStartingGs.placePenguin(new Coord(0, 0), PlayerColor.WHITE);
+
+    this.smallStartingGs.startPlay();
+    //List<PlayerColor> pcs = ref.playGame(this.smallStartingGs);
+    ref.broadcastGameState(this.smallStartingGs);
+    GameState other = ref.runMovingPenguins(this.smallStartingGs);
+
+
+    assertEquals(1, other.getPlayers().size());
+    assertEquals(PlayerColor.RED, other.getPlayers().get(0).getColor());
+    assertTrue(other.isGameOver());
+  }
+
+  @Test(expected = TimeoutException.class)
+  public void testGetMovementCheater() throws TimeoutException {
+    this.redWhiteRef.getPlayerMove(new Cheater());
+  }
+
+  @Test
+  public void testGetMovementNoCheat() throws TimeoutException {
+    HexReferee ref = new HexReferee();
+    GameBoard gb = new HexGameBoard(new int[][] {{2, 2, 2, 1, 1, 3},{3, 3, 1, 1, 0, 2}});
+
+    PlayerInterface pi = new HousePlayer(1, "bella");
+    List<InternalPlayer> ips = ref.makePlayersInternal(
+        Arrays.asList(pi, new HousePlayer(1, "bill")));
+    this.smallStartingGs = new HexGameState(GameStage.PLACING_PENGUINS, gb, ips);
+    this.smallStartingGs.placePenguin(new Coord(0, 0), PlayerColor.WHITE);
+    this.smallStartingGs.startPlay();
+    ref.broadcastGameState(this.smallStartingGs);
+    Move move = ref.getPlayerMove(pi);
+
+    assertEquals(new Move(new Coord(0, 0), new Coord(0, 1)), move);
+  }
 
 
   // cheater implementation that always fails to give a valid move.
@@ -134,11 +261,11 @@ public class HexRefereeTest {
 
 
     @Override public Coord getPenguinPlacement() {
-      return new Coord(-1, -1);
+      throw new IllegalArgumentException();
     }
 
     @Override public Move getPengiunMovement() {
-      return new Move(new Coord(-1, -1), new Coord(0, 0));
+      throw new IllegalArgumentException();
     }
 
     @Override public void receivePlayerRemoved(PlayerColor color) {

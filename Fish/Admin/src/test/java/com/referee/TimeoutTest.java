@@ -13,7 +13,9 @@ import static org.junit.Assert.*;
 public class TimeoutTest {
 
   // Note: This test is commented out since it takes 60 seconds to fail - if you would like this
-  // test to run, just uncomment it
+  // test to run, just uncomment it. This demonstrates the functionality of our timeout for
+  // when we call on players to get an action
+
   /*
   @Test(expected = TimeoutException.class)
   public void testTimeoutThrowsException() throws TimeoutException, InterruptedException {

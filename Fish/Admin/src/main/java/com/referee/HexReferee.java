@@ -186,7 +186,6 @@ public class HexReferee implements Referee {
           gs.placePenguin(attempt, currentPlayer);
         } catch (Exception e) {
 //          throw new IllegalArgumentException(e);
-          System.out.println("Cheat when placing");
           cheaters.add(ep);
           gs.removeCurrentPlayer();
           numPlayers--;
@@ -201,7 +200,7 @@ public class HexReferee implements Referee {
     return gs;
   }
 
-  private Coord getPlayerPlacement(PlayerInterface pi) throws TimeoutException {
+  Coord getPlayerPlacement(PlayerInterface pi) throws TimeoutException {
     Callable<Coord> task = pi::getPenguinPlacement;
     return communicateWithPlayer(task);
   }
@@ -222,7 +221,6 @@ public class HexReferee implements Referee {
         attempt  = this.getPlayerMove(ep);
         gt = gt.getNextGameTree(attempt);
       } catch (Exception e) {
-        System.out.println("Cheat when moving");
         cheaters.add(ep);
         gs.removeCurrentPlayer();
         this.broadcastPlayerRemoved(currentPlayer);
@@ -234,7 +232,7 @@ public class HexReferee implements Referee {
     return gt.getState();
   }
 
-  private Move getPlayerMove(PlayerInterface pi) throws TimeoutException {
+  Move getPlayerMove(PlayerInterface pi) throws TimeoutException {
     Callable<Move> task = pi::getPengiunMovement;
     return communicateWithPlayer(task);
   }
@@ -269,7 +267,20 @@ public class HexReferee implements Referee {
     }
   }
 
-  // request a response from a player. If the method fails, it will throw a timeout exception
+  /**
+   * This method uses threads/ futures to call upon a move from a player. It uses the Callable interface
+   * (which denotes what method to call/return a value from) and creates an executor. The method then
+   * allows for the amount of time specified in TIMEOUT_SECONDS for the player to respond with a move.
+   * If no response is had or another exception is thrown, the referee will receive a timeout exception
+   * from this method
+   *
+   * @param action What action to call in a separate thread and wait for a response from. This is
+   *               needed so that if a player disconnects or their algorithm never terminates, we will
+   *               be able to detect that without blocking the main game thread.
+   * @param <T> The type that the action returns when called
+   * @return The result of the action
+   * @throws TimeoutException if the action fails to execute in a reasonable amount of time.
+   */
   static <T> T communicateWithPlayer(Callable<T> action) throws TimeoutException {
     ExecutorService executor = Executors.newCachedThreadPool();
     T result;
@@ -277,7 +288,6 @@ public class HexReferee implements Referee {
     try {
       result = future.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
     } catch (Exception e) {
-      System.out.println("timeout");
       throw new TimeoutException("hit it");
     } finally {
       // this will cancel execution if there is a timeout

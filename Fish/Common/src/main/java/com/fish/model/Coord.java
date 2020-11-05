@@ -62,4 +62,9 @@ public class Coord {
 
     return code;
   }
+
+  @Override
+  public String toString() {
+    return this.xx + " : " + this.yy;
+  }
 }
