@@ -249,10 +249,11 @@ public class MinMaxAlgorithmTest {
 
   @Test
   public void addFinalMove() {
+    this.gt1 = this.gt1.getNextGameTree(new Move(new Coord(0, 5), new Coord(0, 3)));
     List<MoveValue> scores = this.fms.addFinalMove(this.gt1, new ArrayList<>());
 
     assertEquals(1, scores.size());
-    assertEquals(new Move(new Coord(0, 5), new Coord(0, 1)), scores.get(0).getMove());
+    assertEquals(new Move(new Coord(0, 5), new Coord(0, 3)), scores.get(0).getMove());
     assertEquals(2, scores.get(0).getValue());
   }
 
@@ -271,6 +272,7 @@ public class MinMaxAlgorithmTest {
 
     gs.startPlay();
     this.gt2 = new HexGameTree(gs);
+    this.gt2 = this.gt2.getNextGameTree(new Move(new Coord(0, 5), new Coord(0, 4)));
 
     List<MoveValue> scores = new ArrayList<>();
     scores.add(new MoveValue(new Move(new Coord(1, 1), new Coord(1, 2)), 3));
@@ -281,7 +283,7 @@ public class MinMaxAlgorithmTest {
     assertEquals(new Move(new Coord(1, 1), new Coord(1, 2)), scores.get(0).getMove());
     assertEquals(3, scores.get(0).getValue());
 
-    assertEquals(new Move(new Coord(1, 2), new Coord(1, 0)), scores.get(1).getMove());
-    assertEquals(5, scores.get(1).getValue());
+    assertEquals(new Move(new Coord(0, 5), new Coord(0, 4)), scores.get(1).getMove());
+    assertEquals(2, scores.get(1).getValue());
   }
 }
