@@ -122,7 +122,8 @@ public class MinMaxAlgorithm implements IFunc<List<MoveValue>> {
 
     GameTree gt = gameTree.getNextGameTree(m);
     int score = gt.getState().getScoreBoard().get(this.startingColor);
-    scores.add(new MoveValue(m, score));
+    Move previousMove = gameTree.getPreviousMoves().get(gameTree.getPreviousMoves().size() - 1).getMove();
+    scores.add(new MoveValue(previousMove, score));
     return scores;
   }
 

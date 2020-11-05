@@ -201,7 +201,7 @@ public class HexReferee implements Referee {
     return gs;
   }
 
-  Coord getPlayerPlacement(PlayerInterface pi) throws TimeoutException {
+  private Coord getPlayerPlacement(PlayerInterface pi) throws TimeoutException {
     Callable<Coord> task = pi::getPenguinPlacement;
     return communicateWithPlayer(task);
   }
@@ -234,7 +234,7 @@ public class HexReferee implements Referee {
     return gt.getState();
   }
 
-  Move getPlayerMove(PlayerInterface pi) throws TimeoutException {
+  private Move getPlayerMove(PlayerInterface pi) throws TimeoutException {
     Callable<Move> task = pi::getPengiunMovement;
     return communicateWithPlayer(task);
   }
