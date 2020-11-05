@@ -8,6 +8,12 @@
       <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
+    <content url="file://$MODULE_DIR$/../Common/src/main/java">
+      <sourceFolder url="file://$MODULE_DIR$/../Common/src/main/java" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../Player/src/main/java">
+      <sourceFolder url="file://$MODULE_DIR$/../Player/src/main/java" isTestSource="false" />
+    </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.8.5" level="project" />
