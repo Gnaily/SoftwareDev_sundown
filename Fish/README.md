@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/images/Logo.png" width="300"/>
+    <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/Other/images/Logo.png" width="300"/>
     <h1>Sundown | Game System</h1>
 </div>
 
