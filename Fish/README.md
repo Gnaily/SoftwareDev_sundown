@@ -135,19 +135,6 @@ Common/Other/src/main/java/com.fish/
 ```
 XJson contains two static methods that aid in the processing of JSON input, XBoard processes JSON input that represents game boards, and likewise XState processes a JSON representations of a State, performs one action (moves the first player's first penguin) and either returns false or converts the resulting state back into JSON and returns that.
 
-
-### iii. Maintaining Repository <a name="maintain"></a>
-The main functionality of the overall game system lies in four primary interfaces: Tile, GameBoard, GameState, and GameTree. The individual functionality of each can be understood by examining method signatures. Use the following interface summaries to pinpoint functionatliy you wish to examine:
-
-<div align="center">
-  <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/Other/images/InterfaceTile.png"/>
-  <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/Other/images/InterfaceGameBoard.png"/>
-  <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/Other/images/InterfaceGameStage.png" width="400"/>
-  <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/Other/images/InterfaceGameTree.png" width="375"/>
-</div>
-**Note** There is a typo in the GameState diagram - its title says GameStage but it should be GameState.
-
-
 **Player**
 
 ```
@@ -169,6 +156,7 @@ by the referee.
 - `XStrategy.java` A Test harness main method for running the sample strategy.
 
 **Minimax**
+
 The minimax package defines a sample algorithm that a hacker could use when
 implementing a decision-making algorithm for placing and moving penguins.
 
@@ -249,6 +237,35 @@ of a referee to investors. Currently, it runs a game for two players - one who l
 ahead a single move according to the minimax Strategy, and one who looks ahead two.
 Once the game is run, the method prints out the results to the console. This
 demo shows how the tournament manager might use the referee to run a game in the future.
+
+
+### iii. Maintaining Repository <a name="maintain"></a>
+The main functionality of the overall game system lies in four primary interfaces: Tile, GameBoard, GameState, and GameTree. The individual functionality of each can be understood by examining method signatures. Use the following interface summaries to pinpoint functionatliy you wish to examine:
+
+<div align="center">
+  <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/Other/images/InterfaceTile.png"/>
+  <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/Other/images/InterfaceGameBoard.png"/>
+  <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/Other/images/InterfaceGameStage.png" width="400"/>
+  <img src="https://github.ccs.neu.edu/CS4500-F20/sundown/blob/master/Fish/Common/Other/images/InterfaceGameTree.png" width="375"/>
+</div>
+**Note** There is a typo in the GameState diagram - its title says GameStage but it should be GameState.
+
+Beyond the overall game found in `Common`, there are two other important directories for
+the fish project: `Admin` and `Player`
+
+The `Player` project contains sample implementations of the type of code a hacker
+may write to participate in a game of Fish remotely. Currently, there exists one
+sample algorithm (`MinimaxStrategy.java`) and a sample implementation of the `PlayerInterface`
+that utilizes that algorithm. The sample implementation is written as a `HousePlayer`,
+to demonstrate how the referee might interact with a player added to the game
+by company running the tournament in order to give them a chance to win.
+
+The `Admin` project contains software components concerned with running a Fishy
+tournament for a group of internal and external players. It defines a Referee
+that can be used by the tournament manager to run a game of Fish for a given set
+of players and be given back the results from the game. It also contains an
+interface for the Tournament Manager, that once implemented, will be capable of
+running an entire Tournament of Fish.
 
 
 ### iv. Unit Testing <a name="testing"></a>
