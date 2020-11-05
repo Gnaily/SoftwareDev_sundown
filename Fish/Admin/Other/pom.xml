@@ -37,8 +37,8 @@
                         </goals>
                         <configuration>
                             <sources>
-                                <source>../Common/src/main/java</source>
-                                <source>../Player/src/main/java</source>
+                                <source>../../Common/Other/src/main/java</source>
+                                <source>../../Player/Other/src/main/java</source>
                             </sources>
                         </configuration>
                     </execution>
