@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeoutException;
 
 import static org.junit.Assert.*;
@@ -24,6 +25,7 @@ public class HexRefereeTest {
   HexReferee redWhiteRef;
 
   GameState smallStartingGs;
+  List<PlayerInterface> ips;
 
   @Before
   public void setUp() throws Exception {
@@ -32,9 +34,9 @@ public class HexRefereeTest {
 
     GameBoard gb = new HexGameBoard(new int[][] {{1, 1, 1, 1, 1, 3},{1, 1, 1, 1, 0, 2}});
 
-    List<InternalPlayer> ips = this.redWhiteRef.makePlayersInternal(
-        Arrays.asList(new HousePlayer(1, "fred"), new HousePlayer(1, "bill")));
-    this.smallStartingGs = new HexGameState(GameStage.PLACING_PENGUINS, gb, ips);
+
+    this.ips = Arrays.asList(new HousePlayer(1, "fred"), new HousePlayer(1, "bill"));
+    this.smallStartingGs = new HexGameState(GameStage.PLACING_PENGUINS, gb, this.redWhiteRef.makePlayersInternal(this.ips));
 
   }
 
@@ -253,6 +255,97 @@ public class HexRefereeTest {
     Move move = ref.getPlayerMove(pi);
 
     assertEquals(new Move(new Coord(0, 0), new Coord(0, 1)), move);
+  }
+
+  //TODO: test broadcast methods
+
+  @Test
+  public void testBroadastGameState() {
+    try {
+      this.ips.get(0).getPengiunMovement();
+      fail();
+    }
+    catch (Exception e) {
+      // means the test passed
+    }
+    this.redWhiteRef.broadcastGameState(this.smallStartingGs);
+
+    assertEquals(new Coord(0, 0), this.ips.get(0).getPenguinPlacement());
+    assertEquals(new Coord(0, 0), this.ips.get(1).getPenguinPlacement());
+  }
+
+  @Test
+  public void testBroadcastPenguinPlacement() {
+    try {
+      this.ips.get(0).getPengiunMovement();
+      fail();
+    }
+    catch (Exception e) {
+      // means the test passed
+    }
+    this.redWhiteRef.broadcastGameState(this.smallStartingGs);
+    this.redWhiteRef.broadcastPenguinPlacement(new Coord(0, 0), PlayerColor.WHITE);
+    assertEquals(new Coord(1, 0), this.ips.get(0).getPenguinPlacement());
+    assertEquals(new Coord(1, 0), this.ips.get(1).getPenguinPlacement());
+  }
+
+  @Test
+  public void testBroadcastPenguinMovement() {
+    try {
+      this.ips.get(0).getPengiunMovement();
+      fail();
+    }
+    catch (Exception e) {
+      // means the test passed
+    }
+    this.redWhiteRef.broadcastGameState(this.smallStartingGs);
+    this.redWhiteRef.broadcastPenguinPlacement(new Coord(0, 0), PlayerColor.WHITE);
+    this.redWhiteRef.broadcastPenguinPlacement(new Coord(1, 0), PlayerColor.RED);
+
+    // checks that the best move changes after the referee broadcasts a move to the players
+    assertEquals(new Move(new Coord(0, 0), new Coord(0, 1)),
+        this.ips.get(0).getPengiunMovement());
+    this.redWhiteRef.broadcastPenguinMovement(new Move(new Coord(0, 0), new Coord(0, 2)), PlayerColor.WHITE);
+    assertEquals(new Move(new Coord(1, 0), new Coord(0, 1)),
+        this.ips.get(0).getPengiunMovement());
+  }
+
+  @Test
+  public void testBroadcastPlayerRemoved() {
+    try {
+      this.ips.get(0).getPengiunMovement();
+      fail();
+    }
+    catch (Exception e) {
+      // means the test passed
+    }
+    this.redWhiteRef.broadcastGameState(this.smallStartingGs);
+    this.redWhiteRef.broadcastPenguinPlacement(new Coord(0, 0), PlayerColor.WHITE);
+    this.redWhiteRef.broadcastPenguinPlacement(new Coord(1, 0), PlayerColor.RED);
+
+    // checks that it is the next player's turn once the starting player is removed from the game.
+    // although normally this would cause the game to end (since there is one player left), since the
+    // referee is asking for a move the player will still be able to give it
+    this.redWhiteRef.broadcastPlayerRemoved(PlayerColor.WHITE);
+    assertEquals(new Move(new Coord(1, 0), new Coord(0, 1)),this.ips.get(0).getPengiunMovement());
+  }
+
+
+
+  @Test(expected = TimeoutException.class)
+  public void testCommunicateException() throws TimeoutException {
+    Callable<Integer> exceptor = () -> {
+      throw new IllegalArgumentException();
+    };
+
+    HexReferee.communicateWithPlayer(exceptor);
+  }
+
+  @Test
+  public void testCommunicateWorking() throws TimeoutException {
+    Callable<Integer> exceptor = () -> 2 * 5;
+
+    assertEquals(Integer.valueOf(10), HexReferee.communicateWithPlayer(exceptor));
   }
 
 

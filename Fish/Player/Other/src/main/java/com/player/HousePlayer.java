@@ -67,6 +67,13 @@ public class HousePlayer implements PlayerInterface {
     this.gs.movePenguin(move.getOrigin(), move.getDestination());
   }
 
+  /**
+   * Recieve the initial gamestate for this game of Fish. The implementation of this class assumes
+   * that this is a mutable version of the gamestate that they are able to manipulate for testing
+   * and planning purposes.
+   *
+   * @param gs the starting gamestate (with no pengiuns) passed to the player by the referee.
+   */
   @Override
   public void receiveInitialGameState(GameState gs) {
     this.gs = gs;
@@ -78,6 +85,7 @@ public class HousePlayer implements PlayerInterface {
     // have received the winners.
   }
 
+  // Used for outputting the results of a test game of fish.
   @Override
   public String toString() {
     return this.name + " : " + this.depth;

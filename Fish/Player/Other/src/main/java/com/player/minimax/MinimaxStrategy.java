@@ -72,6 +72,11 @@ public class MinimaxStrategy {
    *   out of all children nodes
    *  - if it is the starting player's turn, chose the move that results in the them having the most
    *   points out of all children nodes
+   *
+   * Note: in our implementation of GameState, players who do not have any moves are skipped automatically.
+   * As a result, the gameState passed in will always have a move available for the current player
+   * assuming that it is a valid gamestate.
+   *
    * @param gs The Gamestate to evaluate the minimax function on
    * @param nn The number of moves to make on behalf of the starting player
    * @return The best move for the player as determined by the algorithm
