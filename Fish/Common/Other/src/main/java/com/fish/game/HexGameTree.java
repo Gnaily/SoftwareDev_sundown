@@ -15,12 +15,15 @@ import java.util.Map;
  *  - List<MoveState> history: All previous states and the moves made from them
  *  - Map<Move, GameState>: All potential gamestates stemming from the current state paired with
  *      the move required to reach that state.
+ *
+ *
+ * If a player does not have any moves the GameState skips them automatically,
+ * such that the GameTree will NOT contain a node for that player's turn.
  */
 public class HexGameTree implements GameTree {
 
   private GameState currentState;
   private List<MoveState> history;
-  //private Map<Move, GameState> possibleMoves;
 
 
   // private Constructor for creating a new GameTree given a list of pr+evious MoveStates and the
@@ -65,6 +68,8 @@ public class HexGameTree implements GameTree {
   /**
    * Returns a copy of all possible gamestates reachable from the current state. The copy only
    * contains states reachable at the current player's turn.
+   *
+   * If
    *
    * @return a list of possible states
    */

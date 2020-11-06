@@ -223,7 +223,7 @@ public class HexReferee implements Referee {
    * --eliminating players if they make an invalid move of any kind
    * --broadcasts the movement to all players to update them
    * @param gs the current gamestate
-   * @return the updated GameState after moving all penguins
+   * @return the updated GameState after moving all penguins  
    */
   GameState runMovingPenguins(GameState gs) {
 
