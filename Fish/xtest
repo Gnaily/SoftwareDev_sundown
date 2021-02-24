@@ -1,8 +1,4 @@
 #!/bin/bash
 
-mvn -f ./Common/Other/pom.xml test -q -Dmy.exe=XTest
-
-mvn -f ./Player/Other/pom.xml test -q
-
-mvn -f ./Admin/Other/pom.xml test -q
+mvn -f ./Common/pom.xml test -q
 

@@ -1,0 +1,3 @@
+#!/bin/bash
+
+java -jar ./Common/target/Fish-1.0.jar $@
